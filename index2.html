@@ -297,11 +297,15 @@
             container.innerHTML = '';
 
             data.forEach(item => {
-                if (item.result && item.result.text) {
-                    const signal = parseSignalText(item.result.text);
-                    if (signal) {
-                        container.appendChild(createSignalCard(signal));
-                    }
+                if (item.result && Array.isArray(item.result)) {
+                    item.result.forEach(message => {
+                        if (message.text) {
+                            const signal = parseSignalText(message.text);
+                            if (signal) {
+                                container.appendChild(createSignalCard(signal));
+                            }
+                        }
+                    });
                 }
             });
 
