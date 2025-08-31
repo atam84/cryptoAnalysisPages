@@ -17,6 +17,89 @@
             min-height: 100vh;
             color: #e1e5e9;
             line-height: 1.4;
+            padding-top: 80px;
+        }
+
+        .top-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(26, 29, 41, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #2d3748;
+            padding: 1rem;
+            z-index: 1000;
+        }
+
+        .top-bar-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .signals-count {
+            background: #2d3748;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #e1e5e9;
+        }
+
+        .search-container {
+            flex: 1;
+            max-width: 300px;
+        }
+
+        .search-input {
+            width: 100%;
+            background: #2d3748;
+            border: 1px solid #4a5568;
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            color: #e1e5e9;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .search-input::placeholder {
+            color: #9ca3af;
+        }
+
+        .search-input:focus {
+            border-color: #22c55e;
+            box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+        }
+
+        .refresh-btn {
+            background: #22c55e;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .refresh-btn:hover {
+            background: #16a34a;
+            transform: translateY(-1px);
+        }
+
+        .refresh-btn:active {
+            transform: translateY(0);
+        }
+
+        .refresh-btn:disabled {
+            background: #4a5568;
+            cursor: not-allowed;
+            transform: none;
         }
 
         .container {
@@ -238,10 +321,46 @@
             .container {
                 padding: 0.75rem;
             }
+
+            .top-bar-content {
+                flex-direction: column;
+                gap: 0.75rem;
+                align-items: stretch;
+            }
+
+            .search-container {
+                max-width: none;
+                order: 2;
+            }
+
+            .signals-count {
+                order: 1;
+                text-align: center;
+            }
+
+            .refresh-btn {
+                order: 3;
+                align-self: center;
+            }
         }
     </style>
 </head>
 <body>
+    <div class="top-bar">
+        <div class="top-bar-content">
+            <div class="signals-count" id="signals-count">0 Signals</div>
+            <div class="search-container">
+                <input 
+                    type="text" 
+                    class="search-input" 
+                    id="search-input" 
+                    placeholder="Search by crypto pair (e.g., SOL, BTC)..."
+                >
+            </div>
+            <button class="refresh-btn" id="refresh-btn">Refresh</button>
+        </div>
+    </div>
+
     <div class="container">
         <div class="header">
             <h1>📈 Trading Signals</h1>
@@ -261,40 +380,104 @@
     </div>
 
     <script>
+        let allSignals = [];
+        let isLoading = false;
+
         async function loadTradingData() {
+            if (isLoading) return;
+            
+            isLoading = true;
+            const refreshBtn = document.getElementById('refresh-btn');
+            const loading = document.getElementById('loading');
+            const error = document.getElementById('error');
+            
+            refreshBtn.disabled = true;
+            refreshBtn.textContent = 'Loading...';
+            loading.style.display = 'block';
+            error.style.display = 'none';
+            document.getElementById('signals-container').style.display = 'none';
+            
             try {
-                const response = await fetch('data.json');
+                const response = await fetch('data.json?t=' + Date.now()); // Cache busting
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 const data = await response.json();
-                displaySignals(data);
+                allSignals = parseAllSignals(data);
+                displayFilteredSignals(allSignals);
+                updateSignalCount(allSignals.length);
             } catch (error) {
                 console.error('Error loading trading data:', error);
-                document.getElementById('loading').style.display = 'none';
                 document.getElementById('error').style.display = 'block';
+                updateSignalCount(0);
+            } finally {
+                loading.style.display = 'none';
+                isLoading = false;
+                refreshBtn.disabled = false;
+                refreshBtn.textContent = 'Refresh';
             }
         }
 
-        function displaySignals(data) {
-            const container = document.getElementById('signals-container');
-            container.innerHTML = '';
-
+        function parseAllSignals(data) {
+            const signals = [];
             data.forEach(item => {
                 if (item.result && Array.isArray(item.result)) {
                     item.result.forEach(message => {
                         if (message.text) {
                             const signal = parseSignalText(message.text, message.date);
                             if (signal) {
-                                container.appendChild(createSignalCard(signal));
+                                signals.push(signal);
                             }
                         }
                     });
                 }
             });
+            return signals.sort((a, b) => b.timestamp - a.timestamp); // Sort by newest first
+        }
 
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('signals-container').style.display = 'grid';
+        function displayFilteredSignals(signals) {
+            const container = document.getElementById('signals-container');
+            container.innerHTML = '';
+
+            signals.forEach(signal => {
+                container.appendChild(createSignalCard(signal));
+            });
+
+            container.style.display = signals.length > 0 ? 'grid' : 'none';
+            if (signals.length === 0 && !isLoading) {
+                container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #9ca3af; padding: 2rem;">No signals found matching your search.</div>';
+                container.style.display = 'grid';
+            }
+        }
+
+        function updateSignalCount(count) {
+            const countElement = document.getElementById('signals-count');
+            countElement.textContent = `${count} Signal${count !== 1 ? 's' : ''}`;
+        }
+
+        function setupSearch() {
+            const searchInput = document.getElementById('search-input');
+            let searchTimeout;
+
+            searchInput.addEventListener('input', (e) => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    const searchTerm = e.target.value.trim().toLowerCase();
+                    
+                    if (!searchTerm) {
+                        displayFilteredSignals(allSignals);
+                        updateSignalCount(allSignals.length);
+                        return;
+                    }
+
+                    const filteredSignals = allSignals.filter(signal => 
+                        signal.pair && signal.pair.toLowerCase().includes(searchTerm)
+                    );
+                    
+                    displayFilteredSignals(filteredSignals);
+                    updateSignalCount(filteredSignals.length);
+                }, 300);
+            });
         }
 
         function parseSignalText(text, timestamp) {
@@ -452,8 +635,14 @@
             return card;
         }
 
-        // Load data when page loads
-        document.addEventListener('DOMContentLoaded', loadTradingData);
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', () => {
+            loadTradingData();
+            setupSearch();
+            
+            // Setup refresh button
+            document.getElementById('refresh-btn').addEventListener('click', loadTradingData);
+        });
     </script>
 </body>
 </html>
