@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Signals Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            color: rgba(255,255,255,0.8);
+            font-size: 1.2rem;
+        }
+
+        .signals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .signal-card {
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .signal-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.15);
+        }
+
+        .signal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .crypto-pair {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .trend-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+        }
+
+        .trend-bullish {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+        }
+
+        .trend-bearish {
+            background: linear-gradient(135deg, #f44336, #d32f2f);
+            color: white;
+        }
+
+        .price-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .price-item {
+            text-align: center;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+
+        .price-item .label {
+            font-size: 0.8rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .price-item .value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .levels-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .levels-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+
+        .levels-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .level-item {
+            padding: 1rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .support-level {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            border-left: 4px solid #2196F3;
+        }
+
+        .resistance-level {
+            background: linear-gradient(135deg, #fce4ec, #f8bbd9);
+            border-left: 4px solid #e91e63;
+        }
+
+        .trading-recommendation {
+            background: linear-gradient(135deg, #f3e5f5, #e1bee7);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .recommendation-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .action-type {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-right: 1rem;
+        }
+
+        .action-buy {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .action-sell {
+            background: #f44336;
+            color: white;
+        }
+
+        .recommendation-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .recommendation-item {
+            text-align: center;
+            padding: 0.75rem;
+            background: rgba(255,255,255,0.7);
+            border-radius: 8px;
+        }
+
+        .analysis-text {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(255,255,255,0.5);
+            border-radius: 8px;
+            font-style: italic;
+            color: #555;
+        }
+
+        .loading {
+            text-align: center;
+            color: white;
+            font-size: 1.2rem;
+            padding: 3rem;
+        }
+
+        .error {
+            text-align: center;
+            color: #ff6b6b;
+            background: rgba(255,255,255,0.9);
+            padding: 2rem;
+            border-radius: 12px;
+            margin: 2rem auto;
+            max-width: 500px;
+        }
+
+        @media (max-width: 768px) {
+            .signals-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📈 Trading Signals</h1>
+            <p>Live Cryptocurrency Trading Analysis Dashboard</p>
+        </div>
+        
+        <div id="loading" class="loading">
+            Loading trading data...
+        </div>
+        
+        <div id="error" class="error" style="display: none;">
+            Failed to load trading data. Please check your data.json file.
+        </div>
+        
+        <div id="signals-container" class="signals-grid" style="display: none;">
+        </div>
+    </div>
+
+    <script>
+        async function loadTradingData() {
+            try {
+                const response = await fetch('data.json');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                displaySignals(data);
+            } catch (error) {
+                console.error('Error loading trading data:', error);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').style.display = 'block';
+            }
+        }
+
+        function displaySignals(data) {
+            const container = document.getElementById('signals-container');
+            container.innerHTML = '';
+
+            data.forEach(item => {
+                if (item.result && item.result.text) {
+                    const signal = parseSignalText(item.result.text);
+                    if (signal) {
+                        container.appendChild(createSignalCard(signal));
+                    }
+                }
+            });
+
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('signals-container').style.display = 'grid';
+        }
+
+        function parseSignalText(text) {
+            try {
+                const lines = text.split('\n').filter(line => line.trim());
+                
+                const signal = {};
+                
+                // Parse trend
+                const trendMatch = text.match(/Trend:\s*(\w+)/i);
+                signal.trend = trendMatch ? trendMatch[1] : '';
+                
+                // Parse crypto pair from trading recommendation
+                const pairMatch = text.match(/\[([A-Z]+\/[A-Z]+)\]/);
+                signal.pair = pairMatch ? pairMatch[1] : '';
+                
+                // Parse OHLC data
+                const openMatch = text.match(/Open\s*:\s*([\d.]+)/);
+                const closeMatch = text.match(/Close\s*:\s*([\d.]+)/);
+                const highMatch = text.match(/High\s*:\s*([\d.]+)/);
+                const lowMatch = text.match(/Low\s*:\s*([\d.]+)/);
+                
+                signal.ohlc = {
+                    open: openMatch ? parseFloat(openMatch[1]) : 0,
+                    close: closeMatch ? parseFloat(closeMatch[1]) : 0,
+                    high: highMatch ? parseFloat(highMatch[1]) : 0,
+                    low: lowMatch ? parseFloat(lowMatch[1]) : 0
+                };
+                
+                // Parse support and resistance
+                const supportMatch = text.match(/Support\s*:\s*([\d.]+)/);
+                const resistanceMatch = text.match(/Résistance\s*:\s*([\d.]+)/);
+                
+                signal.support = supportMatch ? parseFloat(supportMatch[1]) : 0;
+                signal.resistance = resistanceMatch ? parseFloat(resistanceMatch[1]) : 0;
+                
+                // Parse ATH/ATL
+                const athMatch = text.match(/ATH\s*:\s*([\d.]+)/);
+                const atlMatch = text.match(/ATL\s*:\s*([\d.]+)/);
+                
+                signal.ath = athMatch ? parseFloat(athMatch[1]) : 0;
+                signal.atl = atlMatch ? parseFloat(atlMatch[1]) : 0;
+                
+                // Parse trading recommendation
+                const buyMatch = text.match(/(Achat|Vente)\s+entre\s+\[([\d.$\s-]+)\]/);
+                const targetMatch = text.match(/Target\s+\[([\d.$\s-]+)\]/);
+                const stopLossMatch = text.match(/Stop loss à ([\d.$\s]+)/);
+                const winMatch = text.match(/Target min win ([\d.%]+)/);
+                
+                if (buyMatch) {
+                    signal.action = buyMatch[1].toLowerCase() === 'achat' ? 'buy' : 'sell';
+                    signal.entryRange = buyMatch[2];
+                }
+                
+                signal.target = targetMatch ? targetMatch[1] : '';
+                signal.stopLoss = stopLossMatch ? stopLossMatch[1].trim() : '';
+                signal.minWin = winMatch ? winMatch[1] : '';
+                
+                // Parse analysis text
+                const analysisMatch = text.match(/→\s*(.+)/);
+                signal.analysis = analysisMatch ? analysisMatch[1].trim() : '';
+                
+                return signal;
+            } catch (error) {
+                console.error('Error parsing signal:', error);
+                return null;
+            }
+        }
+
+        function createSignalCard(signal) {
+            const card = document.createElement('div');
+            card.className = 'signal-card';
+            
+            const trendClass = signal.trend === 'bullish' ? 'trend-bullish' : 'trend-bearish';
+            const actionClass = signal.action === 'buy' ? 'action-buy' : 'action-sell';
+            const actionText = signal.action === 'buy' ? '🟢 BUY' : '🔴 SELL';
+            
+            card.innerHTML = `
+                <div class="signal-header">
+                    <div class="crypto-pair">${signal.pair || 'Unknown Pair'}</div>
+                    <div class="trend-badge ${trendClass}">
+                        ${signal.trend}
+                    </div>
+                </div>
+                
+                <div class="price-section">
+                    <div class="price-item">
+                        <div class="label">Open</div>
+                        <div class="value">$${signal.ohlc.open.toFixed(3)}</div>
+                    </div>
+                    <div class="price-item">
+                        <div class="label">Close</div>
+                        <div class="value">$${signal.ohlc.close.toFixed(3)}</div>
+                    </div>
+                    <div class="price-item">
+                        <div class="label">High</div>
+                        <div class="value">$${signal.ohlc.high.toFixed(3)}</div>
+                    </div>
+                    <div class="price-item">
+                        <div class="label">Low</div>
+                        <div class="value">$${signal.ohlc.low.toFixed(3)}</div>
+                    </div>
+                </div>
+                
+                <div class="levels-section">
+                    <div class="levels-title">📊 Support & Resistance Levels</div>
+                    <div class="levels-grid">
+                        <div class="level-item support-level">
+                            <div class="label">🟠 Support</div>
+                            <div class="value">$${signal.support.toFixed(3)}</div>
+                        </div>
+                        <div class="level-item resistance-level">
+                            <div class="label">🛑 Resistance</div>
+                            <div class="value">$${signal.resistance.toFixed(3)}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="trading-recommendation">
+                    <div class="recommendation-header">
+                        <div class="action-type ${actionClass}">${actionText}</div>
+                        <div style="font-weight: 600;">Trading Signal</div>
+                    </div>
+                    
+                    <div class="recommendation-details">
+                        <div class="recommendation-item">
+                            <div class="label">Entry Range</div>
+                            <div class="value">${signal.entryRange}</div>
+                        </div>
+                        <div class="recommendation-item">
+                            <div class="label">Target</div>
+                            <div class="value">${signal.target}</div>
+                        </div>
+                        <div class="recommendation-item">
+                            <div class="label">Stop Loss</div>
+                            <div class="value">${signal.stopLoss}</div>
+                        </div>
+                        <div class="recommendation-item">
+                            <div class="label">Min Win</div>
+                            <div class="value">${signal.minWin}</div>
+                        </div>
+                    </div>
+                    
+                    ${signal.analysis ? `<div class="analysis-text">
+                        💡 ${signal.analysis}
+                    </div>` : ''}
+                </div>
+            `;
+            
+            return card;
+        }
+
+        // Load data when page loads
+        document.addEventListener('DOMContentLoaded', loadTradingData);
+    </script>
+</body>
+</html>
