@@ -111,17 +111,33 @@
     */
 
     // 👇 This constant will be replaced via n8n template replacement.
-    const EMBEDDED_DATA = __DATA__; // Leave as-is for template; replace with JSON string like [...]
+    const EMBEDDED_DATA = (typeof __DATA__ !== "undefined") ? __DATA__ : undefined; // Leave as-is for template; replace with JSON string like [...]
 
     async function getData(){
       try{
         if(Array.isArray(EMBEDDED_DATA)) return EMBEDDED_DATA;
       }catch(e){ /* token not replaced, fallthrough */ }
-      // If no embedded data, try fetch data.json
-      try{
-        const res = await fetch('data.json', {cache:'no-store'});
-        if(res.ok){ return await res.json(); }
-      }catch(e){ /* ignore */ }
+
+      // If no embedded data, try to fetch data.json from common relative paths
+      const candidates = [
+        './data.json?ts=' + Date.now(),
+        'data.json?ts=' + Date.now()
+      ];
+      let lastError = '';
+      for(const url of candidates){
+        try{
+          const res = await fetch(url, {cache:'no-store'});
+          if(res.ok){
+            const j = await res.json();
+            console.log('[signals] Loaded data from', url, j);
+            return j;
+          }else{
+            lastError = `[${res.status}] ${res.statusText} at ${url}`;
+          }
+        }catch(err){ lastError = err?.message + ' at ' + url; }
+      }
+      console.warn('[signals] Could not load data.json:', lastError);
+      window.__signals_last_error = lastError;
       return [];
     }
 
@@ -291,7 +307,9 @@
       const updates = extractUpdates(data);
       document.getElementById('count-pill').textContent = `${updates.length} Signal${updates.length!==1?'s':''}`;
       if(!updates.length){
-        grid.innerHTML = '<div class="muted" style="grid-column: span 12">No signals found in data.</div>';
+        const err = window.__signals_last_error;
+        const msg = err ? `No signals found. Also failed to load data.json: ${err}` : 'No signals found in data.';
+        grid.innerHTML = `<div class="muted" style="grid-column: span 12">${msg}</div>`;
         return;
       }
       grid.innerHTML = updates.map(u=>cardTemplate(u.parsed, u.meta)).join('');
