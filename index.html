@@ -92,7 +92,7 @@
     <div id="grid" class="grid" role="list"></div>
 
     <p class="notice">
-      Feed this page with data by replacing <code class="inline">__DATA__</code> at build time from n8n, or by serving a <code class="inline">data.json</code> next to this file. See instructions at the bottom of the source.
+      Feed this page with data by setting <code class="inline">window.__DATA__ = [...]</code> before this script (embed mode), or by serving a <code class="inline">data.json</code> next to this file (fetch mode).
     </p>
   </div>
 
@@ -111,14 +111,11 @@
     */
 
     // 👇 This constant will be replaced via n8n template replacement.
-    const EMBEDDED_DATA = (typeof __DATA__ !== "undefined") ? __DATA__ : undefined; // Leave as-is for template; replace with JSON string like [...]
+    const EMBEDDED_DATA = (typeof window !== 'undefined' && Array.isArray(window.__DATA__)) ? window.__DATA__ : undefined; // Uses window.__DATA__ when present; otherwise fetches data.json
 
     async function getData(){
-      try{
-        if(Array.isArray(EMBEDDED_DATA)) return EMBEDDED_DATA;
-      }catch(e){ /* token not replaced, fallthrough */ }
+      if(Array.isArray(EMBEDDED_DATA)) return EMBEDDED_DATA;
 
-      // If no embedded data, try to fetch data.json from common relative paths
       const candidates = [
         './data.json?ts=' + Date.now(),
         'data.json?ts=' + Date.now()
@@ -134,7 +131,7 @@
           }else{
             lastError = `[${res.status}] ${res.statusText} at ${url}`;
           }
-        }catch(err){ lastError = err?.message + ' at ' + url; }
+        }catch(err){ lastError = (err && err.message ? err.message : String(err)) + ' at ' + url; }
       }
       console.warn('[signals] Could not load data.json:', lastError);
       window.__signals_last_error = lastError;
