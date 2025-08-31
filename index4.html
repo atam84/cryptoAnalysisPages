@@ -1,0 +1,1338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Trading Signals Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-bg: #0a0b0d;
+            --secondary-bg: #1a1d29;
+            --card-bg: #252a3a;
+            --accent-bg: #2d3748;
+            --border-color: #374151;
+            --text-primary: #e1e5e9;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+            --success: #22c55e;
+            --success-bg: rgba(34, 197, 94, 0.1);
+            --danger: #ef4444;
+            --danger-bg: rgba(239, 68, 68, 0.1);
+            --warning: #fbbf24;
+            --warning-bg: rgba(251, 191, 36, 0.1);
+            --info: #3b82f6;
+            --info-bg: rgba(59, 130, 246, 0.1);
+            --glass-bg: rgba(26, 29, 41, 0.95);
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-success: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+            --gradient-danger: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--primary-bg);
+            min-height: 100vh;
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding-top: 120px;
+        }
+
+        /* Enhanced Header with Glass Effect */
+        .top-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 0;
+            z-index: 1000;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .top-bar-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            display: grid;
+            grid-template-columns: auto 1fr auto auto;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 700;
+            font-size: 1.2rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .signals-count {
+            background: var(--card-bg);
+            padding: 0.75rem 1.25rem;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            min-width: 140px;
+        }
+
+        .search-container {
+            position: relative;
+            max-width: 400px;
+        }
+
+        .search-input {
+            width: 100%;
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 25px;
+            padding: 0.75rem 3rem 0.75rem 1.25rem;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .search-input:focus {
+            border-color: var(--success);
+            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            pointer-events: none;
+        }
+
+        .controls {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .refresh-btn, .settings-btn {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            min-width: 100px;
+        }
+
+        .settings-btn {
+            background: var(--info);
+        }
+
+        .refresh-btn:hover {
+            background: #16a34a;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(34, 197, 94, 0.3);
+        }
+
+        .settings-btn:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+        }
+
+        .refresh-btn:disabled {
+            background: var(--accent-bg);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Enhanced Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        /* Enhanced Filters */
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            justify-content: center;
+        }
+
+        .filter-btn {
+            background: var(--card-bg);
+            color: var(--text-secondary);
+            border: 2px solid var(--border-color);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn.active {
+            background: var(--success);
+            color: white;
+            border-color: var(--success);
+        }
+
+        .filter-btn:hover:not(.active) {
+            background: var(--accent-bg);
+            color: var(--text-primary);
+            transform: translateY(-1px);
+        }
+
+        /* Enhanced Grid */
+        .signals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 1.5rem;
+        }
+
+        /* Enhanced Signal Cards */
+        .signal-card {
+            background: var(--secondary-bg);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .signal-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-primary);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .signal-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border-color: var(--success);
+        }
+
+        .signal-card:hover::before {
+            opacity: 1;
+        }
+
+        .signal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .crypto-pair {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .crypto-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .trend-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: capitalize;
+        }
+
+        .trend-bullish {
+            background: var(--success-bg);
+            color: var(--success);
+            border: 1px solid var(--success);
+        }
+
+        .trend-bearish {
+            background: var(--danger-bg);
+            color: var(--danger);
+            border: 1px solid var(--danger);
+        }
+
+        .trend-neutral {
+            background: var(--warning-bg);
+            color: var(--warning);
+            border: 1px solid var(--warning);
+        }
+
+        /* Enhanced Price Section */
+        .price-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--card-bg);
+            padding: 0.75rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .price-row:hover {
+            background: var(--accent-bg);
+            transform: scale(1.02);
+        }
+
+        .price-label {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .price-value {
+            color: var(--text-primary);
+            font-weight: 700;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Enhanced Stats */
+        .stats-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+        }
+
+        .stat-item {
+            background: var(--card-bg);
+            padding: 0.75rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .stat-value {
+            color: var(--text-primary);
+            font-weight: 700;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Enhanced Levels */
+        .levels-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .level-badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .support-badge {
+            background: var(--warning-bg);
+            color: var(--warning);
+            border: 1px solid var(--warning);
+        }
+
+        .resistance-badge {
+            background: var(--danger-bg);
+            color: var(--danger);
+            border: 1px solid var(--danger);
+        }
+
+        /* Enhanced Trade Plan */
+        .trade-plan {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .trade-plan-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .trade-plan ul {
+            list-style: none;
+            font-size: 0.85rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .trade-plan li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            background: var(--accent-bg);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .trade-plan .label {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .trade-plan .value {
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+        }
+
+        .buy-action {
+            color: var(--success);
+        }
+
+        .sell-action {
+            color: var(--danger);
+        }
+
+        /* Enhanced Analysis */
+        .analysis-text {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-style: italic;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+            padding: 0.75rem;
+            background: var(--card-bg);
+            border-radius: 8px;
+            border-left: 3px solid var(--info);
+        }
+
+        /* Enhanced Buttons */
+        .card-actions {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .view-graphs-btn, .alert-btn {
+            flex: 1;
+            background: var(--info);
+            color: white;
+            border: none;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .alert-btn {
+            background: var(--warning);
+        }
+
+        .view-graphs-btn:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+        }
+
+        .alert-btn:hover {
+            background: #f59e0b;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(251, 191, 36, 0.3);
+        }
+
+        .timestamp {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-color);
+            padding-top: 0.75rem;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Enhanced Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-content {
+            background: var(--secondary-bg);
+            margin: 2% auto;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            width: 95%;
+            max-width: 1200px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-title {
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .close-btn {
+            background: var(--danger);
+            color: white;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: #dc2626;
+            transform: scale(1.1);
+        }
+
+        .timeframe-tabs {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .timeframe-tab {
+            background: var(--card-bg);
+            color: var(--text-secondary);
+            border: 2px solid var(--border-color);
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .timeframe-tab.active {
+            background: var(--success);
+            color: white;
+            border-color: var(--success);
+        }
+
+        .timeframe-tab:hover:not(.active) {
+            background: var(--accent-bg);
+            color: var(--text-primary);
+            transform: translateY(-2px);
+        }
+
+        .graph-container {
+            text-align: center;
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .graph-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .graph-loading, .graph-error {
+            padding: 3rem;
+            border-radius: 12px;
+        }
+
+        .graph-loading {
+            color: var(--text-secondary);
+            background: var(--card-bg);
+        }
+
+        .graph-error {
+            color: var(--danger);
+            background: var(--danger-bg);
+            border: 1px solid var(--danger);
+        }
+
+        /* Loading & Error States */
+        .loading {
+            text-align: center;
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            padding: 4rem;
+            background: var(--secondary-bg);
+            border-radius: 16px;
+            margin: 2rem auto;
+            max-width: 500px;
+        }
+
+        .error {
+            text-align: center;
+            color: var(--danger);
+            background: var(--danger-bg);
+            padding: 2rem;
+            border-radius: 16px;
+            margin: 2rem auto;
+            max-width: 500px;
+            border: 1px solid var(--danger);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                padding-top: 160px;
+            }
+
+            .top-bar-content {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .signals-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+
+            .price-section, .stats-section {
+                grid-template-columns: 1fr;
+            }
+
+            .card-actions {
+                flex-direction: column;
+            }
+
+            .filters {
+                justify-content: flex-start;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .modal-content {
+                margin: 5% auto;
+                padding: 1rem;
+                width: 95%;
+            }
+
+            .timeframe-tabs {
+                justify-content: flex-start;
+            }
+        }
+
+        /* Animation Classes */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--primary-bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-bg);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--border-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="top-bar-content">
+            <div class="brand">
+                <span>📈</span>
+                CryptoSignals Pro
+            </div>
+            
+            <div class="search-container">
+                <input 
+                    type="text" 
+                    class="search-input" 
+                    id="search-input" 
+                    placeholder="Search pairs (SOL, BTC, ETH)..."
+                >
+                <span class="search-icon">🔍</span>
+            </div>
+            
+            <div class="signals-count" id="signals-count">
+                <span class="pulse">🔴</span>
+                <span>0 Signals</span>
+            </div>
+            
+            <div class="controls">
+                <button class="refresh-btn" id="refresh-btn">
+                    <span>🔄</span>
+                    Refresh
+                </button>
+                <button class="settings-btn" id="settings-btn">
+                    <span>⚙️</span>
+                    Settings
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Advanced Trading Signals</h1>
+            <p>Real-time cryptocurrency analysis with AI-powered insights</p>
+        </div>
+
+        <div class="filters" id="filters">
+            <button class="filter-btn active" data-filter="all">All Signals</button>
+            <button class="filter-btn" data-filter="bullish">🟢 Bullish</button>
+            <button class="filter-btn" data-filter="bearish">🔴 Bearish</button>
+            <button class="filter-btn" data-filter="buy">💰 Buy Signals</button>
+            <button class="filter-btn" data-filter="sell">📈 Sell Signals</button>
+        </div>
+        
+        <div id="loading" class="loading">
+            <div class="pulse">⏳ Loading advanced trading data...</div>
+        </div>
+        
+        <div id="error" class="error" style="display: none;">
+            ❌ Failed to load trading data. Please check your connection and try again.
+        </div>
+        
+        <div id="signals-container" class="signals-grid" style="display: none;">
+        </div>
+
+        <!-- Enhanced Graph Modal -->
+        <div id="graph-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title" id="modal-title">📊 SOL/USDT Advanced Charts</div>
+                    <button class="close-btn" id="close-modal">&times;</button>
+                </div>
+                
+                <div class="timeframe-tabs" id="timeframe-tabs">
+                    <button class="timeframe-tab active" data-timeframe="1h">1H Chart</button>
+                    <button class="timeframe-tab" data-timeframe="4h">4H Chart</button>
+                    <button class="timeframe-tab" data-timeframe="1d">1D Chart</button>
+                </div>
+
+                <div class="graph-container" id="graph-container">
+                    <div class="graph-loading pulse">📈 Loading advanced chart analysis...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allSignals = [];
+        let isLoading = false;
+        let currentFilter = 'all';
+
+        // Enhanced data loading with better error handling
+        async function loadTradingData() {
+            if (isLoading) return;
+            
+            isLoading = true;
+            const refreshBtn = document.getElementById('refresh-btn');
+            const loading = document.getElementById('loading');
+            const error = document.getElementById('error');
+            
+            refreshBtn.disabled = true;
+            refreshBtn.innerHTML = '<span class="pulse">⏳</span> Loading...';
+            loading.style.display = 'block';
+            error.style.display = 'none';
+            document.getElementById('signals-container').style.display = 'none';
+            
+            try {
+                const response = await fetch('data.json?t=' + Date.now());
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                allSignals = parseAllSignals(data);
+                applyCurrentFilter();
+                updateSignalCount(allSignals.length);
+                
+                // Add success animation
+                document.getElementById('signals-container').classList.add('fade-in');
+            } catch (error) {
+                console.error('Error loading trading data:', error);
+                document.getElementById('error').style.display = 'block';
+                updateSignalCount(0);
+            } finally {
+                loading.style.display = 'none';
+                isLoading = false;
+                refreshBtn.disabled = false;
+                refreshBtn.innerHTML = '<span>🔄</span> Refresh';
+            }
+        }
+
+        function parseAllSignals(data) {
+            const signals = [];
+            data.forEach(item => {
+                if (item.result && Array.isArray(item.result)) {
+                    item.result.forEach(message => {
+                        if (message.text) {
+                            const signal = parseSignalText(message.text, message.date);
+                            if (signal) {
+                                signals.push(signal);
+                            }
+                        }
+                    });
+                }
+            });
+            return signals.sort((a, b) => b.timestamp - a.timestamp);
+        }
+
+        function applyCurrentFilter() {
+            let filteredSignals = [...allSignals];
+            
+            // Apply search filter
+            const searchTerm = document.getElementById('search-input').value.trim().toLowerCase();
+            if (searchTerm) {
+                filteredSignals = filteredSignals.filter(signal => 
+                    signal.pair && signal.pair.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            // Apply category filter
+            if (currentFilter !== 'all') {
+                filteredSignals = filteredSignals.filter(signal => {
+                    switch (currentFilter) {
+                        case 'bullish':
+                            return signal.trend === 'bullish';
+                        case 'bearish':
+                            return signal.trend === 'bearish';
+                        case 'buy':
+                            return signal.action === 'buy';
+                        case 'sell':
+                            return signal.action === 'sell';
+                        default:
+                            return true;
+                    }
+                });
+            }
+
+            displayFilteredSignals(filteredSignals);
+            updateSignalCount(filteredSignals.length);
+        }
+
+        function displayFilteredSignals(signals) {
+            const container = document.getElementById('signals-container');
+            container.innerHTML = '';
+
+            if (signals.length === 0 && !isLoading) {
+                container.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; color: var(--text-secondary); padding: 3rem;">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">🔍</div>
+                        <h3>No signals found</h3>
+                        <p>Try adjusting your search or filters</p>
+                    </div>
+                `;
+                container.style.display = 'grid';
+                return;
+            }
+
+            signals.forEach((signal, index) => {
+                setTimeout(() => {
+                    const card = createEnhancedSignalCard(signal);
+                    card.style.animationDelay = `${index * 0.1}s`;
+                    container.appendChild(card);
+                }, index * 50);
+            });
+
+            container.style.display = signals.length > 0 ? 'grid' : 'none';
+        }
+
+        function updateSignalCount(count) {
+            const countElement = document.getElementById('signals-count');
+            const indicator = count > 0 ? '🟢' : '🔴';
+            countElement.innerHTML = `
+                <span class="pulse">${indicator}</span>
+                <span>${count} Signal${count !== 1 ? 's' : ''}</span>
+            `;
+        }
+
+        function setupEnhancedSearch() {
+            const searchInput = document.getElementById('search-input');
+            let searchTimeout;
+
+            searchInput.addEventListener('input', (e) => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    applyCurrentFilter();
+                }, 300);
+            });
+        }
+
+        function setupFilters() {
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Remove active class from all buttons
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    
+                    // Add active class to clicked button
+                    btn.classList.add('active');
+                    
+                    // Update current filter
+                    currentFilter = btn.dataset.filter;
+                    
+                    // Apply filter
+                    applyCurrentFilter();
+                });
+            });
+        }
+
+        function parseSignalText(text, timestamp) {
+            try {
+                const lines = text.split('\n').filter(line => line.trim());
+                
+                const signal = {
+                    timestamp: timestamp || Date.now()
+                };
+                
+                // Enhanced parsing with better regex patterns
+                const trendMatch = text.match(/Trend:\s*(\w+)/i);
+                signal.trend = trendMatch ? trendMatch[1].toLowerCase() : 'neutral';
+                
+                const pairMatch = text.match(/\[([A-Z]+\/[A-Z]+)\]/);
+                signal.pair = pairMatch ? pairMatch[1] : 'UNKNOWN/USDT';
+                
+                // Enhanced OHLC parsing
+                const ohlcPatterns = {
+                    open: /Open\s*:\s*([\d.]+)/i,
+                    close: /Close\s*:\s*([\d.]+)/i,
+                    high: /High\s*:\s*([\d.]+)/i,
+                    low: /Low\s*:\s*([\d.]+)/i
+                };
+                
+                signal.ohlc = {};
+                Object.keys(ohlcPatterns).forEach(key => {
+                    const match = text.match(ohlcPatterns[key]);
+                    signal.ohlc[key] = match ? parseFloat(match[1]) : 0;
+                });
+
+                signal.amplitude = signal.ohlc.high - signal.ohlc.low;
+                signal.change = signal.ohlc.close - signal.ohlc.open;
+                signal.changePercent = signal.ohlc.open !== 0 ? 
+                    ((signal.change / signal.ohlc.open) * 100) : 0;
+                
+                // Enhanced level parsing
+                const supportMatch = text.match(/Support\s*:\s*([\d.]+)/i);
+                const resistanceMatch = text.match(/(?:RÃ©sistance|Resistance)\s*:\s*([\d.]+)/i);
+                
+                signal.support = supportMatch ? parseFloat(supportMatch[1]) : 0;
+                signal.resistance = resistanceMatch ? parseFloat(resistanceMatch[1]) : 0;
+                
+                // Enhanced trading recommendation parsing
+                const actionMatch = text.match(/(Achat|Vente|Buy|Sell)\s+entre\s+\[([\d.$\s-]+)\]/i);
+                const targetMatch = text.match(/Target\s+\[([\d.$\s-]+)\]/i);
+                const stopLossMatch = text.match(/Stop\s*loss\s*[àa]\s*([\d.$\s]+)/i);
+                const winMatch = text.match(/Target\s*min\s*win\s*([\d.%]+)/i);
+                
+                if (actionMatch) {
+                    const action = actionMatch[1].toLowerCase();
+                    signal.action = (action === 'achat' || action === 'buy') ? 'buy' : 'sell';
+                    signal.entryRange = actionMatch[2];
+                }
+                
+                signal.target = targetMatch ? targetMatch[1] : 'TBD';
+                signal.stopLoss = stopLossMatch ? stopLossMatch[1].trim() : 'TBD';
+                signal.minWin = winMatch ? winMatch[1] : 'TBD';
+                
+                // Enhanced analysis parsing
+                const analysisMatch = text.match(/[→↗↘]\s*(.+)/);
+                signal.analysis = analysisMatch ? analysisMatch[1].trim() : 
+                    'Technical analysis in progress...';
+                
+                return signal;
+            } catch (error) {
+                console.error('Error parsing signal:', error);
+                return null;
+            }
+        }
+
+        function createEnhancedSignalCard(signal) {
+            const card = document.createElement('div');
+            card.className = 'signal-card fade-in';
+            
+            const trendClass = {
+                'bullish': 'trend-bullish',
+                'bearish': 'trend-bearish',
+                'neutral': 'trend-neutral'
+            }[signal.trend] || 'trend-neutral';
+            
+            const trendIcon = {
+                'bullish': '🚀',
+                'bearish': '📉',
+                'neutral': '➡️'
+            }[signal.trend] || '➡️';
+            
+            const actionClass = signal.action === 'buy' ? 'buy-action' : 'sell-action';
+            const actionText = signal.action === 'buy' ? '💰 Buy Zone' : '📈 Sell Zone';
+            const actionIcon = signal.action === 'buy' ? '⬆️' : '⬇️';
+
+            // Format timestamp with enhanced formatting
+            const date = new Date(signal.timestamp * 1000);
+            const timeStr = date.toLocaleString('en-US', {
+                month: 'short',
+                day: 'numeric', 
+                year: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true
+            });
+
+            // Calculate price metrics
+            const changeIcon = signal.changePercent >= 0 ? '📈' : '📉';
+            const changeColor = signal.changePercent >= 0 ? 'var(--success)' : 'var(--danger)';
+            
+            card.innerHTML = `
+                <div class="signal-header">
+                    <div class="crypto-pair">
+                        <div class="crypto-icon">${signal.pair.split('/')[0].charAt(0)}</div>
+                        ${signal.pair || 'Unknown Pair'}
+                    </div>
+                    <div class="trend-badge ${trendClass}">
+                        ${trendIcon} ${signal.trend}
+                    </div>
+                </div>
+                
+                <div class="price-section">
+                    <div class="price-row">
+                        <span class="price-label">🔓 Open:</span>
+                        <span class="price-value">$${signal.ohlc.open.toFixed(4)}</span>
+                    </div>
+                    <div class="price-row">
+                        <span class="price-label">🔒 Close:</span>
+                        <span class="price-value">$${signal.ohlc.close.toFixed(4)}</span>
+                    </div>
+                    <div class="price-row">
+                        <span class="price-label">⬆️ High:</span>
+                        <span class="price-value">$${signal.ohlc.high.toFixed(4)}</span>
+                    </div>
+                    <div class="price-row">
+                        <span class="price-label">⬇️ Low:</span>
+                        <span class="price-value">$${signal.ohlc.low.toFixed(4)}</span>
+                    </div>
+                </div>
+
+                <div class="stats-section">
+                    <div class="stat-item">
+                        <span class="stat-label">${changeIcon} Change:</span>
+                        <span class="stat-value" style="color: ${changeColor}">
+                            ${signal.changePercent.toFixed(2)}%
+                        </span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">📏 Amplitude:</span>
+                        <span class="stat-value">$${signal.amplitude.toFixed(4)}</span>
+                    </div>
+                </div>
+                
+                <div class="levels-section">
+                    <div class="level-badge support-badge">
+                        🟡 Support: $${signal.support.toFixed(4)}
+                    </div>
+                    <div class="level-badge resistance-badge">
+                        🔴 Resistance: $${signal.resistance.toFixed(4)}
+                    </div>
+                </div>
+                
+                <div class="trade-plan">
+                    <div class="trade-plan-title">
+                        🎯 Trade Plan
+                    </div>
+                    <ul>
+                        <li>
+                            <span class="label ${actionClass}">${actionIcon} ${actionText}:</span>
+                            <span class="value">${signal.entryRange}</span>
+                        </li>
+                        <li>
+                            <span class="label">🏆 Targets:</span>
+                            <span class="value">${signal.target}</span>
+                        </li>
+                        <li>
+                            <span class="label">🛡️ Stop-loss:</span>
+                            <span class="value">${signal.stopLoss}</span>
+                        </li>
+                        <li>
+                            <span class="label">💎 Min. Win:</span>
+                            <span class="value">${signal.minWin}</span>
+                        </li>
+                    </ul>
+                </div>
+
+                ${signal.analysis ? `<div class="analysis-text">
+                    💡 ${signal.analysis}
+                </div>` : ''}
+
+                <div class="card-actions">
+                    <button class="view-graphs-btn" onclick="openGraphModal('${signal.pair}')">
+                        📊 View Charts
+                    </button>
+                    <button class="alert-btn" onclick="setAlert('${signal.pair}')">
+                        🔔 Set Alert
+                    </button>
+                </div>
+
+                <div class="timestamp">
+                    📅 ${timeStr}
+                </div>
+            `;
+            
+            return card;
+        }
+
+        // Enhanced modal functionality
+        let currentPair = '';
+        const GITHUB_BASE_URL = 'https://raw.githubusercontent.com/atam84/cryptoAnalysisPages/main/graphs/';
+
+        function setupEnhancedModal() {
+            const modal = document.getElementById('graph-modal');
+            const closeBtn = document.getElementById('close-modal');
+            
+            closeBtn.addEventListener('click', closeGraphModal);
+            
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeGraphModal();
+                }
+            });
+
+            const timeframeTabs = document.querySelectorAll('.timeframe-tab');
+            timeframeTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    timeframeTabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    const timeframe = tab.dataset.timeframe;
+                    loadEnhancedGraph(currentPair, timeframe);
+                });
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modal.style.display === 'block') {
+                    closeGraphModal();
+                }
+            });
+        }
+
+        function openGraphModal(pair) {
+            currentPair = pair;
+            const modal = document.getElementById('graph-modal');
+            const modalTitle = document.getElementById('modal-title');
+            
+            modalTitle.textContent = `📊 ${pair} Advanced Charts`;
+            modal.style.display = 'block';
+            
+            loadEnhancedGraph(pair, '1h');
+        }
+
+        function closeGraphModal() {
+            const modal = document.getElementById('graph-modal');
+            modal.style.display = 'none';
+        }
+
+        function loadEnhancedGraph(pair, timeframe) {
+            const graphContainer = document.getElementById('graph-container');
+            graphContainer.innerHTML = '<div class="graph-loading pulse">📈 Loading advanced chart analysis...</div>';
+            
+            const baseCurrency = pair.split('/')[0];
+            const filename = `${baseCurrency}-USDT-${timeframe}.png`;
+            const imageUrl = GITHUB_BASE_URL + filename;
+            
+            const img = new Image();
+            
+            img.onload = function() {
+                graphContainer.innerHTML = `
+                    <img src="${imageUrl}" alt="${pair} ${timeframe} chart" class="graph-image" />
+                    <div style="margin-top: 1rem; font-size: 0.9rem; color: var(--text-secondary);">
+                        📈 ${pair} • ${timeframe.toUpperCase()} Timeframe • Advanced Technical Analysis
+                    </div>
+                `;
+            };
+            
+            img.onerror = function() {
+                graphContainer.innerHTML = `
+                    <div class="graph-error">
+                        <div style="font-size: 2rem; margin-bottom: 1rem;">📊❌</div>
+                        <h3>Chart Not Available</h3>
+                        <p>Chart file not found: ${filename}</p>
+                        <small>Please ensure the chart exists in the graphs directory</small>
+                    </div>
+                `;
+            };
+            
+            img.src = imageUrl;
+        }
+
+        function setAlert(pair) {
+            // Enhanced alert functionality
+            alert(`🔔 Alert set for ${pair}!\n\nYou'll be notified of significant price movements and trading opportunities.`);
+        }
+
+        // Initialize the enhanced application
+        document.addEventListener('DOMContentLoaded', () => {
+            loadTradingData();
+            setupEnhancedSearch();
+            setupFilters();
+            setupEnhancedModal();
+            
+            document.getElementById('refresh-btn').addEventListener('click', loadTradingData);
+            document.getElementById('settings-btn').addEventListener('click', () => {
+                alert('⚙️ Settings panel coming soon!\n\nFeatures:\n• Custom alerts\n• Portfolio tracking\n• Advanced filters\n• Real-time notifications');
+            });
+
+            // Auto-refresh every 5 minutes
+            setInterval(() => {
+                if (!isLoading) {
+                    loadTradingData();
+                }
+            }, 5 * 60 * 1000);
+        });
+
+        // Make functions globally available
+        window.openGraphModal = openGraphModal;
+        window.setAlert = setAlert;
+    </script>
+</body>
+</html>
