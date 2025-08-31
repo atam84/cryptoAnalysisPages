@@ -29,6 +29,102 @@
             --gradient-danger: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
         }
 
+        // Debugging and data quality functions
+        function analyzeDataQuality(signals) {
+            const analysis = {
+                total: signals.length,
+                complete: 0,
+                incomplete: 0,
+                missing_pairs: 0,
+                missing_ohlc: 0,
+                missing_levels: 0,
+                missing_trends: 0,
+                pairs: new Set()
+            };
+
+            signals.forEach(signal => {
+                analysis.pairs.add(signal.pair || 'UNKNOWN');
+                
+                if (hasCompleteData(signal)) {
+                    analysis.complete++;
+                } else {
+                    analysis.incomplete++;
+                }
+
+                if (!signal.pair || signal.pair === 'UNKNOWN/USDT') {
+                    analysis.missing_pairs++;
+                }
+
+                if (!signal.ohlc || Object.values(signal.ohlc).every(v => v === 0)) {
+                    analysis.missing_ohlc++;
+                }
+
+                if ((signal.support || 0) === 0 && (signal.resistance || 0) === 0) {
+                    analysis.missing_levels++;
+                }
+
+                if (!signal.trend || signal.trend === 'neutral') {
+                    analysis.missing_trends++;
+                }
+            });
+
+            console.group('📊 Data Quality Analysis');
+            console.log('Total Signals:', analysis.total);
+            console.log('Complete Data:', analysis.complete, `(${((analysis.complete/analysis.total)*100).toFixed(1)}%)`);
+            console.log('Incomplete Data:', analysis.incomplete, `(${((analysis.incomplete/analysis.total)*100).toFixed(1)}%)`);
+            console.log('Missing Pairs:', analysis.missing_pairs);
+            console.log('Missing OHLC:', analysis.missing_ohlc);
+            console.log('Missing Levels:', analysis.missing_levels);
+            console.log('Missing Trends:', analysis.missing_trends);
+            console.log('Unique Pairs:', Array.from(analysis.pairs).sort());
+            console.groupEnd();
+
+            return analysis;
+        }
+
+        function debugDataStructure(data) {
+            console.group('🔍 Data Structure Debug');
+            console.log('Raw data type:', typeof data);
+            console.log('Is array:', Array.isArray(data));
+            
+            if (Array.isArray(data)) {
+                console.log('Array length:', data.length);
+                if (data.length > 0) {
+                    console.log('First item structure:', Object.keys(data[0]));
+                    console.log('First item sample:', data[0]);
+                }
+            } else if (typeof data === 'object') {
+                console.log('Object keys:', Object.keys(data));
+                console.log('Object sample:', data);
+            }
+            
+            console.groupEnd();
+        }
+
+        // Enhanced error handling
+        async function loadTradingDataWithDebug() {
+            try {
+                const response = await fetch('data.json?t=' + Date.now());
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                
+                // Debug the raw data structure
+                debugDataStructure(data);
+                
+                const signals = parseAllSignals(data);
+                
+                // Analyze data quality
+                analyzeDataQuality(signals);
+                
+                return signals;
+            } catch (error) {
+                console.error('❌ Error loading data:', error);
+                throw error;
+            }
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -477,8 +573,60 @@
             color: var(--success);
         }
 
-        .sell-action {
-            color: var(--danger);
+        .neutral-action {
+            color: var(--warning);
+        }
+
+        .data-warning {
+            background: var(--warning-bg);
+            color: var(--warning);
+            border: 1px solid var(--warning);
+            padding: 0.5rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            margin: 0.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .signal-card.incomplete {
+            border-left: 3px solid var(--warning);
+        }
+
+        .signal-card.incomplete::before {
+            background: linear-gradient(135deg, var(--warning) 0%, var(--danger) 100%);
+        }
+
+        /* Enhanced error states */
+        .missing-data-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.7rem;
+            color: var(--warning);
+            background: var(--warning-bg);
+            padding: 0.2rem 0.4rem;
+            border-radius: 10px;
+            border: 1px solid var(--warning);
+        }
+
+        .data-quality-indicator {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+        }
+
+        .data-quality-indicator.incomplete {
+            background: var(--warning);
+        }
+
+        .data-quality-indicator.missing {
+            background: var(--danger);
         }
 
         /* Enhanced Analysis */
@@ -964,21 +1112,78 @@
                         <div style="font-size: 3rem; margin-bottom: 1rem;">🔍</div>
                         <h3>No signals found</h3>
                         <p>Try adjusting your search or filters</p>
+                        <button onclick="loadTradingData()" style="margin-top: 1rem; padding: 0.5rem 1rem; background: var(--info); color: white; border: none; border-radius: 8px; cursor: pointer;">
+                            🔄 Reload Data
+                        </button>
                     </div>
                 `;
                 container.style.display = 'grid';
                 return;
             }
 
+            // Add data quality summary
+            const completeSignals = signals.filter(s => hasCompleteData(s));
+            const incompleteSignals = signals.filter(s => !hasCompleteData(s));
+            
+            if (incompleteSignals.length > 0) {
+                const summaryDiv = document.createElement('div');
+                summaryDiv.style.cssText = 'grid-column: 1/-1; background: var(--warning-bg); color: var(--warning); padding: 1rem; border-radius: 12px; border: 1px solid var(--warning); margin-bottom: 1rem;';
+                summaryDiv.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                        <span style="font-size: 1.2rem;">⚠️</span>
+                        <strong>Data Quality Notice</strong>
+                    </div>
+                    <p style="margin: 0; font-size: 0.9rem;">
+                        ${completeSignals.length} complete signals, ${incompleteSignals.length} with limited data. 
+                        Some pairs may be missing OHLC or technical indicators.
+                    </p>
+                `;
+                container.appendChild(summaryDiv);
+            }
+
             signals.forEach((signal, index) => {
                 setTimeout(() => {
                     const card = createEnhancedSignalCard(signal);
                     card.style.animationDelay = `${index * 0.1}s`;
+                    
+                    // Add data quality indicator
+                    const qualityIndicator = document.createElement('div');
+                    qualityIndicator.className = 'data-quality-indicator';
+                    
+                    if (hasCompleteData(signal)) {
+                        qualityIndicator.classList.add('complete');
+                    } else if (hasPartialData(signal)) {
+                        qualityIndicator.classList.add('incomplete');
+                        card.classList.add('incomplete');
+                    } else {
+                        qualityIndicator.classList.add('missing');
+                        card.classList.add('incomplete');
+                    }
+                    
+                    card.style.position = 'relative';
+                    card.appendChild(qualityIndicator);
+                    
                     container.appendChild(card);
                 }, index * 50);
             });
 
             container.style.display = signals.length > 0 ? 'grid' : 'none';
+        }
+
+        function hasCompleteData(signal) {
+            return signal.pair && 
+                   signal.pair !== 'UNKNOWN/USDT' && 
+                   signal.ohlc && 
+                   (signal.ohlc.open > 0 || signal.ohlc.close > 0 || signal.ohlc.high > 0 || signal.ohlc.low > 0) &&
+                   (signal.support > 0 || signal.resistance > 0) &&
+                   signal.trend &&
+                   signal.analysis;
+        }
+
+        function hasPartialData(signal) {
+            return signal.pair && 
+                   signal.pair !== 'UNKNOWN/USDT' && 
+                   (signal.trend || (signal.ohlc && Object.values(signal.ohlc).some(v => v > 0)));
         }
 
         function updateSignalCount(count) {
@@ -1030,129 +1235,116 @@
                     timestamp: timestamp || Date.now()
                 };
                 
-                // Enhanced parsing with better regex patterns
-                const trendMatch = text.match(/Trend:\s*(\w+)/i);
-                signal.trend = trendMatch ? trendMatch[1].toLowerCase() : 'neutral';
+                // Enhanced parsing with better regex patterns and fallback handling
+                const trendMatch = text.match(/Trend[:\s]*(\w+)/i) || text.match(/(haussière|baissière|bullish|bearish|neutral)/i);
+                signal.trend = trendMatch ? trendMatch[1].toLowerCase().replace('haussière', 'bullish').replace('baissière', 'bearish') : 'neutral';
                 
-                const pairMatch = text.match(/\[([A-Z]+\/[A-Z]+)\]/);
-                signal.pair = pairMatch ? pairMatch[1] : 'UNKNOWN/USDT';
-                
-                // Enhanced OHLC parsing
-                const ohlcPatterns = {
-                    open: /Open\s*:\s*([\d.]+)/i,
-                    close: /Close\s*:\s*([\d.]+)/i,
-                    high: /High\s*:\s*([\d.]+)/i,
-                    low: /Low\s*:\s*([\d.]+)/i
-                };
-                
-                signal.ohlc = {};
-                Object.keys(ohlcPatterns).forEach(key => {
-                    const match = text.match(ohlcPatterns[key]);
-                    signal.ohlc[key] = match ? parseFloat(match[1]) : 0;
-                });
-
-                signal.amplitude = signal.ohlc.high - signal.ohlc.low;
-                signal.change = signal.ohlc.close - signal.ohlc.open;
-                signal.changePercent = signal.ohlc.open !== 0 ? 
-                    ((signal.change / signal.ohlc.open) * 100) : 0;
-                
-                // Enhanced level parsing
-                const supportMatch = text.match(/Support\s*:\s*([\d.]+)/i);
-                const resistanceMatch = text.match(/(?:RÃ©sistance|Resistance)\s*:\s*([\d.]+)/i);
-                
-                signal.support = supportMatch ? parseFloat(supportMatch[1]) : 0;
-                signal.resistance = resistanceMatch ? parseFloat(resistanceMatch[1]) : 0;
-                
-                // Enhanced trading recommendation parsing
-                const actionMatch = text.match(/(Achat|Vente|Buy|Sell)\s+entre\s+\[([\d.$\s-]+)\]/i);
-                const targetMatch = text.match(/Target\s+\[([\d.$\s-]+)\]/i);
-                const stopLossMatch = text.match(/Stop\s*loss\s*[àa]\s*([\d.$\s]+)/i);
-                const winMatch = text.match(/Target\s*min\s*win\s*([\d.%]+)/i);
-                
-                if (actionMatch) {
-                    const action = actionMatch[1].toLowerCase();
-                    signal.action = (action === 'achat' || action === 'buy') ? 'buy' : 'sell';
-                    signal.entryRange = actionMatch[2];
-                }
-                
-                signal.target = targetMatch ? targetMatch[1] : 'TBD';
-                signal.stopLoss = stopLossMatch ? stopLossMatch[1].trim() : 'TBD';
-                signal.minWin = winMatch ? winMatch[1] : 'TBD';
-                
-                // Enhanced analysis parsing
-                const analysisMatch = text.match(/[→↗↘]\s*(.+)/);
-                signal.analysis = analysisMatch ? analysisMatch[1].trim() : 
-                    'Technical analysis in progress...';
-                
-                return signal;
-            } catch (error) {
-                console.error('Error parsing signal:', error);
-                return null;
-            }
-        }
+                // Multiple pattern matching for crypto pairs
+                const pairPatterns = [
+                    /\[([A-Z]{2,5}[\/\-][A-Z]{3,5})\]/,
+                    /([
 
         function createEnhancedSignalCard(signal) {
             const card = document.createElement('div');
             card.className = 'signal-card fade-in';
             
+            // Safe value extraction with fallbacks
+            const pair = signal.pair || 'UNKNOWN/USDT';
+            const trend = signal.trend || 'neutral';
+            const ohlc = signal.ohlc || { open: 0, high: 0, low: 0, close: 0 };
+            const amplitude = signal.amplitude || 0;
+            const changePercent = signal.changePercent || 0;
+            const support = signal.support || 0;
+            const resistance = signal.resistance || 0;
+            const action = signal.action || 'hold';
+            const entryRange = signal.entryRange || 'Market Price';
+            const target = signal.target || 'TBD';
+            const stopLoss = signal.stopLoss || 'TBD';
+            const minWin = signal.minWin || 'TBD';
+            const analysis = signal.analysis || 'Analysis pending...';
+            
             const trendClass = {
                 'bullish': 'trend-bullish',
                 'bearish': 'trend-bearish',
                 'neutral': 'trend-neutral'
-            }[signal.trend] || 'trend-neutral';
+            }[trend] || 'trend-neutral';
             
             const trendIcon = {
                 'bullish': '🚀',
                 'bearish': '📉',
                 'neutral': '➡️'
-            }[signal.trend] || '➡️';
+            }[trend] || '➡️';
             
-            const actionClass = signal.action === 'buy' ? 'buy-action' : 'sell-action';
-            const actionText = signal.action === 'buy' ? '💰 Buy Zone' : '📈 Sell Zone';
-            const actionIcon = signal.action === 'buy' ? '⬆️' : '⬇️';
+            const actionClass = action === 'buy' ? 'buy-action' : action === 'sell' ? 'sell-action' : 'neutral-action';
+            const actionText = action === 'buy' ? '💰 Buy Zone' : action === 'sell' ? '📈 Sell Zone' : '⏸️ Hold';
+            const actionIcon = action === 'buy' ? '⬆️' : action === 'sell' ? '⬇️' : '⏸️';
 
-            // Format timestamp with enhanced formatting
-            const date = new Date(signal.timestamp * 1000);
-            const timeStr = date.toLocaleString('en-US', {
-                month: 'short',
-                day: 'numeric', 
-                year: 'numeric',
-                hour: 'numeric',
-                minute: '2-digit',
-                hour12: true
-            });
+            // Format timestamp with error handling
+            let timeStr = 'Unknown time';
+            try {
+                const timestamp = signal.timestamp * (signal.timestamp < 1e12 ? 1000 : 1); // Handle both seconds and milliseconds
+                const date = new Date(timestamp);
+                if (!isNaN(date.getTime())) {
+                    timeStr = date.toLocaleString('en-US', {
+                        month: 'short',
+                        day: 'numeric', 
+                        year: 'numeric',
+                        hour: 'numeric',
+                        minute: '2-digit',
+                        hour12: true
+                    });
+                }
+            } catch (e) {
+                console.warn('Invalid timestamp:', signal.timestamp);
+            }
 
-            // Calculate price metrics
-            const changeIcon = signal.changePercent >= 0 ? '📈' : '📉';
-            const changeColor = signal.changePercent >= 0 ? 'var(--success)' : 'var(--danger)';
+            // Calculate price metrics with error handling
+            const changeIcon = changePercent >= 0 ? '📈' : '📉';
+            const changeColor = changePercent >= 0 ? 'var(--success)' : 'var(--danger)';
+            
+            // Format price values safely
+            const formatPrice = (value, decimals = 4) => {
+                if (value === null || value === undefined || isNaN(value) || value === 0) {
+                    return 'N/A';
+                }
+                return typeof value === 'number' ? `$${value.toFixed(decimals)}` : value.toString();
+            };
+
+            // Handle missing OHLC data
+            const hasOHLCData = ohlc.open > 0 || ohlc.high > 0 || ohlc.low > 0 || ohlc.close > 0;
+            
+            // Get crypto symbol for icon
+            const cryptoSymbol = pair.split('/')[0];
             
             card.innerHTML = `
                 <div class="signal-header">
                     <div class="crypto-pair">
-                        <div class="crypto-icon">${signal.pair.split('/')[0].charAt(0)}</div>
-                        ${signal.pair || 'Unknown Pair'}
+                        <div class="crypto-icon">${cryptoSymbol.charAt(0)}</div>
+                        ${pair}
+                        ${!hasOHLCData ? '<span style="color: var(--warning); font-size: 0.7rem; margin-left: 0.5rem;">⚠️ Limited Data</span>' : ''}
                     </div>
                     <div class="trend-badge ${trendClass}">
-                        ${trendIcon} ${signal.trend}
+                        ${trendIcon} ${trend}
                     </div>
                 </div>
                 
+                ${hasOHLCData ? `
                 <div class="price-section">
                     <div class="price-row">
                         <span class="price-label">🔓 Open:</span>
-                        <span class="price-value">$${signal.ohlc.open.toFixed(4)}</span>
+                        <span class="price-value">${formatPrice(ohlc.open)}</span>
                     </div>
                     <div class="price-row">
                         <span class="price-label">🔒 Close:</span>
-                        <span class="price-value">$${signal.ohlc.close.toFixed(4)}</span>
+                        <span class="price-value">${formatPrice(ohlc.close)}</span>
                     </div>
                     <div class="price-row">
                         <span class="price-label">⬆️ High:</span>
-                        <span class="price-value">$${signal.ohlc.high.toFixed(4)}</span>
+                        <span class="price-value">${formatPrice(ohlc.high)}</span>
                     </div>
                     <div class="price-row">
                         <span class="price-label">⬇️ Low:</span>
-                        <span class="price-value">$${signal.ohlc.low.toFixed(4)}</span>
+                        <span class="price-value">${formatPrice(ohlc.low)}</span>
                     </div>
                 </div>
 
@@ -1160,57 +1352,65 @@
                     <div class="stat-item">
                         <span class="stat-label">${changeIcon} Change:</span>
                         <span class="stat-value" style="color: ${changeColor}">
-                            ${signal.changePercent.toFixed(2)}%
+                            ${changePercent !== 0 ? `${changePercent.toFixed(2)}%` : 'N/A'}
                         </span>
                     </div>
                     <div class="stat-item">
                         <span class="stat-label">📏 Amplitude:</span>
-                        <span class="stat-value">$${signal.amplitude.toFixed(4)}</span>
+                        <span class="stat-value">${amplitude > 0 ? formatPrice(amplitude) : 'N/A'}</span>
                     </div>
                 </div>
+                ` : `
+                <div class="price-section">
+                    <div class="price-row" style="grid-column: 1/-1; background: var(--warning-bg); color: var(--warning);">
+                        <span class="price-label">⚠️ Price Data:</span>
+                        <span class="price-value">Unavailable - Check data source</span>
+                    </div>
+                </div>
+                `}
                 
                 <div class="levels-section">
                     <div class="level-badge support-badge">
-                        🟡 Support: $${signal.support.toFixed(4)}
+                        🟡 Support: ${support > 0 ? formatPrice(support) : 'N/A'}
                     </div>
                     <div class="level-badge resistance-badge">
-                        🔴 Resistance: $${signal.resistance.toFixed(4)}
+                        🔴 Resistance: ${resistance > 0 ? formatPrice(resistance) : 'N/A'}
                     </div>
                 </div>
                 
                 <div class="trade-plan">
                     <div class="trade-plan-title">
-                        🎯 Trade Plan
+                        🎯 Trade Plan ${!hasOHLCData ? '(Limited Data)' : ''}
                     </div>
                     <ul>
                         <li>
                             <span class="label ${actionClass}">${actionIcon} ${actionText}:</span>
-                            <span class="value">${signal.entryRange}</span>
+                            <span class="value">${entryRange}</span>
                         </li>
                         <li>
                             <span class="label">🏆 Targets:</span>
-                            <span class="value">${signal.target}</span>
+                            <span class="value">${target}</span>
                         </li>
                         <li>
                             <span class="label">🛡️ Stop-loss:</span>
-                            <span class="value">${signal.stopLoss}</span>
+                            <span class="value">${stopLoss}</span>
                         </li>
                         <li>
                             <span class="label">💎 Min. Win:</span>
-                            <span class="value">${signal.minWin}</span>
+                            <span class="value">${minWin}</span>
                         </li>
                     </ul>
                 </div>
 
-                ${signal.analysis ? `<div class="analysis-text">
-                    💡 ${signal.analysis}
-                </div>` : ''}
+                <div class="analysis-text">
+                    💡 ${analysis}
+                </div>
 
                 <div class="card-actions">
-                    <button class="view-graphs-btn" onclick="openGraphModal('${signal.pair}')">
+                    <button class="view-graphs-btn" onclick="openGraphModal('${pair}')">
                         📊 View Charts
                     </button>
-                    <button class="alert-btn" onclick="setAlert('${signal.pair}')">
+                    <button class="alert-btn" onclick="setAlert('${pair}')">
                         🔔 Set Alert
                     </button>
                 </div>
@@ -1319,7 +1519,11 @@
             
             document.getElementById('refresh-btn').addEventListener('click', loadTradingData);
             document.getElementById('settings-btn').addEventListener('click', () => {
-                alert('⚙️ Settings panel coming soon!\n\nFeatures:\n• Custom alerts\n• Portfolio tracking\n• Advanced filters\n• Real-time notifications');
+                const isDebugMode = localStorage.getItem('debug-mode') === 'true';
+                const newMode = !isDebugMode;
+                localStorage.setItem('debug-mode', newMode.toString());
+                
+                alert(`⚙️ Settings & Debug Panel\n\n${newMode ? '🔍 Debug mode ENABLED' : '🔍 Debug mode DISABLED'}\n\nDebug features:\n• Data structure analysis\n• Quality metrics in console\n• Enhanced error logging\n\nOther features coming soon:\n• Custom alerts\n• Portfolio tracking\n• Advanced filters\n• Real-time notifications\n\nRefresh page to apply changes.`);
             });
 
             // Auto-refresh every 5 minutes
@@ -1328,7 +1532,78 @@
                     loadTradingData();
                 }
             }, 5 * 60 * 1000);
+
+            // Debug mode indicator
+            if (localStorage.getItem('debug-mode') === 'true') {
+                console.log('🔍 Debug mode enabled - Enhanced logging active');
+                document.body.style.boxShadow = 'inset 0 0 0 2px var(--warning)';
+                document.title += ' [DEBUG]';
+            }
         });
+
+        // Enhanced loadTradingData with conditional debugging
+        async function loadTradingData() {
+            if (isLoading) return;
+            
+            isLoading = true;
+            const refreshBtn = document.getElementById('refresh-btn');
+            const loading = document.getElementById('loading');
+            const error = document.getElementById('error');
+            
+            refreshBtn.disabled = true;
+            refreshBtn.innerHTML = '<span class="pulse">⏳</span> Loading...';
+            loading.style.display = 'block';
+            error.style.display = 'none';
+            document.getElementById('signals-container').style.display = 'none';
+            
+            try {
+                let signals;
+                
+                if (localStorage.getItem('debug-mode') === 'true') {
+                    signals = await loadTradingDataWithDebug();
+                } else {
+                    const response = await fetch('data.json?t=' + Date.now());
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const data = await response.json();
+                    signals = parseAllSignals(data);
+                }
+                
+                allSignals = signals;
+                applyCurrentFilter();
+                updateSignalCount(allSignals.length);
+                
+                // Add success animation
+                document.getElementById('signals-container').classList.add('fade-in');
+                
+                // Show success message if debug mode
+                if (localStorage.getItem('debug-mode') === 'true') {
+                    console.log('✅ Data loaded successfully:', allSignals.length, 'signals');
+                }
+            } catch (error) {
+                console.error('❌ Error loading trading data:', error);
+                document.getElementById('error').style.display = 'block';
+                updateSignalCount(0);
+                
+                // Enhanced error display
+                document.getElementById('error').innerHTML = `
+                    ❌ Failed to load trading data<br>
+                    <small style="color: var(--text-secondary); margin-top: 0.5rem; display: block;">
+                        ${error.message || 'Unknown error occurred'}<br>
+                        Check console for details or verify data.json exists
+                    </small>
+                    <button onclick="loadTradingData()" style="margin-top: 1rem; padding: 0.5rem 1rem; background: var(--info); color: white; border: none; border-radius: 8px; cursor: pointer;">
+                        🔄 Try Again
+                    </button>
+                `;
+            } finally {
+                loading.style.display = 'none';
+                isLoading = false;
+                refreshBtn.disabled = false;
+                refreshBtn.innerHTML = '<span>🔄</span> Refresh';
+            }
+        }
 
         // Make functions globally available
         window.openGraphModal = openGraphModal;
