@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Signals Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0b0d;
+            min-height: 100vh;
+            color: #e1e5e9;
+            line-height: 1.4;
+            padding-top: 80px;
+        }
+
+        .top-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(26, 29, 41, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #2d3748;
+            padding: 1rem;
+            z-index: 1000;
+        }
+
+        .top-bar-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .signals-count {
+            background: #2d3748;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #e1e5e9;
+        }
+
+        .search-container {
+            flex: 1;
+            max-width: 300px;
+        }
+
+        .search-input {
+            width: 100%;
+            background: #2d3748;
+            border: 1px solid #4a5568;
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            color: #e1e5e9;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .search-input::placeholder {
+            color: #9ca3af;
+        }
+
+        .search-input:focus {
+            border-color: #22c55e;
+            box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+        }
+
+        .refresh-btn {
+            background: #22c55e;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .refresh-btn:hover {
+            background: #16a34a;
+            transform: translateY(-1px);
+        }
+
+        .refresh-btn:active {
+            transform: translateY(0);
+        }
+
+        .refresh-btn:disabled {
+            background: #4a5568;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .header p {
+            color: rgba(255,255,255,0.6);
+            font-size: 0.9rem;
+        }
+
+        .signals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1rem;
+        }
+
+        .signal-card {
+            background: #1a1d29;
+            border-radius: 12px;
+            padding: 1rem;
+            border: 1px solid #2d3748;
+        }
+
+        .signal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .crypto-pair {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #e1e5e9;
+        }
+
+        .trend-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-weight: 500;
+            font-size: 0.75rem;
+            text-transform: capitalize;
+        }
+
+        .trend-bullish {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+
+        .trend-bearish {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .price-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            background: #252a3a;
+            padding: 0.5rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+
+        .price-label {
+            color: #9ca3af;
+        }
+
+        .price-value {
+            color: #e1e5e9;
+            font-weight: 500;
+        }
+
+        .stats-section {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            font-size: 0.8rem;
+        }
+
+        .stat-item {
+            color: #9ca3af;
+        }
+
+        .stat-value {
+            color: #e1e5e9;
+            font-weight: 500;
+        }
+
+        .levels-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .level-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .support-badge {
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+        }
+
+        .resistance-badge {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .trade-plan {
+            background: #252a3a;
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .trade-plan-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #e1e5e9;
+            margin-bottom: 0.5rem;
+        }
+
+        .trade-plan ul {
+            list-style: none;
+            font-size: 0.8rem;
+        }
+
+        .trade-plan li {
+            margin-bottom: 0.25rem;
+            color: #9ca3af;
+        }
+
+        .trade-plan .label {
+            color: #e1e5e9;
+            font-weight: 500;
+        }
+
+        .buy-action {
+            color: #22c55e;
+        }
+
+        .sell-action {
+            color: #ef4444;
+        }
+
+        .analysis-text {
+            font-size: 0.8rem;
+            color: #9ca3af;
+            font-style: italic;
+            margin-bottom: 0.75rem;
+            line-height: 1.4;
+        }
+
+        .timestamp {
+            font-size: 0.7rem;
+            color: #6b7280;
+            border-top: 1px solid #374151;
+            padding-top: 0.5rem;
+            text-align: center;
+        }
+
+        .view-graphs-btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 16px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 0.5rem;
+            width: 100%;
+        }
+
+        .view-graphs-btn:hover {
+            background: #2563eb;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            background-color: #1a1d29;
+            margin: 2% auto;
+            padding: 1.5rem;
+            border: 1px solid #2d3748;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 900px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            color: #e1e5e9;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .close-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-btn:hover {
+            background: #dc2626;
+        }
+
+        .timeframe-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .timeframe-tab {
+            background: #2d3748;
+            color: #9ca3af;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .timeframe-tab.active {
+            background: #22c55e;
+            color: white;
+        }
+
+        .timeframe-tab:hover:not(.active) {
+            background: #374151;
+            color: #e1e5e9;
+        }
+
+        .graph-container {
+            text-align: center;
+        }
+
+        .graph-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .graph-loading {
+            color: #9ca3af;
+            padding: 2rem;
+        }
+
+        .graph-error {
+            color: #ef4444;
+            padding: 2rem;
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        .loading {
+            text-align: center;
+            color: white;
+            font-size: 1.2rem;
+            padding: 3rem;
+        }
+
+        .error {
+            text-align: center;
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+            padding: 2rem;
+            border-radius: 12px;
+            margin: 2rem auto;
+            max-width: 500px;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .signals-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .container {
+                padding: 0.75rem;
+            }
+
+            .top-bar-content {
+                flex-direction: column;
+                gap: 0.75rem;
+                align-items: stretch;
+            }
+
+            .search-container {
+                max-width: none;
+                order: 2;
+            }
+
+            .signals-count {
+                order: 1;
+                text-align: center;
+            }
+
+            .refresh-btn {
+                order: 3;
+                align-self: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="top-bar-content">
+            <div class="signals-count" id="signals-count">0 Signals</div>
+            <div class="search-container">
+                <input 
+                    type="text" 
+                    class="search-input" 
+                    id="search-input" 
+                    placeholder="Search by crypto pair (e.g., SOL, BTC)..."
+                >
+            </div>
+            <button class="refresh-btn" id="refresh-btn">Refresh</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>📈 Trading Signals</h1>
+            <p>Live Cryptocurrency Trading Analysis Dashboard</p>
+        </div>
+        
+        <div id="loading" class="loading">
+            Loading trading data...
+        </div>
+        
+        <div id="error" class="error" style="display: none;">
+            Failed to load trading data. Please check your data.json file.
+        </div>
+        
+        <div id="signals-container" class="signals-grid" style="display: none;">
+        </div>
+
+        <!-- Graph Modal -->
+        <div id="graph-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title" id="modal-title">SOL/USDT Charts</div>
+                    <button class="close-btn" id="close-modal">&times;</button>
+                </div>
+                
+                <div class="timeframe-tabs" id="timeframe-tabs">
+                    <button class="timeframe-tab active" data-timeframe="15min">15min</button>
+                    <button class="timeframe-tab" data-timeframe="1h">1h</button>
+                    <button class="timeframe-tab" data-timeframe="4h">4h</button>
+                    <button class="timeframe-tab" data-timeframe="1d">1d</button>
+                    <button class="timeframe-tab" data-timeframe="1w">1w</button>
+                </div>
+
+                <div class="graph-container" id="graph-container">
+                    <div class="graph-loading">Loading chart...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allSignals = [];
+        let isLoading = false;
+
+        async function loadTradingData() {
+            if (isLoading) return;
+            
+            isLoading = true;
+            const refreshBtn = document.getElementById('refresh-btn');
+            const loading = document.getElementById('loading');
+            const error = document.getElementById('error');
+            
+            refreshBtn.disabled = true;
+            refreshBtn.textContent = 'Loading...';
+            loading.style.display = 'block';
+            error.style.display = 'none';
+            document.getElementById('signals-container').style.display = 'none';
+            
+            try {
+                const response = await fetch('data.json?t=' + Date.now()); // Cache busting
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                allSignals = parseAllSignals(data);
+                displayFilteredSignals(allSignals);
+                updateSignalCount(allSignals.length);
+            } catch (error) {
+                console.error('Error loading trading data:', error);
+                document.getElementById('error').style.display = 'block';
+                updateSignalCount(0);
+            } finally {
+                loading.style.display = 'none';
+                isLoading = false;
+                refreshBtn.disabled = false;
+                refreshBtn.textContent = 'Refresh';
+            }
+        }
+
+        function parseAllSignals(data) {
+            const signals = [];
+            data.forEach(item => {
+                if (item.result && Array.isArray(item.result)) {
+                    item.result.forEach(message => {
+                        if (message.text) {
+                            const signal = parseSignalText(message.text, message.date);
+                            if (signal) {
+                                signals.push(signal);
+                            }
+                        }
+                    });
+                }
+            });
+            return signals.sort((a, b) => b.timestamp - a.timestamp); // Sort by newest first
+        }
+
+        function displayFilteredSignals(signals) {
+            const container = document.getElementById('signals-container');
+            container.innerHTML = '';
+
+            signals.forEach(signal => {
+                container.appendChild(createSignalCard(signal));
+            });
+
+            container.style.display = signals.length > 0 ? 'grid' : 'none';
+            if (signals.length === 0 && !isLoading) {
+                container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #9ca3af; padding: 2rem;">No signals found matching your search.</div>';
+                container.style.display = 'grid';
+            }
+        }
+
+        function updateSignalCount(count) {
+            const countElement = document.getElementById('signals-count');
+            countElement.textContent = `${count} Signal${count !== 1 ? 's' : ''}`;
+        }
+
+        function setupSearch() {
+            const searchInput = document.getElementById('search-input');
+            let searchTimeout;
+
+            searchInput.addEventListener('input', (e) => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    const searchTerm = e.target.value.trim().toLowerCase();
+                    
+                    if (!searchTerm) {
+                        displayFilteredSignals(allSignals);
+                        updateSignalCount(allSignals.length);
+                        return;
+                    }
+
+                    const filteredSignals = allSignals.filter(signal => 
+                        signal.pair && signal.pair.toLowerCase().includes(searchTerm)
+                    );
+                    
+                    displayFilteredSignals(filteredSignals);
+                    updateSignalCount(filteredSignals.length);
+                }, 300);
+            });
+        }
+
+        function parseSignalText(text, timestamp) {
+            try {
+                const lines = text.split('\n').filter(line => line.trim());
+                
+                const signal = {
+                    timestamp: timestamp || Date.now()
+                };
+                
+                // Parse trend
+                const trendMatch = text.match(/Trend:\s*(\w+)/i);
+                signal.trend = trendMatch ? trendMatch[1] : '';
+                
+                // Parse crypto pair from trading recommendation
+                const pairMatch = text.match(/\[([A-Z]+\/[A-Z]+)\]/);
+                signal.pair = pairMatch ? pairMatch[1] : '';
+                
+                // Parse OHLC data
+                const openMatch = text.match(/Open\s*:\s*([\d.]+)/);
+                const closeMatch = text.match(/Close\s*:\s*([\d.]+)/);
+                const highMatch = text.match(/High\s*:\s*([\d.]+)/);
+                const lowMatch = text.match(/Low\s*:\s*([\d.]+)/);
+                
+                signal.ohlc = {
+                    open: openMatch ? parseFloat(openMatch[1]) : 0,
+                    close: closeMatch ? parseFloat(closeMatch[1]) : 0,
+                    high: highMatch ? parseFloat(highMatch[1]) : 0,
+                    low: lowMatch ? parseFloat(lowMatch[1]) : 0
+                };
+
+                // Calculate amplitude
+                signal.amplitude = signal.ohlc.high - signal.ohlc.low;
+                
+                // Parse support and resistance
+                const supportMatch = text.match(/Support\s*:\s*([\d.]+)/);
+                const resistanceMatch = text.match(/Résistance\s*:\s*([\d.]+)/);
+                
+                signal.support = supportMatch ? parseFloat(supportMatch[1]) : 0;
+                signal.resistance = resistanceMatch ? parseFloat(resistanceMatch[1]) : 0;
+                
+                // Parse ATH/ATL
+                const athMatch = text.match(/ATH\s*:\s*([\d.]+)/);
+                const atlMatch = text.match(/ATL\s*:\s*([\d.]+)/);
+                
+                signal.ath = athMatch ? parseFloat(athMatch[1]) : 0;
+                signal.atl = atlMatch ? parseFloat(atlMatch[1]) : 0;
+                
+                // Parse trading recommendation
+                const buyMatch = text.match(/(Achat|Vente)\s+entre\s+\[([\d.$\s-]+)\]/);
+                const targetMatch = text.match(/Target\s+\[([\d.$\s-]+)\]/);
+                const stopLossMatch = text.match(/Stop loss à ([\d.$\s]+)/);
+                const winMatch = text.match(/Target min win ([\d.%]+)/);
+                
+                if (buyMatch) {
+                    signal.action = buyMatch[1].toLowerCase() === 'achat' ? 'buy' : 'sell';
+                    signal.entryRange = buyMatch[2];
+                }
+                
+                signal.target = targetMatch ? targetMatch[1] : '';
+                signal.stopLoss = stopLossMatch ? stopLossMatch[1].trim() : '';
+                signal.minWin = winMatch ? winMatch[1] : '';
+                
+                // Parse analysis text
+                const analysisMatch = text.match(/→\s*(.+)/);
+                signal.analysis = analysisMatch ? analysisMatch[1].trim() : '';
+                
+                return signal;
+            } catch (error) {
+                console.error('Error parsing signal:', error);
+                return null;
+            }
+        }
+
+        function createSignalCard(signal) {
+            const card = document.createElement('div');
+            card.className = 'signal-card';
+            
+            const trendClass = signal.trend === 'bullish' ? 'trend-bullish' : 'trend-bearish';
+            const trendIcon = signal.trend === 'bullish' ? '🟢' : '🔴';
+            const actionClass = signal.action === 'buy' ? 'buy-action' : 'sell-action';
+            const actionText = signal.action === 'buy' ? 'Buy zone' : 'Sell zone';
+
+            // Format timestamp
+            const date = new Date(signal.timestamp * 1000);
+            const timeStr = date.toLocaleString('en-US', {
+                month: 'numeric',
+                day: 'numeric', 
+                year: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit'
+            });
+            
+            card.innerHTML = `
+                <div class="signal-header">
+                    <div class="crypto-pair">${signal.pair || 'Unknown Pair'}</div>
+                    <div class="trend-badge ${trendClass}">
+                        ${trendIcon} ${signal.trend}
+                    </div>
+                </div>
+                
+                <div class="price-section">
+                    <div class="price-row">
+                        <span class="price-label">Open:</span>
+                        <span class="price-value">${signal.ohlc.open.toFixed(3)}</span>
+                    </div>
+                    <div class="price-row">
+                        <span class="price-label">Close:</span>
+                        <span class="price-value">${signal.ohlc.close.toFixed(3)}</span>
+                    </div>
+                    <div class="price-row">
+                        <span class="price-label">High:</span>
+                        <span class="price-value">${signal.ohlc.high.toFixed(3)}</span>
+                    </div>
+                    <div class="price-row">
+                        <span class="price-label">Low:</span>
+                        <span class="price-value">${signal.ohlc.low.toFixed(3)}</span>
+                    </div>
+                </div>
+
+                <div class="stats-section">
+                    <div class="stat-item">
+                        Amplitude H/L: <span class="stat-value">${signal.amplitude.toFixed(3)} USDT</span>
+                    </div>
+                    <div class="stat-item">
+                        ATH 48h: <span class="stat-value">${signal.ath.toFixed(2)}</span>
+                    </div>
+                </div>
+                
+                <div class="levels-section">
+                    <div class="level-badge support-badge">🟡 Support: ${signal.support.toFixed(3)}</div>
+                    <div class="level-badge resistance-badge">🔴 Resistance: ${signal.resistance.toFixed(2)}</div>
+                </div>
+                
+                <div class="trade-plan">
+                    <div class="trade-plan-title">Trade plan</div>
+                    <ul>
+                        <li><span class="label ${actionClass}">• ${actionText}:</span> ${signal.entryRange}</li>
+                        <li><span class="label">• Targets:</span> ${signal.target}</li>
+                        <li><span class="label">• Stop-loss:</span> ${signal.stopLoss}</li>
+                        <li><span class="label">• Min. win:</span> ${signal.minWin}</li>
+                    </ul>
+                </div>
+
+                ${signal.analysis ? `<div class="analysis-text">
+                    → ${signal.analysis}
+                </div>` : ''}
+
+                <button class="view-graphs-btn" onclick="openGraphModal('${signal.pair}')">
+                    📊 View Charts
+                </button>
+
+                <div class="timestamp">
+                    ${timeStr}
+                </div>
+            `;
+            
+            return card;
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', () => {
+            loadTradingData();
+            setupSearch();
+            setupModal();
+            
+            // Setup refresh button
+            document.getElementById('refresh-btn').addEventListener('click', loadTradingData);
+        });
+
+        // Modal functionality
+        let currentPair = '';
+        const GITHUB_BASE_URL = 'https://raw.githubusercontent.com/atam84/cryptoAnalysisPages/main/graphs/';
+
+        function setupModal() {
+            const modal = document.getElementById('graph-modal');
+            const closeBtn = document.getElementById('close-modal');
+            
+            // Close modal when clicking the X
+            closeBtn.addEventListener('click', closeGraphModal);
+            
+            // Close modal when clicking outside
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeGraphModal();
+                }
+            });
+
+            // Handle timeframe tab clicks
+            const timeframeTabs = document.querySelectorAll('.timeframe-tab');
+            timeframeTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Remove active class from all tabs
+                    timeframeTabs.forEach(t => t.classList.remove('active'));
+                    // Add active class to clicked tab
+                    tab.classList.add('active');
+                    // Load graph for selected timeframe
+                    const timeframe = tab.dataset.timeframe;
+                    loadGraph(currentPair, timeframe);
+                });
+            });
+
+            // Close with Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modal.style.display === 'block') {
+                    closeGraphModal();
+                }
+            });
+        }
+
+        function openGraphModal(pair) {
+            currentPair = pair;
+            const modal = document.getElementById('graph-modal');
+            const modalTitle = document.getElementById('modal-title');
+            
+            modalTitle.textContent = `${pair} Charts`;
+            modal.style.display = 'block';
+            
+            // Load default timeframe (15min)
+            loadGraph(pair, '15min');
+        }
+
+        function closeGraphModal() {
+            const modal = document.getElementById('graph-modal');
+            modal.style.display = 'none';
+        }
+
+        function loadGraph(pair, timeframe) {
+            const graphContainer = document.getElementById('graph-container');
+            graphContainer.innerHTML = '<div class="graph-loading">Loading chart...</div>';
+            
+            // Convert pair format (e.g., "SOL/USDT" to "SOL")
+            const baseCurrency = pair.split('/')[0];
+            
+            // Try different possible filename formats
+            const possibleFilenames = [
+                `${baseCurrency}_${timeframe}.png`,
+                `${baseCurrency}_${timeframe}.jpg`,
+                `${baseCurrency.toLowerCase()}_${timeframe}.png`,
+                `${baseCurrency.toLowerCase()}_${timeframe}.jpg`,
+                `${pair.replace('/', '')}_${timeframe}.png`,
+                `${pair.replace('/', '')}_${timeframe}.jpg`,
+                `${pair.replace('/', '').toLowerCase()}_${timeframe}.png`,
+                `${pair.replace('/', '').toLowerCase()}_${timeframe}.jpg`
+            ];
+
+            tryLoadGraph(possibleFilenames, 0, graphContainer, pair, timeframe);
+        }
+
+        function tryLoadGraph(filenames, index, container, pair, timeframe) {
+            if (index >= filenames.length) {
+                container.innerHTML = `
+                    <div class="graph-error">
+                        Chart not found for ${pair} (${timeframe})
+                        <br><small>Tried: ${filenames.join(', ')}</small>
+                    </div>
+                `;
+                return;
+            }
+
+            const filename = filenames[index];
+            const imageUrl = GITHUB_BASE_URL + filename;
+            
+            const img = new Image();
+            
+            img.onload = function() {
+                container.innerHTML = `
+                    <img src="${imageUrl}" alt="${pair} ${timeframe} chart" class="graph-image" />
+                `;
+            };
+            
+            img.onerror = function() {
+                // Try next filename
+                tryLoadGraph(filenames, index + 1, container, pair, timeframe);
+            };
+            
+            img.src = imageUrl;
+        }
+
+        // Make openGraphModal globally available
+        window.openGraphModal = openGraphModal;
+    </script>
+</body>
+</html>
