@@ -1,0 +1,176 @@
+[
+  {},
+  {
+    "ok": true,
+    "result": {
+      "message_id": 19512,
+      "from": {
+        "id": 7875853077,
+        "is_bot": true,
+        "first_name": "ia_agent_007",
+        "username": "ia_agent_007_bot"
+      },
+      "chat": {
+        "id": 1777090613,
+        "first_name": "amine",
+        "type": "private"
+      },
+      "date": 1756657159,
+      "text": "Trend: bullish\n\n🟡 Approaching support (202.77)\n🟡 Approaching resistance (205.48)\n\n📈 Dernière bougie 1h :  \n   🟢 Open : 204.58  🔴 Close : 203.87  \n   📈 High : 204.59  📉 Low : 203.87  \n   ↔️ Amplitude H/L : 0.72 USDT\n\n📊 Analyse sur les dernières -48 heures :  \n   🔺 ATH : 207.04  🔻 ATL : 197.56  \n   🟠 Support : 202.77  🛑 Résistance : 205.48\n\n🚨 🚨 🚨 🚨 \n\n- 🟢 [SOL/USDT] \nAchat entre [203 $ - 204 $] \nTarget [206 $ - 207 $] \nStop loss à 202 $ \nTarget min win 1.39% \n--- \n→ Le momentum bullish persiste malgré une légère consolidation. Le prix se rapproche des supports, une opportunité pour acheter avant une potentielle montée vers la résistance. \n---",
+      "entities": [
+        {
+          "offset": 7,
+          "length": 7,
+          "type": "bold"
+        },
+        {
+          "offset": 7,
+          "length": 7,
+          "type": "italic"
+        },
+        {
+          "offset": 84,
+          "length": 23,
+          "type": "bold"
+        },
+        {
+          "offset": 116,
+          "length": 6,
+          "type": "bold"
+        },
+        {
+          "offset": 134,
+          "length": 7,
+          "type": "bold"
+        },
+        {
+          "offset": 157,
+          "length": 6,
+          "type": "bold"
+        },
+        {
+          "offset": 175,
+          "length": 5,
+          "type": "bold"
+        },
+        {
+          "offset": 196,
+          "length": 15,
+          "type": "bold"
+        },
+        {
+          "offset": 223,
+          "length": 41,
+          "type": "bold"
+        },
+        {
+          "offset": 273,
+          "length": 5,
+          "type": "bold"
+        },
+        {
+          "offset": 290,
+          "length": 5,
+          "type": "bold"
+        },
+        {
+          "offset": 311,
+          "length": 9,
+          "type": "bold"
+        },
+        {
+          "offset": 332,
+          "length": 12,
+          "type": "bold"
+        }
+      ]
+    }
+  },
+  {},
+  {
+    "ok": true,
+    "result": {
+      "message_id": 19513,
+      "from": {
+        "id": 7875853077,
+        "is_bot": true,
+        "first_name": "ia_agent_007",
+        "username": "ia_agent_007_bot"
+      },
+      "chat": {
+        "id": 1777090613,
+        "first_name": "amine",
+        "type": "private"
+      },
+      "date": 1756657172,
+      "text": "Trend: bearish\n\n🟡 Approaching support (4.798)\n\n📈 Dernière bougie 1h :  \n   🟢 Open : 4.835  🔴 Close : 4.818  \n   📈 High : 4.837  📉 Low : 4.817  \n   ↔️ Amplitude H/L : 0.02 USDT\n\n📊 Analyse sur les dernières -48 heures :  \n   🔺 ATH : 4.95  🔻 ATL : 4.798  \n   🟠 Support : 4.798  🛑 Résistance : 4.921\n\n🚨 🚨 🚨 🚨 \n\n- 🔴 [ICP/USDT] \nVente entre [4.798 $ - 4.800 $] \nTarget [4.750 $ - 4.755 $] \nStop loss à 4.850 $ \nTarget min win 5% \n--- \n→ La tendance est clairement baissière avec un RSI sous 40 et des bougies rouges predominantes. Il est préférable de prendre position à la baisse avant d'atteindre le support critique.",
+      "entities": [
+        {
+          "offset": 7,
+          "length": 7,
+          "type": "bold"
+        },
+        {
+          "offset": 7,
+          "length": 7,
+          "type": "italic"
+        },
+        {
+          "offset": 48,
+          "length": 23,
+          "type": "bold"
+        },
+        {
+          "offset": 80,
+          "length": 6,
+          "type": "bold"
+        },
+        {
+          "offset": 97,
+          "length": 7,
+          "type": "bold"
+        },
+        {
+          "offset": 119,
+          "length": 6,
+          "type": "bold"
+        },
+        {
+          "offset": 136,
+          "length": 5,
+          "type": "bold"
+        },
+        {
+          "offset": 156,
+          "length": 15,
+          "type": "bold"
+        },
+        {
+          "offset": 183,
+          "length": 41,
+          "type": "bold"
+        },
+        {
+          "offset": 233,
+          "length": 5,
+          "type": "bold"
+        },
+        {
+          "offset": 248,
+          "length": 5,
+          "type": "bold"
+        },
+        {
+          "offset": 268,
+          "length": 9,
+          "type": "bold"
+        },
+        {
+          "offset": 288,
+          "length": 12,
+          "type": "bold"
+        }
+      ]
+    }
+  }
+]
