@@ -103,12 +103,15 @@
          Example Function node: set item.binary to string, then .replace('__DATA__', JSON.stringify(yourArray)) before committing.
       2) Or, host a data.json in the same repo and this page will fetch it.
 
-      Schema expected: an array that may include empty slots or objects shaped like Telegram bot updates with result.text.
-      We'll parse notable fields from .result.text and render cards.
+      Schema expected: flexible. Supported inputs include:
+      - An array of objects where each object has a `result` **object** with `text` (old format)
+      - An array of objects where each object has a `result` **array** of messages (new format you posted)
+      - An array of message objects directly (fallback)
+      We'll recursively scan for messages and render cards from any of those shapes.
     */
 
     // 👇 This constant will be replaced via n8n template replacement.
-    const EMBEDDED_DATA = {"ok":true,"result":{"message_id":19513,"from":{"id":7875853077,"is_bot":true,"first_name":"ia_agent_007","username":"ia_agent_007_bot"},"chat":{"id":1777090613,"first_name":"amine","type":"private"},"date":1756657172,"text":"Trend: bearish\n\n🟡 Approaching support (4.798)\n\n📈 Dernière bougie 1h :  \n   🟢 Open : 4.835  🔴 Close : 4.818  \n   📈 High : 4.837  📉 Low : 4.817  \n   ↔️ Amplitude H/L : 0.02 USDT\n\n📊 Analyse sur les dernières -48 heures :  \n   🔺 ATH : 4.95  🔻 ATL : 4.798  \n   🟠 Support : 4.798  🛑 Résistance : 4.921\n\n🚨 🚨 🚨 🚨 \n\n- 🔴 [ICP/USDT] \nVente entre [4.798 $ - 4.800 $] \nTarget [4.750 $ - 4.755 $] \nStop loss à 4.850 $ \nTarget min win 5% \n--- \n→ La tendance est clairement baissière avec un RSI sous 40 et des bougies rouges predominantes. Il est préférable de prendre position à la baisse avant d'atteindre le support critique.","entities":[{"offset":7,"length":7,"type":"bold"},{"offset":7,"length":7,"type":"italic"},{"offset":48,"length":23,"type":"bold"},{"offset":80,"length":6,"type":"bold"},{"offset":97,"length":7,"type":"bold"},{"offset":119,"length":6,"type":"bold"},{"offset":136,"length":5,"type":"bold"},{"offset":156,"length":15,"type":"bold"},{"offset":183,"length":41,"type":"bold"},{"offset":233,"length":5,"type":"bold"},{"offset":248,"length":5,"type":"bold"},{"offset":268,"length":9,"type":"bold"},{"offset":288,"length":12,"type":"bold"}]}}; // Leave as-is for template; replace with JSON string like [...]
+    const EMBEDDED_DATA = __DATA__; // Leave as-is for template; replace with JSON string like [...]
 
     async function getData(){
       try{
@@ -245,21 +248,39 @@
     }
 
     function extractUpdates(arr){
-      // arr can include empties; filter to objects with .result.text
-      const out = [];
-      for(const item of (arr||[])){
-        const r = item && item.result;
-        if(r && r.text){
-          out.push({
-            parsed: parseMessage(r.text),
-            meta: {
-              when: asWhen(r.date),
-              chat: r.chat?.first_name || r.chat?.id,
-              from: r.from?.username || r.from?.first_name || 'bot',
-            }
-          });
+      // Accepts multiple shapes and flattens into a list of message objects
+      const messages = [];
+
+      (function walk(node){
+        if(!node) return;
+        if(Array.isArray(node)){
+          for(const el of node) walk(el);
+          return;
         }
+        if(typeof node === 'object'){
+          // Direct message object
+          if(node.text){ messages.push(node); return; }
+          // Common wrappers
+          if(node.result !== undefined){ walk(node.result); return; }
+          if(node.message !== undefined){ walk(node.message); return; }
+        }
+      })(arr);
+
+      const out = [];
+      for(const m of messages){
+        out.push({
+          parsed: parseMessage(m.text),
+          meta: {
+            when: asWhen(m.date),
+            ts: m.date || 0,
+            chat: m.chat?.first_name || m.chat?.id,
+            from: m.from?.username || m.from?.first_name || 'bot',
+          }
+        });
       }
+
+      // Sort newest first if dates exist
+      out.sort((a,b)=> (b.meta.ts||0) - (a.meta.ts||0));
       return out;
     }
 
