@@ -512,11 +512,8 @@
                 </div>
                 
                 <div class="timeframe-tabs" id="timeframe-tabs">
-                    <button class="timeframe-tab active" data-timeframe="15min">15min</button>
-                    <button class="timeframe-tab" data-timeframe="1h">1h</button>
+                    <button class="timeframe-tab active" data-timeframe="1h">1h</button>
                     <button class="timeframe-tab" data-timeframe="4h">4h</button>
-                    <button class="timeframe-tab" data-timeframe="1d">1d</button>
-                    <button class="timeframe-tab" data-timeframe="1w">1w</button>
                 </div>
 
                 <div class="graph-container" id="graph-container">
@@ -843,8 +840,8 @@
             modalTitle.textContent = `${pair} Charts`;
             modal.style.display = 'block';
             
-            // Load default timeframe (15min)
-            loadGraph(pair, '15min');
+            // Load default timeframe (1h)
+            loadGraph(pair, '1h');
         }
 
         function closeGraphModal() {
@@ -856,52 +853,35 @@
             const graphContainer = document.getElementById('graph-container');
             graphContainer.innerHTML = '<div class="graph-loading">Loading chart...</div>';
             
-            // Convert pair format (e.g., "SOL/USDT" to "SOL")
+            // Extract base currency from pair (e.g., "SOL/USDT" -> "SOL")
             const baseCurrency = pair.split('/')[0];
             
-            // Try different possible filename formats
-            const possibleFilenames = [
-                `${baseCurrency}_${timeframe}.png`,
-                `${baseCurrency}_${timeframe}.jpg`,
-                `${baseCurrency.toLowerCase()}_${timeframe}.png`,
-                `${baseCurrency.toLowerCase()}_${timeframe}.jpg`,
-                `${pair.replace('/', '')}_${timeframe}.png`,
-                `${pair.replace('/', '')}_${timeframe}.jpg`,
-                `${pair.replace('/', '').toLowerCase()}_${timeframe}.png`,
-                `${pair.replace('/', '').toLowerCase()}_${timeframe}.jpg`
-            ];
-
-            tryLoadGraph(possibleFilenames, 0, graphContainer, pair, timeframe);
-        }
-
-        function tryLoadGraph(filenames, index, container, pair, timeframe) {
-            if (index >= filenames.length) {
-                container.innerHTML = `
-                    <div class="graph-error">
-                        Chart not found for ${pair} (${timeframe})
-                        <br><small>Tried: ${filenames.join(', ')}</small>
-                    </div>
-                `;
-                return;
-            }
-
-            const filename = filenames[index];
+            // Use exact filename format from your directory: {CRYPTO}-USDT-{timeframe}.png
+            const filename = `${baseCurrency}-USDT-${timeframe}.png`;
             const imageUrl = GITHUB_BASE_URL + filename;
             
             const img = new Image();
             
             img.onload = function() {
-                container.innerHTML = `
+                graphContainer.innerHTML = `
                     <img src="${imageUrl}" alt="${pair} ${timeframe} chart" class="graph-image" />
                 `;
             };
             
             img.onerror = function() {
-                // Try next filename
-                tryLoadGraph(filenames, index + 1, container, pair, timeframe);
+                graphContainer.innerHTML = `
+                    <div class="graph-error">
+                        Chart not found: ${filename}
+                        <br><small>Make sure the file exists in your graphs directory</small>
+                    </div>
+                `;
             };
             
             img.src = imageUrl;
+        }
+
+        function tryLoadGraph(filenames, index, container, pair, timeframe) {
+            // This function is no longer needed since we know the exact format
         }
 
         // Make openGraphModal globally available
