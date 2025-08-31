@@ -13,10 +13,10 @@
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #0a0b0d;
             min-height: 100vh;
-            color: #333;
-            line-height: 1.6;
+            color: #e1e5e9;
+            line-height: 1.4;
         }
 
         .container {
@@ -27,188 +27,185 @@
 
         .header {
             text-align: center;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
         }
 
         .header h1 {
             color: white;
-            font-size: 2rem;
-            font-weight: 700;
+            font-size: 1.8rem;
+            font-weight: 600;
             margin-bottom: 0.25rem;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
         .header p {
-            color: rgba(255,255,255,0.8);
-            font-size: 1rem;
+            color: rgba(255,255,255,0.6);
+            font-size: 0.9rem;
         }
 
         .signals-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 1rem;
-            margin-bottom: 1rem;
         }
 
         .signal-card {
-            background: rgba(255,255,255,0.95);
-            border-radius: 16px;
-            padding: 1.25rem;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-            backdrop-filter: blur(10px);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .signal-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+            background: #1a1d29;
+            border-radius: 12px;
+            padding: 1rem;
+            border: 1px solid #2d3748;
         }
 
         .signal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1rem;
-            padding-bottom: 0.75rem;
-            border-bottom: 1px solid #f0f0f0;
+            margin-bottom: 0.75rem;
         }
 
         .crypto-pair {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: #2c3e50;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #e1e5e9;
         }
 
         .trend-badge {
-            padding: 0.4rem 0.8rem;
-            border-radius: 20px;
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 0.8rem;
-            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-weight: 500;
+            font-size: 0.75rem;
+            text-transform: capitalize;
         }
 
         .trend-bullish {
-            background: linear-gradient(135deg, #4CAF50, #45a049);
-            color: white;
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
         }
 
         .trend-bearish {
-            background: linear-gradient(135deg, #f44336, #d32f2f);
-            color: white;
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
         }
 
         .price-section {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 0.75rem;
-            margin-bottom: 1rem;
-        }
-
-        .price-item {
-            text-align: center;
-            padding: 0.75rem;
-            background: #f8f9fa;
-            border-radius: 10px;
-        }
-
-        .price-item .label {
-            font-size: 0.7rem;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-            margin-bottom: 0.25rem;
-        }
-
-        .price-item .value {
-            font-size: 1rem;
-            font-weight: 600;
-            color: #2c3e50;
-        }
-
-        .levels-section {
-            margin-bottom: 1rem;
-        }
-
-        .levels-title {
-            font-size: 1rem;
-            font-weight: 600;
-            color: #2c3e50;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
             margin-bottom: 0.75rem;
         }
 
-        .levels-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.75rem;
-        }
-
-        .level-item {
-            padding: 0.75rem;
-            border-radius: 10px;
-            text-align: center;
-        }
-
-        .support-level {
-            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
-            border-left: 4px solid #2196F3;
-        }
-
-        .resistance-level {
-            background: linear-gradient(135deg, #fce4ec, #f8bbd9);
-            border-left: 4px solid #e91e63;
-        }
-
-        .trading-recommendation {
-            background: linear-gradient(135deg, #f3e5f5, #e1bee7);
-            border-radius: 16px;
-            padding: 1.5rem;
-            margin-top: 1.5rem;
-        }
-
-        .recommendation-header {
+        .price-row {
             display: flex;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-
-        .action-type {
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-weight: 600;
-            margin-right: 1rem;
-        }
-
-        .action-buy {
-            background: #4CAF50;
-            color: white;
-        }
-
-        .action-sell {
-            background: #f44336;
-            color: white;
-        }
-
-        .recommendation-details {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
-        }
-
-        .recommendation-item {
-            text-align: center;
-            padding: 0.75rem;
-            background: rgba(255,255,255,0.7);
+            justify-content: space-between;
+            background: #252a3a;
+            padding: 0.5rem;
             border-radius: 8px;
+            font-size: 0.85rem;
+        }
+
+        .price-label {
+            color: #9ca3af;
+        }
+
+        .price-value {
+            color: #e1e5e9;
+            font-weight: 500;
+        }
+
+        .stats-section {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            font-size: 0.8rem;
+        }
+
+        .stat-item {
+            color: #9ca3af;
+        }
+
+        .stat-value {
+            color: #e1e5e9;
+            font-weight: 500;
+        }
+
+        .levels-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .level-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .support-badge {
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+        }
+
+        .resistance-badge {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .trade-plan {
+            background: #252a3a;
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .trade-plan-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #e1e5e9;
+            margin-bottom: 0.5rem;
+        }
+
+        .trade-plan ul {
+            list-style: none;
+            font-size: 0.8rem;
+        }
+
+        .trade-plan li {
+            margin-bottom: 0.25rem;
+            color: #9ca3af;
+        }
+
+        .trade-plan .label {
+            color: #e1e5e9;
+            font-weight: 500;
+        }
+
+        .buy-action {
+            color: #22c55e;
+        }
+
+        .sell-action {
+            color: #ef4444;
         }
 
         .analysis-text {
-            margin-top: 1rem;
-            padding: 1rem;
-            background: rgba(255,255,255,0.5);
-            border-radius: 8px;
+            font-size: 0.8rem;
+            color: #9ca3af;
             font-style: italic;
-            color: #555;
+            margin-bottom: 0.75rem;
+            line-height: 1.4;
+        }
+
+        .timestamp {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            color: #6b7280;
+            border-top: 1px solid #374151;
+            padding-top: 0.5rem;
         }
 
         .loading {
@@ -220,12 +217,13 @@
 
         .error {
             text-align: center;
-            color: #ff6b6b;
-            background: rgba(255,255,255,0.9);
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
             padding: 2rem;
             border-radius: 12px;
             margin: 2rem auto;
             max-width: 500px;
+            border: 1px solid rgba(239, 68, 68, 0.2);
         }
 
         @media (max-width: 768px) {
@@ -239,20 +237,6 @@
             
             .container {
                 padding: 0.75rem;
-            }
-
-            .price-section {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 0.5rem;
-            }
-
-            .recommendation-details {
-                grid-template-columns: 1fr;
-                gap: 0.5rem;
-            }
-
-            .crypto-pair {
-                font-size: 1.1rem;
             }
         }
     </style>
@@ -300,7 +284,7 @@
                 if (item.result && Array.isArray(item.result)) {
                     item.result.forEach(message => {
                         if (message.text) {
-                            const signal = parseSignalText(message.text);
+                            const signal = parseSignalText(message.text, message.date);
                             if (signal) {
                                 container.appendChild(createSignalCard(signal));
                             }
@@ -313,11 +297,13 @@
             document.getElementById('signals-container').style.display = 'grid';
         }
 
-        function parseSignalText(text) {
+        function parseSignalText(text, timestamp) {
             try {
                 const lines = text.split('\n').filter(line => line.trim());
                 
-                const signal = {};
+                const signal = {
+                    timestamp: timestamp || Date.now()
+                };
                 
                 // Parse trend
                 const trendMatch = text.match(/Trend:\s*(\w+)/i);
@@ -339,6 +325,9 @@
                     high: highMatch ? parseFloat(highMatch[1]) : 0,
                     low: lowMatch ? parseFloat(lowMatch[1]) : 0
                 };
+
+                // Calculate amplitude
+                signal.amplitude = signal.ohlc.high - signal.ohlc.low;
                 
                 // Parse support and resistance
                 const supportMatch = text.match(/Support\s*:\s*([\d.]+)/);
@@ -385,78 +374,78 @@
             card.className = 'signal-card';
             
             const trendClass = signal.trend === 'bullish' ? 'trend-bullish' : 'trend-bearish';
-            const actionClass = signal.action === 'buy' ? 'action-buy' : 'action-sell';
-            const actionText = signal.action === 'buy' ? '🟢 BUY' : '🔴 SELL';
+            const trendIcon = signal.trend === 'bullish' ? '🟢' : '🔴';
+            const actionClass = signal.action === 'buy' ? 'buy-action' : 'sell-action';
+            const actionText = signal.action === 'buy' ? 'Buy zone' : 'Sell zone';
+
+            // Format timestamp
+            const date = new Date(signal.timestamp * 1000);
+            const timeStr = date.toLocaleString('en-US', {
+                month: 'numeric',
+                day: 'numeric', 
+                year: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit'
+            });
             
             card.innerHTML = `
                 <div class="signal-header">
                     <div class="crypto-pair">${signal.pair || 'Unknown Pair'}</div>
                     <div class="trend-badge ${trendClass}">
-                        ${signal.trend}
+                        ${trendIcon} ${signal.trend}
                     </div>
                 </div>
                 
                 <div class="price-section">
-                    <div class="price-item">
-                        <div class="label">Open</div>
-                        <div class="value">$${signal.ohlc.open.toFixed(3)}</div>
+                    <div class="price-row">
+                        <span class="price-label">Open:</span>
+                        <span class="price-value">${signal.ohlc.open.toFixed(3)}</span>
                     </div>
-                    <div class="price-item">
-                        <div class="label">Close</div>
-                        <div class="value">$${signal.ohlc.close.toFixed(3)}</div>
+                    <div class="price-row">
+                        <span class="price-label">Close:</span>
+                        <span class="price-value">${signal.ohlc.close.toFixed(3)}</span>
                     </div>
-                    <div class="price-item">
-                        <div class="label">High</div>
-                        <div class="value">$${signal.ohlc.high.toFixed(3)}</div>
+                    <div class="price-row">
+                        <span class="price-label">High:</span>
+                        <span class="price-value">${signal.ohlc.high.toFixed(3)}</span>
                     </div>
-                    <div class="price-item">
-                        <div class="label">Low</div>
-                        <div class="value">$${signal.ohlc.low.toFixed(3)}</div>
+                    <div class="price-row">
+                        <span class="price-label">Low:</span>
+                        <span class="price-value">${signal.ohlc.low.toFixed(3)}</span>
+                    </div>
+                </div>
+
+                <div class="stats-section">
+                    <div class="stat-item">
+                        Amplitude H/L: <span class="stat-value">${signal.amplitude.toFixed(3)} USDT</span>
+                    </div>
+                    <div class="stat-item">
+                        ATH 48h: <span class="stat-value">${signal.ath.toFixed(2)}</span>
                     </div>
                 </div>
                 
                 <div class="levels-section">
-                    <div class="levels-title">📊 Support & Resistance Levels</div>
-                    <div class="levels-grid">
-                        <div class="level-item support-level">
-                            <div class="label">🟠 Support</div>
-                            <div class="value">$${signal.support.toFixed(3)}</div>
-                        </div>
-                        <div class="level-item resistance-level">
-                            <div class="label">🛑 Resistance</div>
-                            <div class="value">$${signal.resistance.toFixed(3)}</div>
-                        </div>
-                    </div>
+                    <div class="level-badge support-badge">🟡 Support: ${signal.support.toFixed(3)}</div>
+                    <div class="level-badge resistance-badge">🔴 Resistance: ${signal.resistance.toFixed(2)}</div>
                 </div>
                 
-                <div class="trading-recommendation">
-                    <div class="recommendation-header">
-                        <div class="action-type ${actionClass}">${actionText}</div>
-                        <div style="font-weight: 600;">Trading Signal</div>
-                    </div>
-                    
-                    <div class="recommendation-details">
-                        <div class="recommendation-item">
-                            <div class="label">Entry Range</div>
-                            <div class="value">${signal.entryRange}</div>
-                        </div>
-                        <div class="recommendation-item">
-                            <div class="label">Target</div>
-                            <div class="value">${signal.target}</div>
-                        </div>
-                        <div class="recommendation-item">
-                            <div class="label">Stop Loss</div>
-                            <div class="value">${signal.stopLoss}</div>
-                        </div>
-                        <div class="recommendation-item">
-                            <div class="label">Min Win</div>
-                            <div class="value">${signal.minWin}</div>
-                        </div>
-                    </div>
-                    
-                    ${signal.analysis ? `<div class="analysis-text">
-                        💡 ${signal.analysis}
-                    </div>` : ''}
+                <div class="trade-plan">
+                    <div class="trade-plan-title">Trade plan</div>
+                    <ul>
+                        <li><span class="label ${actionClass}">• ${actionText}:</span> ${signal.entryRange}</li>
+                        <li><span class="label">• Targets:</span> ${signal.target}</li>
+                        <li><span class="label">• Stop-loss:</span> ${signal.stopLoss}</li>
+                        <li><span class="label">• Min. win:</span> ${signal.minWin}</li>
+                    </ul>
+                </div>
+
+                ${signal.analysis ? `<div class="analysis-text">
+                    → ${signal.analysis}
+                </div>` : ''}
+
+                <div class="timestamp">
+                    <span>${timeStr}</span>
+                    <span>From: ia_agent_007_bot • Chat: amine</span>
                 </div>
             `;
             
