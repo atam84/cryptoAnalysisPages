@@ -113,6 +113,40 @@
     // 👇 This constant will be replaced via n8n template replacement.
     const EMBEDDED_DATA = (typeof window !== 'undefined' && Array.isArray(window.__DATA__)) ? window.__DATA__ : undefined; // Uses window.__DATA__ when present; otherwise fetches data.json
 
+    // UI/options
+    const UI = { showMeta: false, dedupeLevels: true, preferApproaching: true };
+
+    // Helpers for level comparison & chips (no regex to avoid template escaping issues)
+    function toNum(v){
+      if(v==null) return NaN;
+      const s = String(v);
+      let out = '';
+      for(let i=0;i<s.length;i++){
+        const ch = s[i];
+        if((ch>='0' && ch<='9') || ch==='.' || ch==='-') out += ch;
+      }
+      const n = parseFloat(out);
+      return Number.isFinite(n) ? n : NaN;
+    }
+    function nearlyEqual(a,b,tol=1e-3){
+      const na = toNum(a), nb = toNum(b);
+      if(!Number.isFinite(na) || !Number.isFinite(nb)) return false;
+      return Math.abs(na-nb) <= tol;
+    }
+    const chip = (cls, content) => `<div class="chip ${cls}">${content}</div>`;
+    function renderLevels(parsed){
+      const out = [];
+      if(parsed.approachingSupport){ out.push(chip('warn', `🟡 Support≈ <b>${parsed.approachingSupport}</b>`)); }
+      if(parsed.approachingResistance){ out.push(chip('warn', `🟡 Resistance≈ <b>${parsed.approachingResistance}</b>`)); }
+      if(parsed.support !== undefined && !(UI.dedupeLevels && nearlyEqual(parsed.support, parsed.approachingSupport))){
+        out.push(chip('up', `🟠 Support: <b>${fmt(parsed.support)}</b>`));
+      }
+      if(parsed.resistance !== undefined && !(UI.dedupeLevels && nearlyEqual(parsed.resistance, parsed.approachingResistance))){
+        out.push(chip('res', `🛑 Résistance: <b>${fmt(parsed.resistance)}</b>`));
+      }
+      return `${renderLevels(parsed)}`;
+    }
+
     async function getData(){
       if(Array.isArray(EMBEDDED_DATA)) return EMBEDDED_DATA;
 
@@ -249,6 +283,7 @@
 
           <div class="foot">
             <div class="time">${meta?.when || ''}</div>
+          </div>
             <div class="muted">From: ${meta?.from || 'bot'} · Chat: ${meta?.chat || ''}</div>
           </div>
         </article>
