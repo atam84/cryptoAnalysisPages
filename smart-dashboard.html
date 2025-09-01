@@ -356,6 +356,35 @@
         .sr-value.support { color: var(--success); }
         .sr-value.resistance { color: var(--danger); }
 
+        .market-context {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: var(--accent-bg);
+            border-radius: 8px;
+        }
+
+        .context-item {
+            text-align: center;
+        }
+
+        .context-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+        }
+
+        .context-value {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .context-value.ath { color: var(--info); }
+        .context-value.atl { color: var(--warning); }
+        .context-value.amplitude { color: var(--text-secondary); }
+
         .signal-details {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -655,42 +684,58 @@
 
             parseSignalText(text, timestamp) {
                 try {
-                    // Extract pair from text
+                    // Extract pair from text - look for [PAIR/USDT] format
                     const pairMatch = text.match(/\[([A-Z]+\/[A-Z]+)\]/);
                     if (!pairMatch) return null;
                     
                     const pair = pairMatch[1];
                     
-                    // Extract trend
+                    // Extract trend from "Trend: bullish/bearish"
                     const trendMatch = text.match(/Trend:\s*(bullish|bearish)/i);
                     const trend = trendMatch ? trendMatch[1].toLowerCase() : 'neutral';
                     
-                    // Extract OHLC data
-                    const openMatch = text.match(/Open\s*:\s*([\d.]+)/i);
-                    const closeMatch = text.match(/Close\s*:\s*([\d.]+)/i);
-                    const highMatch = text.match(/High\s*:\s*([\d.]+)/i);
-                    const lowMatch = text.match(/Low\s*:\s*([\d.]+)/i);
+                    // Extract OHLC data from "Dernière bougie 4h" section
+                    const openMatch = text.match(/🟢\s*Open\s*:\s*([\d.]+)/i);
+                    const closeMatch = text.match(/🔴\s*Close\s*:\s*([\d.]+)/i);
+                    const highMatch = text.match(/📈\s*High\s*:\s*([\d.]+)/i);
+                    const lowMatch = text.match(/📉\s*Low\s*:\s*([\d.]+)/i);
                     
-                    // Extract support and resistance
-                    const supportMatch = text.match(/Support\s*:\s*([\d.]+)/i);
-                    const resistanceMatch = text.match(/Resistance\s*:\s*([\d.]+)/i);
+                    // Extract support and resistance from "Support" and "Résistance" sections
+                    const supportMatch = text.match(/🟠\s*Support\s*:\s*([\d.]+)/i);
+                    const resistanceMatch = text.match(/🛑\s*Résistance\s*:\s*([\d.]+)/i);
                     
-                    // Extract action and targets
-                    const actionMatch = text.match(/(?:Achat|Buy|Vente|Sell|Attente|Wait)\s*:?\s*([^$]+)/i);
+                    // Extract action from the trading recommendation section
                     let action = 'wait';
-                    if (actionMatch) {
-                        const actionText = actionMatch[1].toLowerCase();
-                        if (actionText.includes('achat') || actionText.includes('buy')) action = 'buy';
-                        else if (actionText.includes('vente') || actionText.includes('sell')) action = 'sell';
+                    if (text.includes('⏸️') || text.includes('Attente')) {
+                        action = 'wait';
+                    } else if (text.includes('🟢') && text.includes('Achat')) {
+                        action = 'buy';
+                    } else if (text.includes('🔴') && text.includes('Vente')) {
+                        action = 'sell';
+                    } else if (text.includes('Achat') || text.includes('Buy')) {
+                        action = 'buy';
+                    } else if (text.includes('Vente') || text.includes('Sell')) {
+                        action = 'sell';
                     }
                     
-                    // Extract entry range
-                    const entryMatch = text.match(/entre\s*\[([\d.\s-]+)\]/i);
-                    const targetMatch = text.match(/Target\s*\[([\d.\s-]+)\]/i);
-                    const stopLossMatch = text.match(/Stop loss\s*[àa]\s*([\d.]+)/i);
+                    // Extract entry range from "Achat entre [X $ - Y $]" or "Vente entre [X $ - Y $]"
+                    const entryMatch = text.match(/(?:Achat|Vente)\s+entre\s*\[([\d.\s-]+)\s*\$/i);
                     
-                    // Extract win percentage
+                    // Extract target from "Target [X $ - Y $]" or "Target [X $]"
+                    const targetMatch = text.match(/Target\s*\[([\d.\s-]+)\s*\$/i);
+                    
+                    // Extract stop loss from "Stop loss à X $"
+                    const stopLossMatch = text.match(/Stop loss\s*[àa]\s*([\d.]+)\s*\$/i);
+                    
+                    // Extract win percentage from "Target min win X%" or "win X%"
                     const winMatch = text.match(/(?:Target min win|win)\s*([\d.]+)%/i);
+                    
+                    // Extract ATH and ATL values
+                    const athMatch = text.match(/🔺\s*ATH\s*:\s*([\d.]+)/i);
+                    const atlMatch = text.match(/🔻\s*ATL\s*:\s*([\d.]+)/i);
+                    
+                    // Extract amplitude H/L
+                    const amplitudeMatch = text.match(/↔️\s*Amplitude H\/L\s*:\s*([\d.]+)\s*USDT/i);
                     
                     return {
                         pair,
@@ -709,6 +754,9 @@
                         target: targetMatch ? targetMatch[1].trim() : null,
                         stopLoss: stopLossMatch ? parseFloat(stopLossMatch[1]) : null,
                         winPercentage: winMatch ? parseFloat(winMatch[1]) : null,
+                        ath: athMatch ? parseFloat(athMatch[1]) : null,
+                        atl: atlMatch ? parseFloat(atlMatch[1]) : null,
+                        amplitude: amplitudeMatch ? parseFloat(amplitudeMatch[1]) : null,
                         rawText: text
                     };
                     
@@ -829,6 +877,21 @@
                             <div class="sr-item">
                                 <div class="sr-label">Resistance</div>
                                 <div class="sr-value resistance">${signal.resistance || 'N/A'}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="market-context">
+                            <div class="context-item">
+                                <div class="context-label">ATH</div>
+                                <div class="context-value ath">${signal.ath || 'N/A'}</div>
+                            </div>
+                            <div class="context-item">
+                                <div class="context-label">ATL</div>
+                                <div class="context-value atl">${signal.atl || 'N/A'}</div>
+                            </div>
+                            <div class="context-item">
+                                <div class="context-label">Amplitude</div>
+                                <div class="context-value amplitude">${signal.amplitude ? signal.amplitude + ' USDT' : 'N/A'}</div>
                             </div>
                         </div>
                         
