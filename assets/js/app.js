@@ -935,7 +935,7 @@ class ConsoleTradingDashboard {
                 console.log(`✅ Main data loaded for ${pair}:`, mainData);
                 timeframesHTML += `
                     <div class="timeframe-item" data-timeframe="main">
-                        <div class="timeframe-header" onclick="dashboard.toggleTimeframeSection(this)">
+                        <div class="timeframe-header" data-action="toggle">
                             <h5>📊 Main Data</h5>
                             <button class="timeframe-toggle" title="Toggle section">▼</button>
                         </div>
@@ -962,7 +962,7 @@ class ConsoleTradingDashboard {
                         console.log(`✅ ${timeframe} data loaded for ${pair}:`, data);
                         timeframesHTML += `
                             <div class="timeframe-item" data-timeframe="${timeframe}">
-                                <div class="timeframe-header" onclick="dashboard.toggleTimeframeSection(this)">
+                                <div class="timeframe-header" data-action="toggle">
                                     <h5>⏰ ${timeframe} Timeframe</h5>
                                     <button class="timeframe-toggle" title="Toggle section">▼</button>
                                 </div>
@@ -977,13 +977,13 @@ class ConsoleTradingDashboard {
                         console.log(`⚠️ ${timeframe} data not available for ${pair}`);
                         timeframesHTML += `
                             <div class="timeframe-item unavailable" data-timeframe="${timeframe}">
-                                <div class="timeframe-header" onclick="dashboard.toggleTimeframeSection(this)">
+                                <div class="timeframe-header" data-action="toggle">
                                     <h5>⏰ ${timeframe} Timeframe</h5>
                                     <button class="timeframe-toggle" title="Toggle section">▼</button>
                                 </div>
                                 <div class="timeframe-content">
                                     <div class="timeframe-status">
-                                        <span class="status warning">⚠️ Error loading data</span>
+                                        <span class="status warning">⚠️ Data not available</span>
                                     </div>
                                 </div>
                             </div>
@@ -993,10 +993,10 @@ class ConsoleTradingDashboard {
                     console.log(`❌ Error loading ${timeframe} data for ${pair}:`, error);
                     timeframesHTML += `
                         <div class="timeframe-item unavailable" data-timeframe="${timeframe}">
-                            <div class="timeframe-header" onclick="dashboard.toggleTimeframeSection(this)">
+                            <div class="timeframe-header" data-action="toggle">
                                 <h5>⏰ ${timeframe} Timeframe</h5>
                                 <button class="timeframe-toggle" title="Toggle section">▼</button>
-                                </div>
+                            </div>
                             <div class="timeframe-content">
                                 <div class="timeframe-status">
                                     <span class="status warning">⚠️ Error loading data</span>
@@ -1009,12 +1009,26 @@ class ConsoleTradingDashboard {
             
             timeframesHTML += '</div>';
             timeframesTab.innerHTML = timeframesHTML;
+            
+            // Add event listeners for collapsible functionality
+            this.setupTimeframeEventListeners(timeframesTab);
+            
             console.log(`✅ Timeframe modal populated for ${pair} with collapsible sections`);
             
         } catch (error) {
             console.error('❌ Error loading timeframe data for modal:', error);
             timeframesTab.innerHTML = '<div class="error">Error loading timeframe data. Please try again.</div>';
         }
+    }
+
+    setupTimeframeEventListeners(timeframesTab) {
+        // Use event delegation for timeframe headers
+        timeframesTab.addEventListener('click', (event) => {
+            const header = event.target.closest('.timeframe-header');
+            if (header && header.dataset.action === 'toggle') {
+                this.toggleTimeframeSection(header);
+            }
+        });
     }
 
     toggleTimeframeSection(headerElement) {
