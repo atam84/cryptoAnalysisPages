@@ -29,6 +29,84 @@
             --gradient-danger: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
         }
 
+        // Show data format help
+        function showDataFormatHelp() {
+            const helpModal = document.createElement('div');
+            helpModal.className = 'modal';
+            helpModal.style.display = 'block';
+            helpModal.innerHTML = `
+                <div class="modal-content" style="max-width: 800px;">
+                    <div class="modal-header">
+                        <div class="modal-title">📖 Data Format Guide</div>
+                        <button class="close-btn" onclick="this.closest('.modal').remove()">&times;</button>
+                    </div>
+                    
+                    <div style="max-height: 60vh; overflow-y: auto; padding: 1rem;">
+                        <h3 style="color: var(--success); margin-bottom: 1rem;">✅ Supported Data Formats</h3>
+                        
+                        <h4 style="color: var(--text-primary); margin-bottom: 0.5rem;">1. Telegram Message Format</h4>
+                        <pre style="background: var(--card-bg); padding: 1rem; border-radius: 8px; font-size: 0.8rem; overflow-x: auto; margin-bottom: 1rem;"><code>[{
+  "result": [
+    {
+      "text": "BTC/USDT Signal\\nTrend: bullish\\nOpen: 43250.50\\nClose: 43645.80\\nSupport: 42500\\nResistance: 44200",
+      "date": 1640995200
+    }
+  ]
+}]</code></pre>
+
+                        <h4 style="color: var(--text-primary); margin-bottom: 0.5rem;">2. DataSource Format (Your enrichData4.js output)</h4>
+                        <pre style="background: var(--card-bg); padding: 1rem; border-radius: 8px; font-size: 0.8rem; overflow-x: auto; margin-bottom: 1rem;"><code>[{
+  "currency": "SOL-USDT",
+  "last": {
+    "open": 185.25,
+    "high": 187.40,
+    "low": 182.10,
+    "close": 183.75,
+    "trend": { "direction": "baissière" }
+  },
+  "supp_res": {
+    "support": 180.50,
+    "resistance": 188.00
+  }
+}]</code></pre>
+
+                        <h4 style="color: var(--text-primary); margin-bottom: 0.5rem;">3. Direct Signal Format</h4>
+                        <pre style="background: var(--card-bg); padding: 1rem; border-radius: 8px; font-size: 0.8rem; overflow-x: auto; margin-bottom: 1rem;"><code>[{
+  "pair": "ETH/USDT",
+  "trend": "bullish",
+  "ohlc": { "open": 2750.80, "high": 2789.50, "low": 2740.25, "close": 2785.40 },
+  "support": 2720.00,
+  "resistance": 2800.00,
+  "timestamp": 1640995200
+}]</code></pre>
+
+                        <h3 style="color: var(--warning); margin: 1.5rem 0 1rem;">⚠️ Troubleshooting</h3>
+                        <ul style="color: var(--text-secondary); line-height: 1.6;">
+                            <li><strong>No data loaded:</strong> Check if data.json exists and is valid JSON</li>
+                            <li><strong>CORS errors:</strong> Serve files through a local server, not file:// protocol</li>
+                            <li><strong>Missing fields:</strong> Dashboard shows "N/A" for missing data - check console for warnings</li>
+                            <li><strong>Wrong format:</strong> Dashboard tries multiple parsing strategies automatically</li>
+                        </ul>
+
+                        <h3 style="color: var(--info); margin: 1.5rem 0 1rem;">🛠️ Testing</h3>
+                        <p style="color: var(--text-secondary); line-height: 1.6;">
+                            The dashboard automatically loads demo data if data.json fails to load, 
+                            so you can test the interface even without your actual data file.
+                        </p>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(helpModal);
+            
+            // Close on background click
+            helpModal.addEventListener('click', (e) => {
+                if (e.target === helpModal) {
+                    helpModal.remove();
+                }
+            });
+        }
+
         // Debugging and data quality functions
         function analyzeDataQuality(signals) {
             const analysis = {
@@ -1541,7 +1619,7 @@
             }
         });
 
-        // Enhanced loadTradingData with conditional debugging
+        // Enhanced loadTradingData with fallback demo data
         async function loadTradingData() {
             if (isLoading) return;
             
@@ -1557,18 +1635,51 @@
             document.getElementById('signals-container').style.display = 'none';
             
             try {
-                let signals;
+                let data;
+                let signals = [];
                 
-                if (localStorage.getItem('debug-mode') === 'true') {
-                    signals = await loadTradingDataWithDebug();
-                } else {
+                // Always enable debug mode for troubleshooting
+                console.group('🔍 Loading Trading Data');
+                
+                try {
+                    // Try to load data.json
+                    console.log('📁 Attempting to load data.json...');
                     const response = await fetch('data.json?t=' + Date.now());
+                    
                     if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                     }
-                    const data = await response.json();
-                    signals = parseAllSignals(data);
+                    
+                    const contentType = response.headers.get('content-type');
+                    console.log('📄 Content-Type:', contentType);
+                    
+                    data = await response.json();
+                    console.log('✅ Raw data loaded successfully');
+                    console.log('📊 Data type:', typeof data, 'Array:', Array.isArray(data));
+                    console.log('📈 Data sample:', data);
+                    
+                } catch (fetchError) {
+                    console.warn('⚠️ Failed to load data.json:', fetchError.message);
+                    console.log('🎭 Loading demo data instead...');
+                    data = createDemoData();
                 }
+                
+                // Debug the data structure
+                debugDataStructure(data);
+                
+                // Parse signals with multiple strategies
+                signals = parseAllSignals(data);
+                console.log('🎯 Parsed signals:', signals.length);
+                
+                if (signals.length === 0) {
+                    console.warn('⚠️ No signals parsed, trying alternative parsing...');
+                    signals = tryAlternativeParsing(data);
+                }
+                
+                // Analyze data quality
+                const qualityAnalysis = analyzeDataQuality(signals);
+                
+                console.groupEnd();
                 
                 allSignals = signals;
                 applyCurrentFilter();
@@ -1577,25 +1688,42 @@
                 // Add success animation
                 document.getElementById('signals-container').classList.add('fade-in');
                 
-                // Show success message if debug mode
-                if (localStorage.getItem('debug-mode') === 'true') {
-                    console.log('✅ Data loaded successfully:', allSignals.length, 'signals');
-                }
-            } catch (error) {
-                console.error('❌ Error loading trading data:', error);
-                document.getElementById('error').style.display = 'block';
-                updateSignalCount(0);
+                console.log('✅ Dashboard loaded with', allSignals.length, 'signals');
                 
-                // Enhanced error display
+            } catch (error) {
+                console.error('❌ Critical error loading trading data:', error);
+                console.groupEnd();
+                
+                // Show fallback demo data
+                console.log('🎭 Loading demo data as fallback...');
+                allSignals = createDemoData();
+                applyCurrentFilter();
+                updateSignalCount(allSignals.length);
+                
+                document.getElementById('error').style.display = 'block';
                 document.getElementById('error').innerHTML = `
-                    ❌ Failed to load trading data<br>
+                    ⚠️ Using Demo Data - data.json not found<br>
                     <small style="color: var(--text-secondary); margin-top: 0.5rem; display: block;">
-                        ${error.message || 'Unknown error occurred'}<br>
-                        Check console for details or verify data.json exists
+                        Error: ${error.message}<br><br>
+                        <strong>Expected data.json format:</strong><br>
+                        • Array of objects with signal data<br>
+                        • Objects with 'result' arrays (Telegram format)<br>
+                        • Objects with 'symbol', 'data' arrays (DataSource format)<br>
+                        • Text-based signal messages<br><br>
+                        <strong>Troubleshooting:</strong><br>
+                        1. Ensure data.json exists in root directory<br>
+                        2. Check browser console (F12) for detailed errors<br>
+                        3. Verify JSON syntax is valid<br>
+                        4. Check for CORS issues if testing locally
                     </small>
-                    <button onclick="loadTradingData()" style="margin-top: 1rem; padding: 0.5rem 1rem; background: var(--info); color: white; border: none; border-radius: 8px; cursor: pointer;">
-                        🔄 Try Again
-                    </button>
+                    <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+                        <button onclick="loadTradingData()" style="padding: 0.5rem 1rem; background: var(--info); color: white; border: none; border-radius: 8px; cursor: pointer;">
+                            🔄 Try Again
+                        </button>
+                        <button onclick="showDataFormatHelp()" style="padding: 0.5rem 1rem; background: var(--warning); color: white; border: none; border-radius: 8px; cursor: pointer;">
+                            📖 Data Format Help
+                        </button>
+                    </div>
                 `;
             } finally {
                 loading.style.display = 'none';
@@ -1605,9 +1733,204 @@
             }
         }
 
+        // Create demo data for testing - expanded version
+        function createDemoData() {
+            const demoSignals = [
+                {
+                    pair: 'BTC/USDT',
+                    timestamp: Date.now() / 1000,
+                    trend: 'bullish',
+                    ohlc: { open: 43250.50, high: 43890.75, low: 42980.25, close: 43645.80 },
+                    support: 42500.00,
+                    resistance: 44200.00,
+                    action: 'buy',
+                    entryRange: '43500-43700',
+                    target: '44000-44200',
+                    stopLoss: '42800',
+                    minWin: '3.2%',
+                    analysis: 'Strong bullish momentum with RSI trending upward. Breaking resistance at 43800. Volume confirmation suggests continuation.',
+                    amplitude: 910.50,
+                    change: 395.30,
+                    changePercent: 0.91
+                },
+                {
+                    pair: 'SOL/USDT',
+                    timestamp: Date.now() / 1000 - 3600,
+                    trend: 'bearish',
+                    ohlc: { open: 185.25, high: 187.40, low: 182.10, close: 183.75 },
+                    support: 180.50,
+                    resistance: 188.00,
+                    action: 'sell',
+                    entryRange: '183-184',
+                    target: '180-181',
+                    stopLoss: '188.50',
+                    minWin: '2.1%',
+                    analysis: 'Bearish divergence detected on 4H timeframe. Price rejected at key resistance level. RSI showing overbought conditions.',
+                    amplitude: 5.30,
+                    change: -1.50,
+                    changePercent: -0.81
+                },
+                {
+                    pair: 'ETH/USDT',
+                    timestamp: Date.now() / 1000 - 1800,
+                    trend: 'bullish',
+                    ohlc: { open: 2750.80, high: 2789.50, low: 2740.25, close: 2785.40 },
+                    support: 2720.00,
+                    resistance: 2800.00,
+                    action: 'buy',
+                    entryRange: '2780-2790',
+                    target: '2800-2820',
+                    stopLoss: '2735',
+                    minWin: '1.8%',
+                    analysis: 'ETH showing strength above key support at 2720. Volume profile indicates institutional accumulation. MACD bullish cross confirmed.',
+                    amplitude: 49.25,
+                    change: 34.60,
+                    changePercent: 1.26
+                },
+                {
+                    pair: 'ADA/USDT',
+                    timestamp: Date.now() / 1000 - 7200,
+                    trend: 'neutral',
+                    ohlc: { open: 0.485, high: 0.492, low: 0.478, close: 0.487 },
+                    support: 0.475,
+                    resistance: 0.495,
+                    action: 'hold',
+                    entryRange: '0.485-0.490',
+                    target: '0.495-0.500',
+                    stopLoss: '0.472',
+                    minWin: '2.5%',
+                    analysis: 'ADA consolidating in tight range. Waiting for breakout confirmation. Low volatility suggests accumulation phase.',
+                    amplitude: 0.014,
+                    change: 0.002,
+                    changePercent: 0.41
+                },
+                {
+                    pair: 'DOGE/USDT',
+                    timestamp: Date.now() / 1000 - 5400,
+                    trend: 'bullish',
+                    ohlc: { open: 0.0825, high: 0.0847, low: 0.0818, close: 0.0842 },
+                    support: 0.0810,
+                    resistance: 0.0855,
+                    action: 'buy',
+                    entryRange: '0.0840-0.0845',
+                    target: '0.0850-0.0860',
+                    stopLoss: '0.0815',
+                    minWin: '2.8%',
+                    analysis: 'DOGE breaking above consolidation pattern. Social sentiment turning positive. Watch for volume spike confirmation.',
+                    amplitude: 0.0029,
+                    change: 0.0017,
+                    changePercent: 2.06
+                }
+            ];
+            
+            console.log('🎭 Generated demo data with', demoSignals.length, 'sample signals');
+            return demoSignals;
+        }
+
+        // Alternative parsing strategies
+        function tryAlternativeParsing(data) {
+            console.log('🔄 Trying alternative parsing strategies...');
+            
+            const signals = [];
+            
+            // Strategy 1: Look for nested arrays/objects
+            const flattened = flattenData(data);
+            console.log('📦 Flattened data items:', flattened.length);
+            
+            flattened.forEach((item, index) => {
+                console.log(`📋 Processing item ${index}:`, item);
+                
+                // Try to extract signals from various formats
+                if (typeof item === 'string') {
+                    const signal = parseSignalText(item, Date.now());
+                    if (signal) signals.push(signal);
+                } else if (item && typeof item === 'object') {
+                    if (item.symbol || item.pair || item.currency) {
+                        const signal = parseObjectSignal(item);
+                        if (signal) signals.push(signal);
+                    }
+                }
+            });
+            
+            console.log('🎯 Alternative parsing found:', signals.length, 'signals');
+            return signals;
+        }
+
+        // Flatten nested data structures
+        function flattenData(data, result = []) {
+            if (Array.isArray(data)) {
+                data.forEach(item => flattenData(item, result));
+            } else if (data && typeof data === 'object') {
+                // Check if this object looks like a signal
+                if (data.symbol || data.pair || data.currency || data.text || data.result) {
+                    result.push(data);
+                }
+                
+                // Recursively check nested objects
+                Object.values(data).forEach(value => {
+                    if (Array.isArray(value) || (value && typeof value === 'object')) {
+                        flattenData(value, result);
+                    }
+                });
+            } else if (typeof data === 'string') {
+                result.push(data);
+            }
+            
+            return result;
+        }
+
+        // Parse object-based signals
+        function parseObjectSignal(obj) {
+            try {
+                const signal = {
+                    timestamp: obj.timestamp || obj.date || Date.now() / 1000,
+                    pair: obj.symbol || obj.pair || obj.currency || 'UNKNOWN/USDT',
+                    trend: 'neutral',
+                    ohlc: { open: 0, high: 0, low: 0, close: 0 },
+                    support: 0,
+                    resistance: 0,
+                    action: 'hold',
+                    entryRange: 'TBD',
+                    target: 'TBD',
+                    stopLoss: 'TBD',
+                    minWin: 'TBD',
+                    analysis: 'Analysis pending...'
+                };
+
+                // Extract OHLC if available
+                if (obj.open !== undefined) signal.ohlc.open = obj.open;
+                if (obj.high !== undefined) signal.ohlc.high = obj.high;
+                if (obj.low !== undefined) signal.ohlc.low = obj.low;
+                if (obj.close !== undefined) signal.ohlc.close = obj.close;
+
+                // Extract other fields
+                if (obj.support !== undefined) signal.support = obj.support;
+                if (obj.resistance !== undefined) signal.resistance = obj.resistance;
+                
+                // Calculate derived values
+                signal.amplitude = signal.ohlc.high - signal.ohlc.low;
+                signal.change = signal.ohlc.close - signal.ohlc.open;
+                signal.changePercent = signal.ohlc.open !== 0 ? (signal.change / signal.ohlc.open * 100) : 0;
+
+                // Determine trend
+                if (signal.changePercent > 1) signal.trend = 'bullish';
+                else if (signal.changePercent < -1) signal.trend = 'bearish';
+
+                // Set action based on trend
+                signal.action = signal.trend === 'bullish' ? 'buy' : 'sell';
+
+                return signal;
+            } catch (error) {
+                console.warn('⚠️ Error parsing object signal:', error, obj);
+                return null;
+            }
+        }
+
         // Make functions globally available
         window.openGraphModal = openGraphModal;
         window.setAlert = setAlert;
+        window.showDataFormatHelp = showDataFormatHelp;
+        window.loadTradingData = loadTradingData;
     </script>
 </body>
 </html>
