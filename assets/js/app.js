@@ -17,11 +17,13 @@ class ConsoleTradingDashboard {
     }
 
     async init() {
+        console.log('🔄 Initializing dashboard...');
         this.setupEventListeners();
         this.updateVersionDisplay();
         await this.loadData();
         this.updateStats();
         this.renderSignals();
+        console.log('✅ Dashboard initialization complete');
     }
 
     updateVersionDisplay() {
@@ -110,9 +112,25 @@ class ConsoleTradingDashboard {
         });
         
         // Setup donation button
-        document.getElementById('donateBtn').addEventListener('click', () => {
-            this.showDonationModal();
-        });
+        const donateBtn = document.getElementById('donateBtn');
+        if (donateBtn) {
+            console.log('✅ Donate button found, adding event listener');
+            donateBtn.addEventListener('click', () => {
+                console.log('🔄 Donate button clicked!');
+                this.showDonationModal();
+            });
+        } else {
+            console.error('❌ Donate button not found!');
+        }
+        
+        // Setup donation modal close button
+        const closeDonationModal = document.getElementById('closeDonationModal');
+        if (closeDonationModal) {
+            closeDonationModal.addEventListener('click', () => {
+                console.log('🔄 Closing donation modal');
+                this.hideDonationModal();
+            });
+        }
 
         // Setup data status modal
         document.getElementById('dataStatusBtn').addEventListener('click', () => {
@@ -1359,8 +1377,20 @@ class ConsoleTradingDashboard {
     // ===== DONATION SYSTEM METHODS =====
 
     showDonationModal() {
-        this.populateDonationModal();
-        document.getElementById('donationModal').style.display = 'block';
+        console.log('🔄 showDonationModal called');
+        try {
+            const modal = document.getElementById('donationModal');
+            if (!modal) {
+                console.error('❌ Donation modal not found!');
+                return;
+            }
+            console.log('✅ Modal found, populating...');
+            this.populateDonationModal();
+            modal.style.display = 'block';
+            console.log('✅ Modal displayed');
+        } catch (error) {
+            console.error('❌ Error showing donation modal:', error);
+        }
     }
 
     hideDonationModal() {
@@ -1368,9 +1398,19 @@ class ConsoleTradingDashboard {
     }
 
     populateDonationModal() {
-        this.populateFiatMethods();
-        this.populateCryptoOptions();
-        this.setupDonationTabs();
+        console.log('🔄 populateDonationModal called');
+        try {
+            if (typeof DONATION_CONFIG === 'undefined') {
+                console.error('❌ DONATION_CONFIG not loaded!');
+                return;
+            }
+            console.log('✅ DONATION_CONFIG loaded:', DONATION_CONFIG);
+            this.populateFiatMethods();
+            this.populateCryptoOptions();
+            this.setupDonationTabs();
+        } catch (error) {
+            console.error('❌ Error populating donation modal:', error);
+        }
     }
 
     populateFiatMethods() {
