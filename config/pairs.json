@@ -1,78 +1,10 @@
 [
   {
-    symbol: "BTC-USDT",
-    style: "4h",
+    "symbol": "SOL-USDT",
+    "style": "4h"
   },
   {
-    symbol: "ETH-USDT",
-    style: "4h",
-  },
-  {
-    symbol: "BNB-USDT",
-    style: "4h",
-  },
-  {
-    symbol: "OP-USDT",
-    style: "4h",
-  },
-  {
-    symbol: "ADA-USDT",
-    style: "4h",
-  },
-  {
-    symbol: "SUI-USDT",
-    style: "4h",
-  },
-  {
-    symbol: "ARB-USDT",
-    style: "4h",
-  },
-  {
-    symbol: "ZIL-USDT",
-    style: "4h",
-  },
-  {
-    symbol: "ONE-USDT",
-    style: "4h",
-  },
-  {
-    symbol: "SAND-USDT",
-    style: "4h",
-  },
-  {
-    symbol: "DOT-USDT",
-    style: "4h",
-  },
-  {
-    symbol: "FET-USDT",
-    style: "4h",
-  },
-  {
-    symbol: "POL-USDT",
-    style: "4h",
-  },
-  {
-    symbol: "ATOM-USDT",
-    style: "4h",
-  },
-  {
-    symbol: "SOL-USDT",
-    style: "4h",
-  },
-  {
-    symbol: "ICP-USDT",
-    style: "4h",
-  },
-  {
-    symbol: "A-USDT",
-    style: "4h",
-  },
-  {
-    symbol: "SEI-USDT",
-    style: "4h",
-  },
-  {
-    symbol: "AVAX-USDT",
-    style: "4h",
+    "symbol": "ICP-USDT",
+    "style": "4h"
   }
 ]

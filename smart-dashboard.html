@@ -660,6 +660,7 @@
                     // Load pairs configuration
                     const pairsResponse = await fetch('./config/pairs.json');
                     const pairs = await pairsResponse.json();
+                    console.log('Loaded pairs config:', pairs);
                     
                     // Load data for each pair
                     const allData = [];
@@ -670,6 +671,7 @@
                             const dataResponse = await fetch(`./assets/pairs/${pair.symbol}/data-${pair.symbol}.json`);
                             if (dataResponse.ok) {
                                 const pairData = await dataResponse.json();
+                                console.log(`Loaded data for ${pair.symbol}:`, pairData);
                                 allData.push({
                                     ...pairData,
                                     pair: pair.symbol,
@@ -681,6 +683,7 @@
                         }
                     }
                     
+                    console.log('Final data array:', allData);
                     this.data = allData;
                     this.filteredData = [...this.data];
                     
@@ -711,7 +714,7 @@
                     
                     // Signal type filter
                     if (this.currentFilters.signal !== 'all' && 
-                        item.signal.classification?.type !== this.currentFilters.signal) {
+                        item.classification?.type !== this.currentFilters.signal) {
                         return false;
                     }
                     
@@ -724,11 +727,11 @@
             updateStats() {
                 const totalPairs = this.data.length;
                 const activeSignals = this.data.filter(item => 
-                    item.signal.classification?.type !== 'NO_SIGNAL'
+                    item.classification?.type !== 'NO_SIGNAL'
                 ).length;
                 
                 const winRates = this.data
-                    .map(item => item.signal.classification?.expected_win_rate)
+                    .map(item => item.classification?.expected_win_rate)
                     .filter(rate => rate)
                     .map(rate => parseInt(rate.replace('%', '')));
                 
@@ -737,7 +740,7 @@
                     : 0;
                 
                 const riskLevels = this.data
-                    .map(item => item.signal.position_sizing?.confidence_tier)
+                    .map(item => item.position_sizing?.confidence_tier)
                     .filter(level => level);
                 
                 const avgRiskLevel = riskLevels.length > 0 
@@ -782,11 +785,10 @@
             }
 
             renderPairCard(item) {
-                const signal = item.signal;
-                const classification = signal.classification || {};
-                const recommendation = signal.recommendation || {};
-                const technical = signal.technical_analysis || {};
-                const position = signal.position_sizing || {};
+                const classification = item.classification || {};
+                const recommendation = item.recommendation || {};
+                const technical = item.technical_analysis || {};
+                const position = item.position_sizing || {};
                 
                 const signalType = classification.type || 'NO_SIGNAL';
                 const confidence = classification.confidence || 'LOW';
