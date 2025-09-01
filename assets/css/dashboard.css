@@ -159,6 +159,7 @@ body {
     font-family: var(--font-mono);
     font-size: 13px;
     overflow: hidden;
+    max-width: 100%;
 }
 
 .console-signal-card .card-header {
@@ -235,7 +236,7 @@ body {
 
 /* Data Sections */
 .console-signal-card .data-section {
-    padding: 16px;
+    padding: 12px 16px;
     border-bottom: 1px solid var(--border-light);
 }
 
@@ -247,7 +248,7 @@ body {
     font-size: 0.8rem;
     font-weight: 600;
     color: var(--text-accent);
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     border-bottom: 1px solid var(--border-light);
@@ -256,15 +257,15 @@ body {
 
 .console-signal-card .data-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 8px;
 }
 
 .console-signal-card .data-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px 12px;
+    padding: 6px 10px;
     background: var(--bg-secondary);
     border-radius: 4px;
     border: 1px solid var(--border-light);
@@ -273,13 +274,13 @@ body {
 .console-signal-card .data-label {
     color: var(--text-muted);
     font-weight: 500;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
 }
 
 .console-signal-card .data-value {
     color: var(--text-primary);
     font-weight: 600;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
 }
 
 .console-signal-card .data-value.success {
@@ -301,18 +302,32 @@ body {
 /* Analysis Section */
 .console-signal-card .analysis-section {
     background: var(--bg-secondary);
-    margin: 16px;
+    margin: 12px 16px;
     border-radius: 4px;
     border: 1px solid var(--border-light);
 }
 
 .console-signal-card .analysis-content {
-    padding: 16px;
+    padding: 12px;
     color: var(--text-secondary);
-    font-size: 0.8rem;
-    line-height: 1.5;
+    font-size: 0.75rem;
+    line-height: 1.4;
     white-space: pre-wrap;
     word-wrap: break-word;
+    max-height: 80px;
+    overflow: hidden;
+    position: relative;
+}
+
+.console-signal-card .analysis-content::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 40px;
+    height: 20px;
+    background: linear-gradient(transparent, var(--bg-secondary));
+    pointer-events: none;
 }
 
 /* Action Buttons */
@@ -320,7 +335,7 @@ body {
     display: flex;
     gap: 8px;
     justify-content: center;
-    padding: 16px;
+    padding: 12px 16px;
     background: var(--bg-secondary);
     border-top: 1px solid var(--border-light);
 }
@@ -330,11 +345,11 @@ body {
     color: var(--text-primary);
     border: 1px solid var(--border);
     border-radius: 4px;
-    padding: 8px 16px;
+    padding: 6px 12px;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-family: var(--font-mono);
 }
 
@@ -342,6 +357,172 @@ body {
     background: var(--info);
     color: white;
     border-color: var(--info);
+}
+
+/* Modal Content Styles */
+.timeframe-data, .graphs-data, .analysis-data {
+    background: var(--bg-console);
+    border-radius: 6px;
+    padding: 16px;
+}
+
+.timeframe-data h4, .graphs-data h4, .analysis-data h4 {
+    color: var(--text-accent);
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--border-light);
+    padding-bottom: 8px;
+}
+
+.timeframe-item {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-light);
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 12px;
+}
+
+.timeframe-item:last-child {
+    margin-bottom: 0;
+}
+
+.timeframe-item h5 {
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.timeframe-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 8px;
+}
+
+.metric-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 8px;
+    background: var(--bg-console);
+    border-radius: 4px;
+    font-size: 0.8rem;
+}
+
+.metric-label {
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.metric-value {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.metric-value.bullish {
+    color: var(--success);
+}
+
+.metric-value.bearish {
+    color: var(--danger);
+}
+
+.metric-value.neutral {
+    color: var(--warning);
+}
+
+.metric-value.buy {
+    color: var(--success);
+}
+
+.metric-value.sell {
+    color: var(--danger);
+}
+
+.metric-value.wait {
+    color: var(--warning);
+}
+
+/* Chart Styles */
+.chart-item {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-light);
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 12px;
+}
+
+.chart-item:last-child {
+    margin-bottom: 0;
+}
+
+.chart-item h5 {
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.chart-container {
+    text-align: center;
+}
+
+.chart-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+    border: 1px solid var(--border-light);
+}
+
+.chart-placeholder {
+    padding: 40px;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    background: var(--bg-console);
+    border-radius: 4px;
+    border: 1px solid var(--border-light);
+}
+
+/* Analysis Content */
+.analysis-content {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-light);
+    border-radius: 6px;
+    padding: 16px;
+}
+
+.analysis-section {
+    margin-bottom: 16px;
+}
+
+.analysis-section:last-child {
+    margin-bottom: 0;
+}
+
+.analysis-section h5 {
+    color: var(--text-accent);
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    border-bottom: 1px solid var(--border-light);
+    padding-bottom: 4px;
+}
+
+.analysis-section p {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    line-height: 1.4;
+    margin-bottom: 4px;
+}
+
+.analysis-section p:last-child {
+    margin-bottom: 0;
+}
+
+.analysis-section strong {
+    color: var(--text-primary);
+    font-weight: 600;
 }
 
 /* Filters */

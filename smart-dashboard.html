@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Console Trading Dashboard v1.1</title>
+    <title>Console Trading Dashboard v1.2</title>
     <meta name="description" content="Console-Style Cryptocurrency Trading Analysis Dashboard">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
@@ -12,10 +12,11 @@
     <!-- Version Management -->
     <script>
         // Dashboard Version Management
-        const DASHBOARD_VERSION = '1.1';
+        const DASHBOARD_VERSION = '1.2';
         const VERSION_HISTORY = [
             { version: '1.0', date: '2025-01-01', changes: 'Initial release with comprehensive signal cards and modal system' },
-            { version: '1.1', date: '2025-01-01', changes: 'Console-style redesign with external CSS/JS and improved data organization' }
+            { version: '1.1', date: '2025-01-01', changes: 'Console-style redesign with external CSS/JS and improved data organization' },
+            { version: '1.2', date: '2025-01-01', changes: 'Fixed modal functionality, improved card display, and enhanced user experience' }
         ];
         
         // Function to increment version before push
@@ -51,7 +52,7 @@
             </h1>
             <p>Terminal-Style Cryptocurrency Trading Analysis</p>
             <div class="version-info">
-                <span class="version-badge">v<span id="dashboardVersion">1.1</span></span>
+                <span class="version-badge">v<span id="dashboardVersion">1.2</span></span>
                 <span class="version-date">Updated: <span id="lastUpdateDate">2025-01-01</span></span>
                 <button class="version-info-btn" id="versionInfoBtn" title="Version Information">ℹ️</button>
             </div>

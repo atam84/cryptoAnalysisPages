@@ -725,21 +725,188 @@ class ConsoleTradingDashboard {
     }
 
     openDetailsModal(pair, signals) {
-        // Implementation for details modal
-        console.log(`Opening details modal for ${pair}`, signals);
+        try {
+            const modal = document.getElementById('detailsModal');
+            const modalTitle = document.getElementById('detailsModalTitle');
+            const timeframesTab = document.getElementById('timeframesTab');
+            const graphsTab = document.getElementById('graphsTab');
+            const analysisTab = document.getElementById('analysisTab');
+            
+            if (!modal || !modalTitle) {
+                console.error('❌ Modal elements not found');
+                return;
+            }
+            
+            // Update modal title
+            modalTitle.textContent = `📊 ${pair} - Trading Details`;
+            
+            // Populate timeframes tab
+            if (timeframesTab) {
+                let timeframesHTML = '<div class="timeframe-data">';
+                timeframesHTML += '<h4>⏰ Timeframe Analysis</h4>';
+                
+                if (signals && signals.length > 0) {
+                    signals.forEach(signal => {
+                        const timeframe = signal.timeframe || 'Main';
+                        timeframesHTML += `
+                            <div class="timeframe-item">
+                                <h5>${timeframe} Timeframe</h5>
+                                <div class="timeframe-metrics">
+                                    <div class="metric-row">
+                                        <span class="metric-label">Trend:</span>
+                                        <span class="metric-value ${signal.trend}">${signal.trend?.toUpperCase() || 'N/A'}</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span class="metric-label">Action:</span>
+                                        <span class="metric-value ${signal.action}">${signal.action?.toUpperCase() || 'N/A'}</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span class="metric-label">Confidence:</span>
+                                        <span class="metric-value">${signal.classification?.confidence || 'N/A'}</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span class="metric-label">Win Rate:</span>
+                                        <span class="metric-value">${signal.classification?.win_rate || 'N/A'}%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    timeframesHTML += '<p>No timeframe data available</p>';
+                }
+                
+                timeframesHTML += '</div>';
+                timeframesTab.innerHTML = timeframesHTML;
+            }
+            
+            // Populate graphs tab
+            if (graphsTab) {
+                let graphsHTML = '<div class="graphs-data">';
+                graphsHTML += '<h4>📊 Chart Analysis</h4>';
+                
+                // Try to load chart images
+                const chartTimeframes = ['1h', '8h', '1d'];
+                chartTimeframes.forEach(tf => {
+                    const chartUrl = `./assets/pairs/${pair}/graph-${pair}-${tf}.png`;
+                    graphsHTML += `
+                        <div class="chart-item">
+                            <h5>${tf} Chart</h5>
+                            <div class="chart-container">
+                                <img src="${chartUrl}" alt="${pair} ${tf} chart" 
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+                                     class="chart-image">
+                                <div class="chart-placeholder" style="display: none;">
+                                    <p>📊 Chart not available for ${tf} timeframe</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                graphsHTML += '</div>';
+                graphsTab.innerHTML = graphsHTML;
+            }
+            
+            // Populate analysis tab
+            if (analysisTab) {
+                let analysisHTML = '<div class="analysis-data">';
+                analysisHTML += '<h4>🧠 Detailed Analysis</h4>';
+                
+                if (signals && signals.length > 0) {
+                    const signal = signals[0]; // Use first signal for analysis
+                    analysisHTML += `
+                        <div class="analysis-content">
+                            <div class="analysis-section">
+                                <h5>📊 Classification</h5>
+                                <p><strong>Type:</strong> ${signal.classification?.type || 'N/A'}</p>
+                                <p><strong>Confidence:</strong> ${signal.classification?.confidence || 'N/A'}</p>
+                                <p><strong>Confluence Score:</strong> ${signal.classification?.confluence_score || 'N/A'}/10</p>
+                                <p><strong>Win Rate:</strong> ${signal.classification?.win_rate || 'N/A'}%</p>
+                            </div>
+                            
+                            <div class="analysis-section">
+                                <h5>🎯 Recommendation</h5>
+                                <p><strong>Action:</strong> ${signal.recommendation?.action || 'N/A'}</p>
+                                <p><strong>Entry Range:</strong> ${signal.recommendation?.entry_range ? 
+                                    `${signal.recommendation.entry_range.min || 'N/A'} - ${signal.recommendation.entry_range.max || 'N/A'}` : 'N/A'}</p>
+                                <p><strong>Targets:</strong> ${signal.recommendation?.targets ? 
+                                    signal.recommendation.targets.map(t => t.price || 'N/A').join(' - ') : 'N/A'}</p>
+                                <p><strong>Stop Loss:</strong> ${signal.risk_management?.stop_loss ? 
+                                    (signal.risk_management.stop_loss.price || signal.risk_management.stop_loss.percentage || 'N/A') : 'N/A'}</p>
+                            </div>
+                            
+                            <div class="analysis-section">
+                                <h5>🧠 Reasoning</h5>
+                                <p>${signal.reasoning || 'No reasoning provided'}</p>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    analysisHTML += '<p>No analysis data available</p>';
+                }
+                
+                analysisHTML += '</div>';
+                analysisTab.innerHTML = analysisHTML;
+            }
+            
+            // Show modal
+            modal.style.display = 'block';
+            
+            // Switch to timeframes tab by default
+            this.switchDetailsTab('timeframes');
+            
+        } catch (error) {
+            console.error('❌ Error opening details modal:', error);
+        }
     }
 
     openDetailsModalWithGraphs(pair, signals) {
-        // Implementation for charts modal
-        console.log(`Opening charts modal for ${pair}`, signals);
+        // Open the same modal but switch to graphs tab
+        this.openDetailsModal(pair, signals);
+        
+        // Switch to graphs tab after a short delay to ensure modal is loaded
+        setTimeout(() => {
+            this.switchDetailsTab('graphs');
+        }, 100);
     }
 
     hideDetailsModal() {
-        // Implementation for hiding details modal
+        const modal = document.getElementById('detailsModal');
+        if (modal) {
+            modal.style.display = 'none';
+        }
     }
 
     switchDetailsTab(tabName) {
-        // Implementation for tab switching
+        try {
+            // Hide all tab contents
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => {
+                content.style.display = 'none';
+            });
+            
+            // Remove active class from all tab buttons
+            const tabButtons = document.querySelectorAll('.detail-tab-btn');
+            tabButtons.forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            const selectedTab = document.getElementById(tabName + 'Tab');
+            if (selectedTab) {
+                selectedTab.style.display = 'block';
+            }
+            
+            // Add active class to selected tab button
+            const selectedButton = document.querySelector(`[data-tab="${tabName}"]`);
+            if (selectedButton) {
+                selectedButton.classList.add('active');
+            }
+            
+        } catch (error) {
+            console.error('❌ Error switching tabs:', error);
+        }
     }
 }
 
