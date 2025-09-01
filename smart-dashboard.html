@@ -1112,6 +1112,405 @@
             font-size: 0.9rem;
             font-weight: 500;
         }
+
+        /* New styles for comprehensive signal card */
+        .comprehensive-signal-card {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            padding: 20px;
+        }
+
+        .comprehensive-signal-card .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .comprehensive-signal-card .pair-info h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .comprehensive-signal-card .signal-meta {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .comprehensive-signal-card .signal-type {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .comprehensive-signal-card .signal-type.no-signal {
+            background: var(--bg-card);
+            color: var(--text-muted);
+        }
+
+        .comprehensive-signal-card .confidence-level {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .comprehensive-signal-card .confidence-level.low {
+            background: rgba(220, 53, 69, 0.2);
+            color: var(--danger);
+        }
+
+        .comprehensive-signal-card .confidence-level.medium {
+            background: rgba(255, 193, 7, 0.2);
+            color: var(--warning);
+        }
+
+        .comprehensive-signal-card .confidence-level.high {
+            background: rgba(40, 167, 69, 0.2);
+            color: var(--success);
+        }
+
+        .comprehensive-signal-card .key-metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .comprehensive-signal-card .metric-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        .comprehensive-signal-card .metric-label {
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .comprehensive-signal-card .metric-value {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .comprehensive-signal-card .secondary-metrics {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .comprehensive-signal-card .metric-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        .comprehensive-signal-card .technical-summary {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .comprehensive-signal-card .tech-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        .comprehensive-signal-card .tech-label {
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .comprehensive-signal-card .tech-value {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .comprehensive-signal-card .analysis-section {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        .comprehensive-signal-card .analysis-section h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .comprehensive-signal-card .analysis-text {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .comprehensive-signal-card .action-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .comprehensive-signal-card .details-btn,
+        .comprehensive-signal-card .charts-btn {
+            background: var(--info);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+
+        .comprehensive-signal-card .details-btn:hover,
+        .comprehensive-signal-card .charts-btn:hover {
+            background: #138496;
+            transform: translateY(-1px);
+        }
+
+        /* Details Modal Styling */
+        .details-modal {
+            max-width: 90vw;
+            max-height: 90vh;
+            width: 1200px;
+        }
+
+        .details-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 12px;
+        }
+
+        .detail-tab-btn {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .detail-tab-btn:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .detail-tab-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .detail-tab-content {
+            display: none;
+        }
+
+        .detail-tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* Timeframes Tab */
+        .timeframes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .timeframe-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .timeframe-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .timeframe-header h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .timeframe-trend {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .timeframe-trend.bullish {
+            background: rgba(40, 167, 69, 0.2);
+            color: var(--success);
+        }
+
+        .timeframe-trend.bearish {
+            background: rgba(220, 53, 69, 0.2);
+            color: var(--danger);
+        }
+
+        .timeframe-trend.neutral {
+            background: rgba(255, 193, 7, 0.2);
+            color: var(--warning);
+        }
+
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .data-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        .data-item .label {
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .data-item .value {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        /* Graphs Tab */
+        .graphs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .graph-item {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .graph-item h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+
+        .graph-item img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+
+        .graph-error {
+            color: var(--text-muted);
+            font-style: italic;
+            padding: 20px;
+        }
+
+        /* Analysis Tab */
+        .analysis-overview {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .analysis-item {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .analysis-item h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .analysis-item p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .no-data {
+            text-align: center;
+            color: var(--text-muted);
+            font-style: italic;
+            padding: 40px;
+        }
+
+        /* Responsive Design for Details Modal */
+        @media (max-width: 768px) {
+            .details-modal {
+                max-width: 95vw;
+                width: 95vw;
+            }
+            
+            .details-tabs {
+                flex-wrap: wrap;
+                gap: 6px;
+            }
+            
+            .detail-tab-btn {
+                padding: 8px 16px;
+                font-size: 0.8rem;
+            }
+            
+            .timeframes-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .graphs-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .data-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1216,6 +1615,41 @@
         </div>
     </div>
 
+    <!-- Details Modal -->
+    <div class="modal" id="detailsModal">
+        <div class="modal-content details-modal">
+            <div class="modal-header">
+                <h3 id="detailsModalTitle">📋 Trading Details</h3>
+                <button class="modal-close" id="closeDetailsModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="details-tabs">
+                    <button class="detail-tab-btn active" data-tab="timeframes">⏰ Timeframes</button>
+                    <button class="detail-tab-btn" data-tab="graphs">📊 Graphs</button>
+                    <button class="detail-tab-btn" data-tab="analysis">🔍 Analysis</button>
+                </div>
+                
+                <div class="detail-tab-content active" id="timeframes-tab">
+                    <div class="timeframes-grid" id="timeframesContent">
+                        <!-- Timeframe data will be populated here -->
+                    </div>
+                </div>
+                
+                <div class="detail-tab-content" id="graphs-tab">
+                    <div class="graphs-grid" id="graphsContent">
+                        <!-- Graphs will be populated here -->
+                    </div>
+                </div>
+                
+                <div class="detail-tab-content" id="analysis-tab">
+                    <div class="analysis-details" id="analysisContent">
+                        <!-- Detailed analysis will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         class TradingSignalsDashboard {
             constructor() {
@@ -1280,11 +1714,24 @@
                     this.hideDataStatusModal();
                 });
 
-                // Close modal when clicking outside
-                window.addEventListener('click', (event) => {
-                    const modal = document.getElementById('dataStatusModal');
-                    if (event.target === modal) {
+                // Setup details modal
+                document.getElementById('closeDetailsModal').addEventListener('click', () => {
+                    this.hideDetailsModal();
+                });
+
+                // Setup details modal tab switching
+                document.querySelectorAll('.detail-tab-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const tabName = e.target.dataset.tab;
+                        this.switchDetailsTab(tabName);
+                    });
+                });
+
+                // Close modals when clicking outside
+                window.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('modal')) {
                         this.hideDataStatusModal();
+                        this.hideDetailsModal();
                     }
                 });
             }
@@ -1844,11 +2291,173 @@
                     '<span class="data-type-badge signal">📊 Signal Data</span>' : 
                     '<span class="data-type-badge price">💰 Price Data</span>';
                 
+                // Render comprehensive signal card
+                if (dataType === 'signal' && primarySignal.rawData && primarySignal.rawData.signal) {
+                    return this.renderComprehensiveSignalCard(primarySignal.rawData.signal, pair, timestamp, timeframeSignals);
+                } else {
+                    return this.renderSimplePairCard(pairGroup, primarySignal, timestamp, dataTypeBadge, overallTrend, overallAction);
+                }
+            }
+
+            renderComprehensiveSignalCard(signalData, pair, timestamp, timeframeSignals) {
+                const classification = signalData.classification || {};
+                const recommendation = signalData.recommendation || {};
+                const technical = signalData.technical_analysis || {};
+                const position = signalData.position_sizing || {};
+                const risk = signalData.risk_management || {};
+                
+                // Determine trend and action
+                const trend = technical.trend_direction ? technical.trend_direction.toLowerCase() : 'neutral';
+                const action = recommendation.action ? recommendation.action.toLowerCase() : 'wait';
+                
+                // Format entry range
+                let entryRange = 'N/A';
+                if (recommendation.entry_range && Array.isArray(recommendation.entry_range)) {
+                    const [min, max] = recommendation.entry_range;
+                    if (min !== null && max !== null) {
+                        entryRange = `${min} - ${max}`;
+                    } else if (min !== null) {
+                        entryRange = `${min}`;
+                    }
+                }
+                
+                // Format take profit targets
+                let targets = 'N/A';
+                if (recommendation.take_profit && recommendation.take_profit.length > 0) {
+                    targets = recommendation.take_profit.join(' - ');
+                }
+                
+                // Format stop loss
+                const stopLoss = recommendation.stop_loss || 'N/A';
+                
+                // Format win rate
+                const winRate = classification.expected_win_rate || 'N/A';
+                
+                // Format risk/reward ratio
+                const riskReward = recommendation.risk_reward_ratio || 'N/A';
+                
+                // Format max drawdown
+                const maxDrawdown = recommendation.max_drawdown || 'N/A';
+                
+                // Format position size
+                const positionSize = position.suggested_position_size || position.base_position_percent || 'N/A';
+                
+                // Format confluence score
+                const confluenceScore = classification.confluence_score || 'N/A';
+                
+                // Format reasoning (truncate if too long)
+                const reasoning = signalData.reasoning || 'No reasoning provided';
+                const shortReasoning = reasoning.length > 150 ? reasoning.substring(0, 150) + '...' : reasoning;
+                
+                return `
+                    <div class="comprehensive-signal-card ${trend} ${action}">
+                        <div class="card-header">
+                            <div class="pair-info">
+                                <h3>${pair}</h3>
+                                <div class="trend-badge ${trend}">
+                                    ${trend === 'bullish' ? '🐂 Bullish' : trend === 'bearish' ? '🐻 Bearish' : '⏸️ Neutral'}
+                                </div>
+                            </div>
+                            <div class="signal-meta">
+                                <span class="signal-type ${classification.type ? classification.type.toLowerCase().replace('_', '-') : 'no-signal'}">
+                                    ${classification.type || 'NO_SIGNAL'}
+                                </span>
+                                <span class="confidence-level ${classification.confidence ? classification.confidence.toLowerCase() : 'low'}">
+                                    ${classification.confidence || 'LOW'}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="key-metrics-grid">
+                            <div class="metric-item">
+                                <span class="metric-label">Entry Range:</span>
+                                <span class="metric-value">${entryRange}</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">Targets:</span>
+                                <span class="metric-value">${targets}</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">Stop Loss:</span>
+                                <span class="metric-value">${stopLoss}</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">Win Rate:</span>
+                                <span class="metric-value">${winRate}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="secondary-metrics">
+                            <div class="metric-row">
+                                <div class="metric-item">
+                                    <span class="metric-label">Risk/Reward:</span>
+                                    <span class="metric-value">${riskReward}</span>
+                                </div>
+                                <div class="metric-item">
+                                    <span class="metric-label">Max Drawdown:</span>
+                                    <span class="metric-value">${maxDrawdown}</span>
+                                </div>
+                            </div>
+                            <div class="metric-row">
+                                <div class="metric-item">
+                                    <span class="metric-label">Position Size:</span>
+                                    <span class="metric-value">${positionSize}</span>
+                                </div>
+                                <div class="metric-item">
+                                    <span class="metric-label">Confluence:</span>
+                                    <span class="metric-value">${confluenceScore}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="technical-summary">
+                            <div class="tech-item">
+                                <span class="tech-label">Primary TF:</span>
+                                <span class="tech-value">${technical.primary_timeframe || 'N/A'}</span>
+                            </div>
+                            <div class="tech-item">
+                                <span class="tech-label">Volume:</span>
+                                <span class="tech-value">${technical.volume_confirmation || 'N/A'}</span>
+                            </div>
+                            <div class="tech-item">
+                                <span class="tech-label">Pattern:</span>
+                                <span class="tech-value">${technical.pattern_strength || 'N/A'}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="analysis-section">
+                            <h4>Analysis</h4>
+                            <p class="analysis-text">${shortReasoning}</p>
+                        </div>
+                        
+                        <div class="card-footer">
+                            <div class="timestamp">
+                                <span class="timestamp-label">Data from:</span>
+                                ${timestamp}
+                            </div>
+                            <div class="action-buttons">
+                                <button class="details-btn" onclick="dashboard.openDetailsModal('${pair}', ${JSON.stringify(timeframeSignals).replace(/"/g, '&quot;')})">
+                                    📋 Details
+                                </button>
+                                <button class="charts-btn" onclick="dashboard.viewCharts('${pair}')">
+                                    📊 Charts
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderSimplePairCard(pairGroup, primarySignal, timestamp, dataTypeBadge, overallTrend, overallAction) {
+                const { pair, signals } = pairGroup;
+                
                 // Create tabs array with main data first
                 const allTabs = [];
+                const mainSignal = signals.find(s => s.timeframe === 'main');
                 if (mainSignal) {
                     allTabs.push({ signal: mainSignal, label: 'MAIN', isMain: true });
                 }
+                const timeframeSignals = signals.filter(s => s.timeframe !== 'main');
                 allTabs.push(...timeframeSignals.map(s => ({ signal: s, label: s.timeframe, isMain: false })));
                 
                 return `
@@ -2120,11 +2729,187 @@
                 this.renderSignals();
                 this.updateStats();
             }
+
+            openDetailsModal(pair, timeframeSignals) {
+                const modal = document.getElementById('detailsModal');
+                const title = document.getElementById('detailsModalTitle');
+                
+                if (modal && title) {
+                    title.textContent = `📋 ${pair} Trading Details`;
+                    this.populateDetailsModal(pair, timeframeSignals);
+                    modal.style.display = 'block';
+                }
+            }
+
+            hideDetailsModal() {
+                const modal = document.getElementById('detailsModal');
+                if (modal) {
+                    modal.style.display = 'none';
+                }
+            }
+
+            populateDetailsModal(pair, timeframeSignals) {
+                // Populate timeframes tab
+                this.populateTimeframesTab(pair, timeframeSignals);
+                
+                // Populate graphs tab
+                this.populateGraphsTab(pair);
+                
+                // Populate analysis tab
+                this.populateAnalysisTab(pair, timeframeSignals);
+            }
+
+            populateTimeframesTab(pair, timeframeSignals) {
+                const container = document.getElementById('timeframesContent');
+                if (!container) return;
+                
+                if (timeframeSignals.length === 0) {
+                    container.innerHTML = '<div class="no-data">No timeframe data available</div>';
+                    return;
+                }
+                
+                let html = '';
+                timeframeSignals.forEach(signal => {
+                    const data = signal.rawData || {};
+                    html += `
+                        <div class="timeframe-card">
+                            <div class="timeframe-header">
+                                <h4>${signal.timeframe.toUpperCase()}</h4>
+                                <span class="timeframe-trend ${signal.trend}">${signal.trend}</span>
+                            </div>
+                            <div class="timeframe-data">
+                                ${this.renderTimeframeData(data, signal.timeframe)}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                container.innerHTML = html;
+            }
+
+            renderTimeframeData(data, timeframe) {
+                if (data.signal) {
+                    const signal = data.signal;
+                    const recommendation = signal.recommendation || {};
+                    const technical = signal.technical_analysis || {};
+                    
+                    return `
+                        <div class="data-grid">
+                            <div class="data-item">
+                                <span class="label">Action:</span>
+                                <span class="value">${recommendation.action || 'N/A'}</span>
+                            </div>
+                            <div class="data-item">
+                                <span class="label">Entry:</span>
+                                <span class="value">${recommendation.entry_range ? recommendation.entry_range.join(' - ') : 'N/A'}</span>
+                            </div>
+                            <div class="data-item">
+                                <span class="label">Targets:</span>
+                                <span class="value">${recommendation.take_profit ? recommendation.take_profit.join(' - ') : 'N/A'}</span>
+                            </div>
+                            <div class="data-item">
+                                <span class="label">Stop Loss:</span>
+                                <span class="value">${recommendation.stop_loss || 'N/A'}</span>
+                            </div>
+                            <div class="data-item">
+                                <span class="label">Trend:</span>
+                                <span class="value">${technical.trend_direction || 'N/A'}</span>
+                            </div>
+                            <div class="data-item">
+                                <span class="label">Volume:</span>
+                                <span class="value">${technical.volume_confirmation || 'N/A'}</span>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    // Price data
+                    return `
+                        <div class="data-grid">
+                            <div class="data-item">
+                                <span class="label">Support:</span>
+                                <span class="value">${data.support || 'N/A'}</span>
+                            </div>
+                            <div class="data-item">
+                                <span class="label">Resistance:</span>
+                                <span class="value">${data.resistance || 'N/A'}</span>
+                            </div>
+                            <div class="data-item">
+                                <span class="label">High:</span>
+                                <span class="value">${data.highest || 'N/A'}</span>
+                            </div>
+                            <div class="data-item">
+                                <span class="label">Low:</span>
+                                <span class="value">${data.Lowest || data.lowest || 'N/A'}</span>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+
+            populateGraphsTab(pair) {
+                const container = document.getElementById('graphsContent');
+                if (!container) return;
+                
+                const timeframes = ['1h', '8h', '1d'];
+                let html = '';
+                
+                timeframes.forEach(timeframe => {
+                    const graphPath = `./assets/pairs/${pair}/graph-${pair}-${timeframe}.png`;
+                    html += `
+                        <div class="graph-item">
+                            <h4>${timeframe.toUpperCase()} Chart</h4>
+                            <img src="${graphPath}" alt="${pair} ${timeframe} chart" 
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                            <div class="graph-error" style="display: none;">
+                                <p>Chart not available for ${timeframe}</p>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                container.innerHTML = html;
+            }
+
+            populateAnalysisTab(pair, timeframeSignals) {
+                const container = document.getElementById('analysisContent');
+                if (!container) return;
+                
+                if (timeframeSignals.length === 0) {
+                    container.innerHTML = '<div class="no-data">No analysis data available</div>';
+                    return;
+                }
+                
+                let html = '<div class="analysis-overview">';
+                timeframeSignals.forEach(signal => {
+                    const data = signal.rawData || {};
+                    if (data.signal && data.signal.reasoning) {
+                        html += `
+                            <div class="analysis-item">
+                                <h4>${signal.timeframe.toUpperCase()} Analysis</h4>
+                                <p>${data.signal.reasoning}</p>
+                            </div>
+                        `;
+                    }
+                });
+                html += '</div>';
+                
+                container.innerHTML = html;
+            }
+
+            switchDetailsTab(tabName) {
+                // Remove active class from all tabs and content
+                document.querySelectorAll('.detail-tab-btn').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.detail-tab-content').forEach(content => content.classList.remove('active'));
+                
+                // Add active class to clicked tab and corresponding content
+                document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+                document.getElementById(`${tabName}-tab`).classList.add('active');
+            }
         }
 
         // Initialize dashboard when DOM is loaded
         document.addEventListener('DOMContentLoaded', () => {
-            new TradingSignalsDashboard();
+            window.dashboard = new TradingSignalsDashboard();
         });
     </script>
 </body>
