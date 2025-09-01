@@ -429,28 +429,71 @@
             margin-bottom: 40px;
         }
 
-        .signal-card {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 24px;
-            transition: all 0.2s ease;
-            position: relative;
-            overflow: hidden;
+        /* Grid Layout for Pair Cards */
+        .signals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 24px;
+            margin-top: 24px;
         }
 
-        .signal-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-            border-color: var(--success);
+        @media (max-width: 768px) {
+            .signals-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
         }
 
-        .signal-card.bullish {
-            border-left: 4px solid var(--success);
+        /* Enhanced Pair Card Styling */
+        .pair-card .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
         }
 
-        .signal-card.bearish {
-            border-left: 4px solid var(--danger);
+        .pair-card .pair-info h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .pair-card .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        .pair-card .timestamp {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Loading and Empty States */
+        .loading, .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state .icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            opacity: 0.6;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .empty-state p {
+            color: var(--text-muted);
         }
 
         /* Card Header */
@@ -833,6 +876,163 @@
                 width: 100%;
             }
         }
+
+        /* Pair Cards */
+        .pair-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+        }
+
+        .pair-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .pair-card.bullish {
+            border-left: 4px solid var(--success);
+        }
+
+        .pair-card.bearish {
+            border-left: 4px solid var(--danger);
+        }
+
+        .pair-card.neutral {
+            border-left: 4px solid var(--warning);
+        }
+
+        .pair-card.buy {
+            border-right: 4px solid var(--success);
+        }
+
+        .pair-card.sell {
+            border-right: 4px solid var(--danger);
+        }
+
+        .pair-card.wait {
+            border-right: 4px solid var(--warning);
+        }
+
+        /* Timeframe Tabs */
+        .timeframe-tabs {
+            display: flex;
+            gap: 8px;
+            margin: 16px 0;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 12px;
+        }
+
+        .tab-btn {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .tab-btn:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Tab Content */
+        .tab-content {
+            margin-top: 16px;
+        }
+
+        .tab-content-inner {
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .timeframe-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .timeframe-badge {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .action-badge {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .action-badge.buy {
+            background: rgba(40, 167, 69, 0.2);
+            color: var(--success);
+            border: 1px solid var(--success);
+        }
+
+        .action-badge.sell {
+            background: rgba(220, 53, 69, 0.2);
+            color: var(--danger);
+            border: 1px solid var(--danger);
+        }
+
+        .action-badge.wait {
+            background: rgba(255, 193, 7, 0.2);
+            color: var(--warning);
+            border: 1px solid var(--warning);
+        }
+
+        /* Responsive Design for Pair Cards */
+        @media (max-width: 768px) {
+            .timeframe-tabs {
+                flex-wrap: wrap;
+                gap: 6px;
+            }
+            
+            .tab-btn {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+            }
+            
+            .pair-card {
+                padding: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .timeframe-tabs {
+                justify-content: center;
+            }
+            
+            .tab-btn {
+                flex: 1;
+                text-align: center;
+                min-width: 60px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -841,16 +1041,16 @@
         <div class="header">
             <h1>
                 <span class="icon">📊</span>
-                Trading Signals
+                Trading Pairs Dashboard
             </h1>
-            <p>Live Cryptocurrency Trading Analysis Dashboard</p>
+            <p>Comprehensive Cryptocurrency Trading Analysis by Pair</p>
         </div>
 
         <!-- Stats Bar -->
         <div class="stats-bar">
             <div class="stat-item">
                 <div class="stat-value" id="totalSignals">0</div>
-                <div class="stat-label">Total Signals</div>
+                <div class="stat-label">Total Pairs</div>
             </div>
             <div class="stat-item">
                 <div class="stat-value" id="bullishSignals">0</div>
@@ -920,7 +1120,7 @@
 
         <!-- Signals Grid -->
         <div class="signals-grid" id="signalsGrid">
-            <div class="loading">Loading trading signals...</div>
+            <div class="loading">Loading trading pairs...</div>
         </div>
     </div>
 
@@ -1274,10 +1474,26 @@
             }
 
             updateStats() {
-                const total = this.data.length;
-                const bullish = this.data.filter(s => s.trend === 'bullish').length;
-                const bearish = this.data.filter(s => s.trend === 'bearish').length;
-                const wait = this.data.filter(s => s.action === 'wait').length;
+                // Calculate stats based on unique pairs rather than individual timeframe signals
+                const uniquePairs = new Set(this.data.map(signal => signal.pair));
+                const total = uniquePairs.size;
+                
+                // Calculate overall trends and actions for each pair
+                const pairStats = Array.from(uniquePairs).map(pair => {
+                    const pairSignals = this.data.filter(s => s.pair === pair);
+                    const trends = pairSignals.map(s => s.trend);
+                    const actions = pairSignals.map(s => s.action);
+                    
+                    return {
+                        pair,
+                        overallTrend: this.getOverallTrend(trends),
+                        overallAction: this.getOverallAction(actions)
+                    };
+                });
+                
+                const bullish = pairStats.filter(p => p.overallTrend === 'bullish').length;
+                const bearish = pairStats.filter(p => p.overallTrend === 'bearish').length;
+                const wait = pairStats.filter(p => p.overallAction === 'wait').length;
                 
                 document.getElementById('totalSignals').textContent = total;
                 document.getElementById('bullishSignals').textContent = bullish;
@@ -1334,22 +1550,51 @@
                     grid.innerHTML = `
                         <div class="empty-state">
                             <div class="icon">🔍</div>
-                            <h3>No signals found</h3>
+                            <h3>No pairs found</h3>
                             <p>Try adjusting your filters or refresh the data</p>
                         </div>
                     `;
                     return;
                 }
                 
-                grid.innerHTML = this.filteredData.map(signal => this.renderSignalCard(signal)).join('');
+                // Group data by pair instead of showing individual timeframe cards
+                const pairGroups = this.groupDataByPair();
+                grid.innerHTML = pairGroups.map(pairGroup => this.renderPairCard(pairGroup)).join('');
             }
 
-            renderSignalCard(signal) {
-                const trendClass = signal.trend;
-                const actionClass = signal.action;
+            groupDataByPair() {
+                const pairGroups = new Map();
+                
+                this.filteredData.forEach(signal => {
+                    if (!pairGroups.has(signal.pair)) {
+                        pairGroups.set(signal.pair, []);
+                    }
+                    pairGroups.get(signal.pair).push(signal);
+                });
+                
+                // Convert to array and sort by pair name
+                return Array.from(pairGroups.entries()).map(([pair, signals]) => ({
+                    pair,
+                    signals: signals.sort((a, b) => {
+                        const timeframeOrder = { '1h': 1, '8h': 2, '1d': 3 };
+                        return timeframeOrder[a.timeframe] - timeframeOrder[b.timeframe];
+                    })
+                }));
+            }
+
+            renderPairCard(pairGroup) {
+                const { pair, signals } = pairGroup;
+                const primarySignal = signals[0]; // Use first signal for primary info
+                const dataType = primarySignal.dataType;
+                
+                // Determine overall trend and action
+                const trends = signals.map(s => s.trend);
+                const actions = signals.map(s => s.action);
+                const overallTrend = this.getOverallTrend(trends);
+                const overallAction = this.getOverallAction(actions);
                 
                 // Format timestamp
-                const date = new Date(signal.timestamp * 1000);
+                const date = new Date(primarySignal.timestamp * 1000);
                 const timestamp = date.toLocaleDateString('en-US', {
                     month: 'numeric',
                     day: 'numeric',
@@ -1361,29 +1606,80 @@
                 });
                 
                 // Determine data type badge
-                const dataTypeBadge = signal.dataType === 'signal' ? 
+                const dataTypeBadge = dataType === 'signal' ? 
                     '<span class="data-type-badge signal">📊 Signal Data</span>' : 
                     '<span class="data-type-badge price">💰 Price Data</span>';
                 
-                // Render different content based on data type
-                if (signal.dataType === 'signal') {
-                    return this.renderSignalCardContent(signal, timestamp, dataTypeBadge);
-                } else {
-                    return this.renderPriceCardContent(signal, timestamp, dataTypeBadge);
-                }
-            }
-
-            renderSignalCardContent(signal, timestamp, dataTypeBadge) {
                 return `
-                    <div class="signal-card ${signal.trend} ${signal.action}">
+                    <div class="pair-card ${overallTrend} ${overallAction}">
                         <div class="card-header">
                             <div class="pair-info">
-                                <h3>${signal.pair} <span class="timeframe-badge">${signal.timeframe}</span></h3>
-                                <div class="trend-badge ${signal.trend}">
-                                    ${signal.trend === 'bullish' ? '🐂 Bullish' : signal.trend === 'bearish' ? '🐻 Bearish' : '⏸️ Neutral'}
+                                <h3>${pair}</h3>
+                                <div class="trend-badge ${overallTrend}">
+                                    ${overallTrend === 'bullish' ? '🐂 Bullish' : overallTrend === 'bearish' ? '🐻 Bearish' : '⏸️ Neutral'}
                                 </div>
                             </div>
                             ${dataTypeBadge}
+                        </div>
+                        
+                        <div class="timeframe-tabs">
+                            ${signals.map((signal, index) => `
+                                <button class="tab-btn ${index === 0 ? 'active' : ''}" 
+                                        onclick="this.parentElement.parentElement.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active')); 
+                                                 this.classList.add('active'); 
+                                                 this.parentElement.parentElement.querySelectorAll('.tab-content').forEach(content => content.style.display = 'none'); 
+                                                 this.parentElement.parentElement.querySelector('.tab-content-${index}').style.display = 'block';">
+                                    ${signal.timeframe}
+                                </button>
+                            `).join('')}
+                        </div>
+                        
+                        ${signals.map((signal, index) => `
+                            <div class="tab-content tab-content-${index}" style="display: ${index === 0 ? 'block' : 'none'};">
+                                ${dataType === 'signal' ? 
+                                    this.renderSignalTabContent(signal) : 
+                                    this.renderPriceTabContent(signal)
+                                }
+                            </div>
+                        `).join('')}
+                        
+                        <div class="card-footer">
+                            <div class="timestamp">${timestamp}</div>
+                            <button class="action-btn-compact" onclick="this.viewCharts('${pair}')">
+                                📊 Charts
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            getOverallTrend(trends) {
+                const bullishCount = trends.filter(t => t === 'bullish').length;
+                const bearishCount = trends.filter(t => t === 'bearish').length;
+                
+                if (bullishCount > bearishCount) return 'bullish';
+                if (bearishCount > bullishCount) return 'bearish';
+                return 'neutral';
+            }
+
+            getOverallAction(actions) {
+                const buyCount = actions.filter(a => a === 'buy').length;
+                const sellCount = actions.filter(a => a === 'sell').length;
+                const waitCount = actions.filter(a => a === 'wait').length;
+                
+                if (buyCount > sellCount && buyCount > waitCount) return 'buy';
+                if (sellCount > buyCount && sellCount > waitCount) return 'sell';
+                return 'wait';
+            }
+
+            renderSignalTabContent(signal) {
+                return `
+                    <div class="tab-content-inner">
+                        <div class="timeframe-header">
+                            <span class="timeframe-badge">${signal.timeframe}</span>
+                            <span class="action-badge ${signal.action}">
+                                ${signal.action === 'buy' ? '🟢 BUY' : signal.action === 'sell' ? '🔴 SELL' : '🟡 WAIT'}
+                            </span>
                         </div>
                         
                         <div class="compact-data">
@@ -1423,28 +1719,16 @@
                         <div class="analysis-compact">
                             <div class="analysis-text">${signal.reasoning.length > 120 ? signal.reasoning.substring(0, 120) + '...' : signal.reasoning}</div>
                         </div>
-                        
-                        <div class="card-footer">
-                            <div class="timestamp">${timestamp}</div>
-                            <button class="action-btn-compact" onclick="this.viewCharts('${signal.pair}')">
-                                📊 Charts
-                            </button>
-                        </div>
                     </div>
                 `;
             }
 
-            renderPriceCardContent(signal, timestamp, dataTypeBadge) {
+            renderPriceTabContent(signal) {
                 return `
-                    <div class="signal-card ${signal.trend} ${signal.action}">
-                        <div class="card-header">
-                            <div class="pair-info">
-                                <h3>${signal.pair} <span class="timeframe-badge">${signal.timeframe}</span></h3>
-                                <div class="trend-badge ${signal.trend}">
-                                    ⏸️ Neutral
-                                </div>
-                            </div>
-                            ${dataTypeBadge}
+                    <div class="tab-content-inner">
+                        <div class="timeframe-header">
+                            <span class="timeframe-badge">${signal.timeframe}</span>
+                            <span class="action-badge wait">🟡 WAIT</span>
                         </div>
                         
                         <div class="compact-data">
@@ -1479,13 +1763,6 @@
                         
                         <div class="analysis-compact">
                             <div class="analysis-text">${signal.reasoning.length > 120 ? signal.reasoning.substring(0, 120) + '...' : signal.reasoning}</div>
-                        </div>
-                        
-                        <div class="card-footer">
-                            <div class="timestamp">${timestamp}</div>
-                            <button class="action-btn-compact" onclick="this.viewCharts('${signal.pair}')">
-                                📊 Charts
-                            </button>
                         </div>
                     </div>
                 `;
