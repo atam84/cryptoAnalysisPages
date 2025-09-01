@@ -102,13 +102,28 @@
             letter-spacing: 0.5px;
         }
 
-        /* Filters */
+        /* Enhanced Filters */
         .filters {
             display: flex;
             justify-content: center;
-            gap: 16px;
+            gap: 20px;
             margin-bottom: 40px;
             flex-wrap: wrap;
+            align-items: end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .filter-group label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .filter-select {
@@ -123,7 +138,44 @@
         }
 
         .filter-select:focus {
-            border-color: var(--success);
+            border-color: var(--info);
+            box-shadow: 0 0 0 2px rgba(23, 162, 184, 0.2);
+        }
+
+        .refresh-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            background: var(--info);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .refresh-btn:hover {
+            background: #138496;
+            transform: translateY(-1px);
+        }
+
+        .refresh-btn:active {
+            transform: translateY(0);
+        }
+
+        .refresh-icon {
+            font-size: 1rem;
+        }
+
+        .refresh-btn.loading .refresh-icon {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
 
         /* Signals Grid */
@@ -191,6 +243,34 @@
             background: rgba(220, 53, 69, 0.2);
             color: var(--danger);
             border: 1px solid rgba(220, 53, 69, 0.3);
+        }
+
+        .trend-badge.neutral {
+            background: rgba(255, 193, 7, 0.2);
+            color: var(--warning);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+        }
+
+        /* Data Type Badge */
+        .data-type-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .data-type-badge.signal {
+            background: rgba(23, 162, 184, 0.2);
+            color: var(--info);
+            border: 1px solid rgba(23, 162, 184, 0.3);
+        }
+
+        .data-type-badge.price {
+            background: rgba(255, 193, 7, 0.2);
+            color: var(--warning);
+            border: 1px solid rgba(255, 193, 7, 0.3);
         }
 
         .price-change {
@@ -398,7 +478,25 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Empty State */
+        /* Loading and Empty States */
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: var(--text-muted);
+        }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--info);
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+
         .empty-state {
             text-align: center;
             padding: 60px;
@@ -413,6 +511,12 @@
 
         .empty-state p {
             font-size: 1rem;
+        }
+
+        .empty-state .icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            opacity: 0.5;
         }
 
         /* Responsive */
@@ -433,6 +537,57 @@
             .filters {
                 flex-direction: column;
                 align-items: center;
+                gap: 16px;
+            }
+            
+            .filter-group {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .filter-select {
+                width: 100%;
+            }
+            
+            .refresh-btn {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .stats-bar {
+                gap: 12px;
+            }
+            
+            .stat-item {
+                padding: 8px 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header {
+                margin-bottom: 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .stats-bar {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .stat-item {
+                width: 100%;
             }
         }
     </style>
@@ -468,20 +623,49 @@
             </div>
         </div>
 
-        <!-- Filters -->
+        <!-- Enhanced Filters -->
         <div class="filters">
-            <select class="filter-select" id="trendFilter">
-                <option value="all">All Trends</option>
-                <option value="bullish">Bullish</option>
-                <option value="bearish">Bearish</option>
-            </select>
+            <div class="filter-group">
+                <label for="pairFilter">Pair:</label>
+                <select class="filter-select" id="pairFilter">
+                    <option value="all">All Pairs</option>
+                </select>
+            </div>
             
-            <select class="filter-select" id="actionFilter">
-                <option value="all">All Actions</option>
-                <option value="buy">Buy</option>
-                <option value="sell">Sell</option>
-                <option value="wait">Wait</option>
-            </select>
+            <div class="filter-group">
+                <label for="timeframeFilter">Timeframe:</label>
+                <select class="filter-select" id="timeframeFilter">
+                    <option value="all">All Timeframes</option>
+                    <option value="1h">1 Hour</option>
+                    <option value="8h">8 Hours</option>
+                    <option value="1d">1 Day</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="trendFilter">Trend:</label>
+                <select class="filter-select" id="trendFilter">
+                    <option value="all">All Trends</option>
+                    <option value="bullish">Bullish</option>
+                    <option value="bearish">Bearish</option>
+                    <option value="neutral">Neutral</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="actionFilter">Action:</label>
+                <select class="filter-select" id="actionFilter">
+                    <option value="all">All Actions</option>
+                    <option value="buy">Buy</option>
+                    <option value="sell">Sell</option>
+                    <option value="wait">Wait</option>
+                </select>
+            </div>
+            
+            <button class="refresh-btn" id="refreshBtn">
+                <span class="refresh-icon">🔄</span>
+                Refresh
+            </button>
         </div>
 
         <!-- Signals Grid -->
@@ -495,10 +679,15 @@
             constructor() {
                 this.data = [];
                 this.filteredData = [];
+                this.pairs = [];
+                this.dataCache = new Map();
                 this.currentFilters = {
+                    pair: 'all',
+                    timeframe: 'all',
                     trend: 'all',
                     action: 'all'
                 };
+                this.isLoading = false;
                 
                 this.init();
             }
@@ -511,6 +700,20 @@
             }
 
             setupEventListeners() {
+                // Populate pair filter options
+                this.populatePairFilter();
+                
+                // Setup filter event listeners
+                document.getElementById('pairFilter').addEventListener('change', (e) => {
+                    this.currentFilters.pair = e.target.value;
+                    this.applyFilters();
+                });
+                
+                document.getElementById('timeframeFilter').addEventListener('change', (e) => {
+                    this.currentFilters.timeframe = e.target.value;
+                    this.applyFilters();
+                });
+                
                 document.getElementById('trendFilter').addEventListener('change', (e) => {
                     this.currentFilters.trend = e.target.value;
                     this.applyFilters();
@@ -520,10 +723,16 @@
                     this.currentFilters.action = e.target.value;
                     this.applyFilters();
                 });
+                
+                // Setup refresh button
+                document.getElementById('refreshBtn').addEventListener('click', () => {
+                    this.refreshData();
+                });
             }
 
             async loadData() {
                 try {
+                    this.setLoadingState(true);
                     console.log('🔄 Loading trading signals...');
                     
                     // Load pairs configuration
@@ -532,20 +741,34 @@
                         throw new Error('Failed to load pairs configuration');
                     }
                     
-                    const pairs = await pairsResponse.json();
-                    console.log('📋 Pairs configuration loaded:', pairs);
+                    this.pairs = await pairsResponse.json();
+                    console.log('📋 Pairs configuration loaded:', this.pairs);
                     
                     // Load data for each pair
                     const allData = [];
                     
-                    for (const pair of pairs) {
+                    for (const pair of this.pairs) {
                         try {
                             console.log(`📊 Loading data for ${pair.symbol}...`);
+                            
+                            // Check cache first
+                            if (this.dataCache.has(pair.symbol)) {
+                                const cachedData = this.dataCache.get(pair.symbol);
+                                console.log(`✅ Using cached data for ${pair.symbol}`);
+                                const transformedData = this.transformPairData(cachedData, pair);
+                                if (transformedData) {
+                                    allData.push(transformedData);
+                                }
+                                continue;
+                            }
                             
                             const dataResponse = await fetch(`./assets/pairs/${pair.symbol}/${pair.dataFile}`);
                             if (dataResponse.ok) {
                                 const pairData = await dataResponse.json();
                                 console.log(`✅ Data loaded for ${pair.symbol}:`, pairData);
+                                
+                                // Cache the data
+                                this.dataCache.set(pair.symbol, pairData);
                                 
                                 const transformedData = this.transformPairData(pairData, pair);
                                 if (transformedData) {
@@ -567,6 +790,8 @@
                 } catch (error) {
                     console.error('❌ Failed to load data:', error);
                     this.showError('Failed to load trading signals.');
+                } finally {
+                    this.setLoadingState(false);
                 }
             }
 
@@ -574,86 +799,140 @@
                 try {
                     console.log(`🔄 Transforming data for ${pairConfig.symbol}...`);
                     
-                    const signal = pairData.signal;
-                    if (!signal) {
-                        console.warn(`⚠️ No signal data found for ${pairConfig.symbol}`);
-                        return null;
+                    // Handle pairs with signal data
+                    if (pairConfig.hasSignals && pairData.signal) {
+                        return this.transformSignalData(pairData, pairConfig);
                     }
                     
-                    const classification = signal.classification || {};
-                    const recommendation = signal.recommendation || {};
-                    const technical = signal.technical_analysis || {};
-                    const position = signal.position_sizing || {};
-                    
-                    // Determine trend
-                    let trend = 'neutral';
-                    if (technical.trend_direction) {
-                        trend = technical.trend_direction.toLowerCase();
+                    // Handle pairs with simple price data
+                    if (!pairConfig.hasSignals) {
+                        return this.transformPriceData(pairData, pairConfig);
                     }
                     
-                    // Determine action
-                    let action = 'wait';
-                    if (recommendation.action) {
-                        const actionText = recommendation.action.toLowerCase();
-                        if (actionText === 'buy' || actionText === 'long') action = 'buy';
-                        else if (actionText === 'sell' || actionText === 'short') action = 'sell';
-                        else if (actionText === 'wait') action = 'wait';
-                    }
-                    
-                    // Extract entry range
-                    let entryRange = null;
-                    if (recommendation.entry_range && Array.isArray(recommendation.entry_range)) {
-                        const [min, max] = recommendation.entry_range;
-                        if (min !== null && max !== null) {
-                            entryRange = `${min} - ${max}`;
-                        } else if (min !== null) {
-                            entryRange = `${min}`;
-                        }
-                    }
-                    
-                    // Extract target
-                    let target = null;
-                    if (recommendation.take_profit && recommendation.take_profit.length > 0) {
-                        target = recommendation.take_profit.join(' - ');
-                    }
-                    
-                    // Extract stop loss
-                    const stopLoss = recommendation.stop_loss;
-                    
-                    // Extract win rate
-                    let winPercentage = null;
-                    if (classification.expected_win_rate) {
-                        winPercentage = parseFloat(classification.expected_win_rate.replace('%', ''));
-                    }
-                    
-                    const transformed = {
-                        pair: pairConfig.symbol,
-                        trend,
-                        action,
-                        entryRange,
-                        target,
-                        stopLoss,
-                        winPercentage,
-                        confidence: classification.confidence || 'LOW',
-                        confluenceScore: classification.confluence_score || 'N/A',
-                        timeframe: technical.primary_timeframe || 'N/A',
-                        volumeConfirmation: technical.volume_confirmation || 'N/A',
-                        keyLevelProximity: technical.key_level_proximity || 'N/A',
-                        patternStrength: technical.pattern_strength || 'N/A',
-                        confidenceTier: position.confidence_tier || 'N/A',
-                        suggestedPositionSize: position.suggested_position_size || 'N/A',
-                        reasoning: signal.reasoning || 'No reasoning provided',
-                        timestamp: signal.timestamp || Date.now() / 1000,
-                        rawData: pairData
-                    };
-                    
-                    console.log(`✅ Transformed data for ${pairConfig.symbol}:`, transformed);
-                    return transformed;
+                    console.warn(`⚠️ No signal data found for ${pairConfig.symbol}`);
+                    return null;
                     
                 } catch (error) {
                     console.error(`❌ Failed to transform data for ${pairConfig.symbol}:`, error);
                     return null;
                 }
+            }
+
+            transformSignalData(pairData, pairConfig) {
+                const signal = pairData.signal;
+                const classification = signal.classification || {};
+                const recommendation = signal.recommendation || {};
+                const technical = signal.technical_analysis || {};
+                const position = signal.position_sizing || {};
+                
+                // Determine trend
+                let trend = 'neutral';
+                if (technical.trend_direction) {
+                    trend = technical.trend_direction.toLowerCase();
+                }
+                
+                // Determine action
+                let action = 'wait';
+                if (recommendation.action) {
+                    const actionText = recommendation.action.toLowerCase();
+                    if (actionText === 'buy' || actionText === 'long') action = 'buy';
+                    else if (actionText === 'sell' || actionText === 'short') action = 'sell';
+                    else if (actionText === 'wait') action = 'wait';
+                }
+                
+                // Extract entry range
+                let entryRange = null;
+                if (recommendation.entry_range && Array.isArray(recommendation.entry_range)) {
+                    const [min, max] = recommendation.entry_range;
+                    if (min !== null && max !== null) {
+                        entryRange = `${min} - ${max}`;
+                    } else if (min !== null) {
+                        entryRange = `${min}`;
+                    }
+                }
+                
+                // Extract target
+                let target = null;
+                if (recommendation.take_profit && recommendation.take_profit.length > 0) {
+                    target = recommendation.take_profit.join(' - ');
+                }
+                
+                // Extract stop loss
+                const stopLoss = recommendation.stop_loss;
+                
+                // Extract win rate
+                let winPercentage = null;
+                if (classification.expected_win_rate) {
+                    winPercentage = parseFloat(classification.expected_win_rate.replace('%', ''));
+                }
+                
+                const transformed = {
+                    pair: pairConfig.symbol,
+                    trend,
+                    action,
+                    entryRange,
+                    target,
+                    stopLoss,
+                    winPercentage,
+                    confidence: classification.confidence || 'LOW',
+                    confluenceScore: classification.confluence_score || 'N/A',
+                    timeframe: technical.primary_timeframe || 'N/A',
+                    volumeConfirmation: technical.volume_confirmation || 'N/A',
+                    keyLevelProximity: technical.key_level_proximity || 'N/A',
+                    patternStrength: technical.pattern_strength || 'N/A',
+                    confidenceTier: position.confidence_tier || 'N/A',
+                    suggestedPositionSize: position.suggested_position_size || 'N/A',
+                    reasoning: signal.reasoning || 'No reasoning provided',
+                    timestamp: signal.timestamp || Date.now() / 1000,
+                    dataType: 'signal',
+                    rawData: pairData
+                };
+                
+                console.log(`✅ Transformed signal data for ${pairConfig.symbol}:`, transformed);
+                return transformed;
+            }
+
+            transformPriceData(pairData, pairConfig) {
+                // Transform simple price data into a compatible format
+                const support = pairData.support || 'N/A';
+                const resistance = pairData.resistance || 'N/A';
+                const highest = pairData.highest || 'N/A';
+                const lowest = pairData.Lowest || 'N/A';
+                const amplitude = pairData.Amplitude_HL || 'N/A';
+                const candles = pairData.Candles || 'N/A';
+                const variations = pairData.Variations || {};
+                
+                const transformed = {
+                    pair: pairConfig.symbol,
+                    trend: 'neutral', // Default for price data
+                    action: 'wait', // Default for price data
+                    entryRange: `${support} - ${resistance}`,
+                    target: highest,
+                    stopLoss: lowest,
+                    winPercentage: null,
+                    confidence: 'N/A',
+                    confluenceScore: 'N/A',
+                    timeframe: pairData.timeframe || 'N/A',
+                    volumeConfirmation: 'N/A',
+                    keyLevelProximity: 'N/A',
+                    patternStrength: 'N/A',
+                    confidenceTier: 'N/A',
+                    suggestedPositionSize: 'N/A',
+                    reasoning: `Price analysis: Support at ${support}, Resistance at ${resistance}. Current range: ${lowest} - ${highest}.`,
+                    timestamp: Date.now() / 1000,
+                    dataType: 'price',
+                    support,
+                    resistance,
+                    highest,
+                    lowest,
+                    amplitude,
+                    candles,
+                    variations,
+                    rawData: pairData
+                };
+                
+                console.log(`✅ Transformed price data for ${pairConfig.symbol}:`, transformed);
+                return transformed;
             }
 
             applyFilters() {
@@ -690,8 +969,9 @@
                 if (this.filteredData.length === 0) {
                     grid.innerHTML = `
                         <div class="empty-state">
+                            <div class="icon">🔍</div>
                             <h3>No signals found</h3>
-                            <p>Try adjusting your filters</p>
+                            <p>Try adjusting your filters or refresh the data</p>
                         </div>
                     `;
                     return;
@@ -716,15 +996,30 @@
                     hour12: true
                 });
                 
+                // Determine data type badge
+                const dataTypeBadge = signal.dataType === 'signal' ? 
+                    '<span class="data-type-badge signal">📊 Signal Data</span>' : 
+                    '<span class="data-type-badge price">💰 Price Data</span>';
+                
+                // Render different content based on data type
+                if (signal.dataType === 'signal') {
+                    return this.renderSignalCardContent(signal, timestamp, dataTypeBadge);
+                } else {
+                    return this.renderPriceCardContent(signal, timestamp, dataTypeBadge);
+                }
+            }
+
+            renderSignalCardContent(signal, timestamp, dataTypeBadge) {
                 return `
-                    <div class="signal-card ${trendClass} ${actionClass}">
+                    <div class="signal-card ${signal.trend} ${signal.action}">
                         <div class="card-header">
                             <div class="pair-info">
                                 <h3>${signal.pair}</h3>
-                                <div class="trend-badge ${trendClass}">
-                                    ${trendClass === 'bullish' ? '🐂 Bullish' : trendClass === 'bearish' ? '🐻 Bearish' : '⏸️ Neutral'}
+                                <div class="trend-badge ${signal.trend}">
+                                    ${signal.trend === 'bullish' ? '🐂 Bullish' : signal.trend === 'bearish' ? '🐻 Bearish' : '⏸️ Neutral'}
                                 </div>
                             </div>
+                            ${dataTypeBadge}
                         </div>
                         
                         <div class="market-data">
@@ -773,6 +1068,65 @@
                 `;
             }
 
+            renderPriceCardContent(signal, timestamp, dataTypeBadge) {
+                return `
+                    <div class="signal-card ${signal.trend} ${signal.action}">
+                        <div class="card-header">
+                            <div class="pair-info">
+                                <h3>${signal.pair}</h3>
+                                <div class="trend-badge ${signal.trend}">
+                                    ⏸️ Neutral
+                                </div>
+                            </div>
+                            ${dataTypeBadge}
+                        </div>
+                        
+                        <div class="market-data">
+                            <div class="data-item">
+                                <div class="data-label">Support</div>
+                                <div class="data-value">${signal.support}</div>
+                            </div>
+                            <div class="data-item">
+                                <div class="data-label">Resistance</div>
+                                <div class="data-value">${signal.resistance}</div>
+                            </div>
+                            <div class="data-item">
+                                <div class="data-label">Timeframe</div>
+                                <div class="data-value">${signal.timeframe}</div>
+                            </div>
+                            <div class="data-item">
+                                <div class="data-label">Candles</div>
+                                <div class="data-value">${signal.candles}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="trade-plan">
+                            <h4>Price Levels</h4>
+                            <ul>
+                                <li><strong>Current Range:</strong> ${signal.entryRange}</li>
+                                <li><strong>High:</strong> ${signal.highest}</li>
+                                <li><strong>Low:</strong> ${signal.lowest}</li>
+                                <li><strong>Amplitude:</strong> ${signal.amplitude}</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="analysis">
+                            <h4>Price Analysis</h4>
+                            <div class="analysis-text">${signal.reasoning}</div>
+                        </div>
+                        
+                        <button class="action-btn" onclick="this.viewCharts('${signal.pair}')">
+                            📊 View Charts
+                        </button>
+                        
+                        <div class="card-footer">
+                            <div class="timestamp">${timestamp}</div>
+                            <div class="source">From: Price Analysis Dashboard</div>
+                        </div>
+                    </div>
+                `;
+            }
+
             viewCharts(pair) {
                 console.log(`Viewing charts for ${pair}`);
                 // This could open a modal or navigate to a chart view
@@ -787,6 +1141,72 @@
                         <p>${message}</p>
                     </div>
                 `;
+            }
+
+            // Enhanced methods for better functionality
+            populatePairFilter() {
+                const pairFilter = document.getElementById('pairFilter');
+                if (this.pairs.length > 0) {
+                    this.pairs.forEach(pair => {
+                        const option = document.createElement('option');
+                        option.value = pair.symbol;
+                        option.textContent = pair.symbol;
+                        pairFilter.appendChild(option);
+                    });
+                }
+            }
+
+            setLoadingState(loading) {
+                this.isLoading = loading;
+                const refreshBtn = document.getElementById('refreshBtn');
+                const refreshIcon = refreshBtn.querySelector('.refresh-icon');
+                
+                if (loading) {
+                    refreshBtn.classList.add('loading');
+                    refreshBtn.disabled = true;
+                    refreshBtn.textContent = 'Loading...';
+                } else {
+                    refreshBtn.classList.remove('loading');
+                    refreshBtn.disabled = false;
+                    refreshBtn.innerHTML = '<span class="refresh-icon">🔄</span>Refresh';
+                }
+            }
+
+            async refreshData() {
+                console.log('🔄 Refreshing data...');
+                this.dataCache.clear(); // Clear cache for fresh data
+                await this.loadData();
+                this.updateStats();
+                this.renderSignals();
+            }
+
+            applyFilters() {
+                this.filteredData = this.data.filter(signal => {
+                    // Pair filter
+                    if (this.currentFilters.pair !== 'all' && signal.pair !== this.currentFilters.pair) {
+                        return false;
+                    }
+                    
+                    // Timeframe filter
+                    if (this.currentFilters.timeframe !== 'all' && signal.timeframe !== this.currentFilters.timeframe) {
+                        return false;
+                    }
+                    
+                    // Trend filter
+                    if (this.currentFilters.trend !== 'all' && signal.trend !== this.currentFilters.trend) {
+                        return false;
+                    }
+                    
+                    // Action filter
+                    if (this.currentFilters.action !== 'all' && signal.action !== this.currentFilters.action) {
+                        return false;
+                    }
+                    
+                    return true;
+                });
+                
+                this.renderSignals();
+                this.updateStats();
             }
         }
 

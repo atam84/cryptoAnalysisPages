@@ -1,43 +1,57 @@
 [
   {
     "symbol": "BTC-USDT",
-    "style": ["1h", "8h", "1d"],
+    "style": ["8h", "1d"],
+    "dataFile": "data-BTC-USDT-1d.json",
+    "hasSignals": false,
     "candles_soft_limit": 150,
     "candles_hard_limit": 200
   },
   {
     "symbol": "ETH-USDT",
     "style": ["1h", "8h", "1d"],
+    "dataFile": "data-ETH-USDT.json",
+    "hasSignals": true,
     "candles_soft_limit": 150,
     "candles_hard_limit": 200
   },
   {
     "symbol": "BNB-USDT",
     "style": ["1h", "8h", "1d"],
+    "dataFile": "data-BNB-USDT-1d.json",
+    "hasSignals": false,
     "candles_soft_limit": 150,
     "candles_hard_limit": 200
   },
   {
     "symbol": "OP-USDT",
     "style": ["1h", "8h", "1d"],
+    "dataFile": "data-OP-USDT.json",
+    "hasSignals": true,
     "candles_soft_limit": 150,
     "candles_hard_limit": 200
   },
   {
     "symbol": "ADA-USDT",
     "style": ["1h", "8h", "1d"],
+    "dataFile": "data-ADA-USDT.json",
+    "hasSignals": true,
     "candles_soft_limit": 150,
     "candles_hard_limit": 200
   },
   {
     "symbol": "SUI-USDT",
     "style": ["1h", "8h", "1d"],
+    "dataFile": "data-SUI-USDT.json",
+    "hasSignals": true,
     "candles_soft_limit": 150,
     "candles_hard_limit": 200
   },
   {
     "symbol": "ARB-USDT",
     "style": ["1h", "8h", "1d"],
+    "dataFile": "data-ARB-USDT.json",
+    "hasSignals": true,
     "candles_soft_limit": 150,
     "candles_hard_limit": 200
   }
