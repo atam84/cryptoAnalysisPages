@@ -28,13 +28,8 @@ class ConsoleTradingDashboard {
         this.updateVersionDisplay();
         console.log('✅ Version display updated');
         
-        try {
-            await this.loadData();
-            console.log('✅ Data loaded');
-        } catch (error) {
-            console.error('❌ Error loading data:', error);
-            console.log('⚠️ Continuing with dashboard initialization despite data loading error');
-        }
+        await this.loadData();
+        console.log('✅ Data loaded');
         
         this.updateStats();
         console.log('✅ Stats updated');
@@ -283,8 +278,7 @@ class ConsoleTradingDashboard {
             console.error('❌ Theme switcher not found in setTheme');
         }
         
-        // Add visual console indicator
-        console.log(`%c🎨 Theme switched to: ${theme}`, `color: ${theme === 'light' ? '#000' : '#fff'}; background: ${theme === 'light' ? '#fff' : '#000'}; padding: 5px; border-radius: 5px; font-weight: bold;`);
+        console.log(`🎨 Theme switched to: ${theme}`);
     }
 
     async loadData() {
@@ -1480,20 +1474,9 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('🔍 Theme switcher element exists:', !!document.getElementById('themeSwitcher'));
     console.log('🔍 Header actions element exists:', !!document.querySelector('.header-actions'));
     
-    try {
-        // Wait a bit more to ensure all elements are fully rendered
-        setTimeout(() => {
-            console.log('⏰ Delayed initialization, creating dashboard...');
-            try {
-                window.dashboard = new ConsoleTradingDashboard();
-                console.log('✅ Dashboard created successfully');
-            } catch (error) {
-                console.error('❌ Error creating dashboard:', error);
-                alert('Error creating dashboard: ' + error.message);
-            }
-        }, 100);
-    } catch (error) {
-        console.error('❌ Error in dashboard initialization:', error);
-        alert('Error in dashboard initialization: ' + error.message);
-    }
+    // Wait a bit more to ensure all elements are fully rendered
+    setTimeout(() => {
+        console.log('⏰ Delayed initialization, creating dashboard...');
+        window.dashboard = new ConsoleTradingDashboard();
+    }, 100);
 });
