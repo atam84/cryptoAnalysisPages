@@ -1,0 +1,18 @@
+{
+ "symbol": "BNB-USDT",
+ "timeframe": "1d",
+ "support": "593",
+ "resistance": "659",
+ "highest": "900.55",
+ "Lowest": "601.36",
+ "Amplitude_HL": "19.78",
+ "Candles": "75",
+ "Variations": {
+	"Open_Close": "-3.9",
+	"Open_Close_pct": "-0.45",
+	"From_High": "-15.22",
+	"Open_Close_pct": "-1.75",
+	"From_Low": "4.57", 
+	"Open_Close_pct": "0.54"
+  }
+}
