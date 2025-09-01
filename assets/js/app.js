@@ -278,7 +278,8 @@ class ConsoleTradingDashboard {
             console.error('❌ Theme switcher not found in setTheme');
         }
         
-        console.log(`🎨 Theme switched to: ${theme}`);
+        // Add visual console indicator
+        console.log(`%c🎨 Theme switched to: ${theme}`, `color: ${theme === 'light' ? '#000' : '#fff'}; background: ${theme === 'light' ? '#fff' : '#000'}; padding: 5px; border-radius: 5px; font-weight: bold;`);
     }
 
     async loadData() {
