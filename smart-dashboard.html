@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Crypto Analysis Dashboard</title>
+    <meta name="description" content="Comprehensive crypto analysis dashboard with multi-timeframe data, technical indicators, and trading signals">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --bg-card: #1e293b;
+            
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+            
+            --border: #475569;
+            --border-light: #64748b;
+            
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            
+            --radius: 8px;
+            --radius-lg: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+
+        /* Header */
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        .logo-text h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .controls {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: var(--radius);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.875rem;
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .select {
+            padding: 0.5rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Main Grid */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        @media (max-width: 1200px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Pairs Section */
+        .pairs-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .pairs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1rem;
+        }
+
+        .pair-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+
+        .pair-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .pair-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+        }
+
+        .pair-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+
+        .symbol {
+            font-size: 1.125rem;
+            font-weight: 700;
+        }
+
+        .signal-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .signal-badge.moderate {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .signal-badge.no-signal {
+            background: rgba(100, 116, 139, 0.2);
+            color: var(--text-muted);
+            border: 1px solid rgba(100, 116, 139, 0.3);
+        }
+
+        .signal-badge.high {
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--primary);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+        }
+
+        .pair-meta {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+            font-size: 0.875rem;
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .meta-label {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .meta-value {
+            font-weight: 600;
+        }
+
+        .pair-body {
+            padding: 1rem;
+        }
+
+        .timeframe-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        .timeframe-tab {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: var(--radius);
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+
+        .timeframe-tab.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .timeframe-tab:hover:not(.active) {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .data-item {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 0.75rem;
+            text-align: center;
+        }
+
+        .data-label {
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        .data-value {
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .trend-bullish { color: var(--success); }
+        .trend-bearish { color: var(--danger); }
+        .trend-neutral { color: var(--warning); }
+
+        .confidence-high { color: var(--success); }
+        .confidence-medium { color: var(--warning); }
+        .confidence-low { color: var(--danger); }
+
+        .pair-footer {
+            padding: 1rem;
+            border-top: 1px solid var(--border);
+            background: var(--bg-tertiary);
+        }
+
+        .recommendation {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+
+        .action-badge {
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+        }
+
+        .action-badge.buy {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .action-badge.sell {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .action-badge.wait {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .risk-reward {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+            font-size: 0.875rem;
+        }
+
+        .rr-item {
+            text-align: center;
+        }
+
+        .rr-label {
+            color: var(--text-secondary);
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .rr-value {
+            font-weight: 600;
+        }
+
+        /* Charts Section */
+        .charts-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+        }
+
+        .chart-container {
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .chart-image {
+            width: 100%;
+            height: auto;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .chart-image:hover {
+            transform: scale(1.02);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+
+        .modal-content {
+            position: relative;
+            margin: 2% auto;
+            padding: 0;
+            width: 90%;
+            max-width: 800px;
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+
+        .modal-image {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            color: var(--text-primary);
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close:hover {
+            background: rgba(0, 0, 0, 0.7);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 12px;
+            }
+
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .pairs-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .data-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .risk-reward {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">📊</div>
+                    <div class="logo-text">
+                        <h1>Smart Crypto Dashboard</h1>
+                    </div>
+                </div>
+                <div class="controls">
+                    <select class="select" id="pairFilter">
+                        <option value="all">All Pairs</option>
+                    </select>
+                    <select class="select" id="signalFilter">
+                        <option value="all">All Signals</option>
+                        <option value="MODERATE">Moderate</option>
+                        <option value="HIGH">High</option>
+                        <option value="NO_SIGNAL">No Signal</option>
+                    </select>
+                    <button class="btn" id="refreshBtn">🔄 Refresh</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Stats Overview -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="totalPairs">-</div>
+                <div class="stat-label">Total Pairs</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="activeSignals">-</div>
+                <div class="stat-label">Active Signals</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="avgWinRate">-</div>
+                <div class="stat-label">Avg Win Rate</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="riskLevel">-</div>
+                <div class="stat-label">Risk Level</div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-grid">
+            <!-- Pairs Section -->
+            <div class="pairs-section">
+                <h2 class="section-title">📈 Trading Pairs Analysis</h2>
+                <div id="pairsGrid" class="pairs-grid">
+                    <div class="loading">Loading crypto analysis data...</div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="charts-section">
+                <h2 class="section-title">📊 Technical Charts</h2>
+                <div id="chartsContainer">
+                    <div class="empty-state">Select a pair to view charts</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for enlarged charts -->
+    <div id="chartModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <img id="modalImage" class="modal-image" src="" alt="Chart">
+        </div>
+    </div>
+
+    <script>
+        class SmartCryptoDashboard {
+            constructor() {
+                this.data = [];
+                this.filteredData = [];
+                this.currentFilters = {
+                    pair: 'all',
+                    signal: 'all'
+                };
+                this.selectedPair = null;
+                
+                this.init();
+            }
+
+            async init() {
+                this.setupEventListeners();
+                await this.loadData();
+                this.updateStats();
+                this.renderPairs();
+                this.setupPairFilter();
+            }
+
+            setupEventListeners() {
+                document.getElementById('refreshBtn').addEventListener('click', () => this.refreshData());
+                document.getElementById('pairFilter').addEventListener('change', (e) => {
+                    this.currentFilters.pair = e.target.value;
+                    this.applyFilters();
+                });
+                document.getElementById('signalFilter').addEventListener('change', (e) => {
+                    this.currentFilters.signal = e.target.value;
+                    this.applyFilters();
+                });
+
+                // Modal events
+                const modal = document.getElementById('chartModal');
+                const close = document.querySelector('.close');
+                close.onclick = () => modal.style.display = 'none';
+                window.onclick = (e) => {
+                    if (e.target === modal) modal.style.display = 'none';
+                };
+            }
+
+            async loadData() {
+                try {
+                    // Load pairs configuration
+                    const pairsResponse = await fetch('./config/pairs.json');
+                    const pairs = await pairsResponse.json();
+                    
+                    // Load data for each pair
+                    const allData = [];
+                    
+                    for (const pair of pairs) {
+                        try {
+                            // Load main analysis data
+                            const dataResponse = await fetch(`./assets/pairs/${pair.symbol}/data-${pair.symbol}.json`);
+                            if (dataResponse.ok) {
+                                const pairData = await dataResponse.json();
+                                allData.push({
+                                    ...pairData,
+                                    pair: pair.symbol,
+                                    timeframe: pair.style || '4h'
+                                });
+                            }
+                        } catch (error) {
+                            console.warn(`Failed to load data for ${pair.symbol}:`, error);
+                        }
+                    }
+                    
+                    this.data = allData;
+                    this.filteredData = [...this.data];
+                    
+                } catch (error) {
+                    console.error('Failed to load data:', error);
+                    this.showError('Failed to load crypto analysis data.');
+                }
+            }
+
+            setupPairFilter() {
+                const pairFilter = document.getElementById('pairFilter');
+                const pairs = this.data.map(item => item.pair);
+                
+                pairs.forEach(pair => {
+                    const option = document.createElement('option');
+                    option.value = pair;
+                    option.textContent = pair;
+                    pairFilter.appendChild(option);
+                });
+            }
+
+            applyFilters() {
+                this.filteredData = this.data.filter(item => {
+                    // Pair filter
+                    if (this.currentFilters.pair !== 'all' && item.pair !== this.currentFilters.pair) {
+                        return false;
+                    }
+                    
+                    // Signal type filter
+                    if (this.currentFilters.signal !== 'all' && 
+                        item.signal.classification?.type !== this.currentFilters.signal) {
+                        return false;
+                    }
+                    
+                    return true;
+                });
+                
+                this.renderPairs();
+            }
+
+            updateStats() {
+                const totalPairs = this.data.length;
+                const activeSignals = this.data.filter(item => 
+                    item.signal.classification?.type !== 'NO_SIGNAL'
+                ).length;
+                
+                const winRates = this.data
+                    .map(item => item.signal.classification?.expected_win_rate)
+                    .filter(rate => rate)
+                    .map(rate => parseInt(rate.replace('%', '')));
+                
+                const avgWinRate = winRates.length > 0 
+                    ? Math.round(winRates.reduce((a, b) => a + b, 0) / winRates.length)
+                    : 0;
+                
+                const riskLevels = this.data
+                    .map(item => item.signal.position_sizing?.confidence_tier)
+                    .filter(level => level);
+                
+                const avgRiskLevel = riskLevels.length > 0 
+                    ? this.calculateAverageRiskLevel(riskLevels)
+                    : 'MEDIUM';
+                
+                document.getElementById('totalPairs').textContent = totalPairs;
+                document.getElementById('activeSignals').textContent = activeSignals;
+                document.getElementById('avgWinRate').textContent = avgWinRate + '%';
+                document.getElementById('riskLevel').textContent = avgRiskLevel;
+            }
+
+            calculateAverageRiskLevel(levels) {
+                const riskMap = { 'LOW': 1, 'MEDIUM': 2, 'HIGH': 3 };
+                const avg = levels.reduce((sum, level) => sum + (riskMap[level] || 2), 0) / levels.length;
+                
+                if (avg <= 1.5) return 'LOW';
+                if (avg <= 2.5) return 'MEDIUM';
+                return 'HIGH';
+            }
+
+            renderPairs() {
+                const grid = document.getElementById('pairsGrid');
+                
+                if (this.filteredData.length === 0) {
+                    grid.innerHTML = `
+                        <div class="empty-state">
+                            <h3>No signals found</h3>
+                            <p>Try adjusting your filters</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                grid.innerHTML = this.filteredData.map(item => this.renderPairCard(item)).join('');
+                
+                // Add click events to pair cards
+                this.filteredData.forEach((item, index) => {
+                    const card = grid.children[index];
+                    card.addEventListener('click', () => this.selectPair(item));
+                });
+            }
+
+            renderPairCard(item) {
+                const signal = item.signal;
+                const classification = signal.classification || {};
+                const recommendation = signal.recommendation || {};
+                const technical = signal.technical_analysis || {};
+                const position = signal.position_sizing || {};
+                
+                const signalType = classification.type || 'NO_SIGNAL';
+                const confidence = classification.confidence || 'LOW';
+                const trend = technical.trend_direction || 'NEUTRAL';
+                const action = recommendation.action || 'WAIT';
+                
+                return `
+                    <div class="pair-card" data-pair="${item.pair}">
+                        <div class="pair-header">
+                            <div class="pair-title">
+                                <span class="symbol">${item.pair}</span>
+                                <span class="signal-badge ${signalType.toLowerCase().replace('_', '-')}">${signalType}</span>
+                            </div>
+                            <div class="pair-meta">
+                                <div class="meta-item">
+                                    <span class="meta-label">Timeframe</span>
+                                    <span class="meta-value">${technical.primary_timeframe || 'N/A'}</span>
+                                </div>
+                                <div class="meta-item">
+                                    <span class="meta-label">Confidence</span>
+                                    <span class="meta-value confidence-${confidence.toLowerCase()}">${confidence}</span>
+                                </div>
+                                <div class="meta-item">
+                                    <span class="meta-label">Win Rate</span>
+                                    <span class="meta-value">${classification.expected_win_rate || 'N/A'}</span>
+                                </div>
+                                <div class="meta-item">
+                                    <span class="meta-label">Confluence</span>
+                                    <span class="meta-value">${classification.confluence_score || 'N/A'}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="pair-body">
+                            <div class="timeframe-tabs">
+                                <button class="timeframe-tab active" data-timeframe="1h">1H</button>
+                                <button class="timeframe-tab" data-timeframe="4h">4H</button>
+                                <button class="timeframe-tab" data-timeframe="8h">8H</button>
+                            </div>
+                            
+                            <div class="data-grid">
+                                <div class="data-item">
+                                    <div class="data-label">Trend</div>
+                                    <div class="data-value trend-${trend.toLowerCase()}">${trend}</div>
+                                </div>
+                                <div class="data-item">
+                                    <div class="data-label">Volume</div>
+                                    <div class="data-value">${technical.volume_confirmation || 'N/A'}</div>
+                                </div>
+                                <div class="data-item">
+                                    <div class="data-label">Pattern</div>
+                                    <div class="data-value">${technical.pattern_strength || 'N/A'}</div>
+                                </div>
+                                <div class="data-item">
+                                    <div class="data-label">Levels</div>
+                                    <div class="data-value">${technical.key_level_proximity || 'N/A'}</div>
+                                </div>
+                                <div class="data-item">
+                                    <div class="data-label">Confidence</div>
+                                    <div class="data-value confidence-${position.confidence_tier?.toLowerCase() || 'low'}">${position.confidence_tier || 'N/A'}</div>
+                                </div>
+                                <div class="data-item">
+                                    <div class="data-label">Position</div>
+                                    <div class="data-value">${position.base_position_percent || 'N/A'}%</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="pair-footer">
+                            <div class="recommendation">
+                                <span class="action-badge ${action.toLowerCase()}">${action}</span>
+                                <span class="meta-value">${recommendation.timeframe || 'N/A'}</span>
+                            </div>
+                            
+                            <div class="risk-reward">
+                                <div class="rr-item">
+                                    <div class="rr-label">Risk/Reward</div>
+                                    <div class="rr-value">${recommendation.risk_reward_ratio || 'N/A'}</div>
+                                </div>
+                                <div class="rr-item">
+                                    <div class="rr-label">Max Drawdown</div>
+                                    <div class="rr-value">${recommendation.max_drawdown || 'N/A'}</div>
+                                </div>
+                                <div class="rr-item">
+                                    <div class="rr-label">Entry Range</div>
+                                    <div class="rr-value">${this.formatEntryRange(recommendation.entry_range)}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            formatEntryRange(range) {
+                if (!range || !Array.isArray(range) || range.length < 2) return 'N/A';
+                const [min, max] = range;
+                if (min === null || max === null) return 'N/A';
+                return `${min} - ${max}`;
+            }
+
+            selectPair(item) {
+                this.selectedPair = item;
+                this.renderCharts(item);
+                this.updateActivePair(item.pair);
+            }
+
+            updateActivePair(pairName) {
+                // Update pair filter to show selected pair
+                document.getElementById('pairFilter').value = pairName;
+                this.currentFilters.pair = pairName;
+            }
+
+            async renderCharts(item) {
+                const container = document.getElementById('chartsContainer');
+                const pair = item.pair;
+                
+                container.innerHTML = `
+                    <div class="chart-container">
+                        <h3 class="chart-title">📊 ${pair} - 1 Hour</h3>
+                        <img src="./assets/pairs/${pair}/graph-${pair}-1h.png" 
+                             alt="${pair} 1H Chart" 
+                             class="chart-image"
+                             onclick="this.showModal(this.src)">
+                    </div>
+                    <div class="chart-container">
+                        <h3 class="chart-title">📊 ${pair} - 4 Hours</h3>
+                        <img src="./assets/pairs/${pair}/graph-${pair}-4h.png" 
+                             alt="${pair} 4H Chart" 
+                             class="chart-image"
+                             onclick="this.showModal(this.src)">
+                    </div>
+                    <div class="chart-container">
+                        <h3 class="chart-title">📊 ${pair} - 8 Hours</h3>
+                        <img src="./assets/pairs/${pair}/graph-${pair}-8h.png" 
+                             alt="${pair} 8H Chart" 
+                             class="chart-image"
+                             onclick="this.showModal(this.src)">
+                    </div>
+                `;
+
+                // Add click events to charts
+                const charts = container.querySelectorAll('.chart-image');
+                charts.forEach(chart => {
+                    chart.addEventListener('click', () => this.showModal(chart.src));
+                });
+            }
+
+            showModal(imageSrc) {
+                const modal = document.getElementById('chartModal');
+                const modalImage = document.getElementById('modalImage');
+                modalImage.src = imageSrc;
+                modal.style.display = 'block';
+            }
+
+            async refreshData() {
+                const refreshBtn = document.getElementById('refreshBtn');
+                refreshBtn.disabled = true;
+                refreshBtn.textContent = '🔄 Refreshing...';
+                
+                try {
+                    await this.loadData();
+                    this.updateStats();
+                    this.renderPairs();
+                    if (this.selectedPair) {
+                        this.renderCharts(this.selectedPair);
+                    }
+                } catch (error) {
+                    console.error('Refresh failed:', error);
+                    this.showError('Failed to refresh data.');
+                } finally {
+                    refreshBtn.disabled = false;
+                    refreshBtn.textContent = '🔄 Refresh';
+                }
+            }
+
+            showError(message) {
+                const grid = document.getElementById('pairsGrid');
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <h3>Error</h3>
+                        <p>${message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Initialize dashboard when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            new SmartCryptoDashboard();
+        });
+    </script>
+</body>
+</html>

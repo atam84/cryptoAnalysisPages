@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Analysis Dashboard - Test Version</title>
+    <meta name="description" content="Test version of the crypto analysis dashboard with embedded sample data">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --bg-card: #1e293b;
+            
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+            
+            --border: #475569;
+            --border-light: #64748b;
+            
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            
+            --radius: 12px;
+            --radius-lg: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 1rem 0;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .logo-text h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-text p {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: var(--radius);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.875rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-secondary);
+            border-color: var(--border-light);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-xl);
+            border-color: var(--primary);
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .stat-title {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .stat-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-change {
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin: 2rem 0;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .filters {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+
+        /* Pairs Grid */
+        .pairs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .pair-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.3s ease;
+        }
+
+        .pair-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-xl);
+            border-color: var(--primary);
+        }
+
+        .pair-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+        }
+
+        .pair-symbol {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .symbol-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .signal-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .signal-badge.moderate {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .signal-badge.no-signal {
+            background: rgba(100, 116, 139, 0.2);
+            color: var(--text-muted);
+            border: 1px solid rgba(100, 116, 139, 0.3);
+        }
+
+        .signal-badge.high {
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--primary);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+        }
+
+        .pair-meta {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            font-size: 0.875rem;
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .meta-label {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .meta-value {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .pair-body {
+            padding: 1.5rem;
+        }
+
+        .analysis-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .analysis-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .analysis-item {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .analysis-label {
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .analysis-value {
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .trend-bullish {
+            color: var(--success);
+        }
+
+        .trend-bearish {
+            color: var(--danger);
+        }
+
+        .trend-neutral {
+            color: var(--warning);
+        }
+
+        .confidence-high {
+            color: var(--success);
+        }
+
+        .confidence-medium {
+            color: var(--warning);
+        }
+
+        .confidence-low {
+            color: var(--danger);
+        }
+
+        .pair-footer {
+            padding: 1.5rem;
+            border-top: 1px solid var(--border);
+            background: var(--bg-tertiary);
+        }
+
+        .recommendation {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .action-badge {
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .action-badge.buy {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .action-badge.sell {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .action-badge.wait {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .risk-reward {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.875rem;
+        }
+
+        .rr-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .rr-label {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .rr-value {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 16px;
+            }
+
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .pairs-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+
+            .analysis-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .pair-meta {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .analysis-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filters {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .filter-select {
+                width: 100%;
+            }
+        }
+
+        .notice {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">📊</div>
+                    <div class="logo-text">
+                        <h1>Crypto Analysis Dashboard</h1>
+                        <p>Test Version - Sample Data</p>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-secondary" id="refreshBtn">
+                        <span>🔄</span>
+                        Refresh
+                    </button>
+                    <button class="btn btn-primary" id="exportBtn">
+                        <span>📥</span>
+                        Export
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Stats Overview -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-title">Total Pairs</span>
+                    <div class="stat-icon" style="background: rgba(99, 102, 241, 0.2); color: var(--primary);">📈</div>
+                </div>
+                <div class="stat-value" id="totalPairs">2</div>
+                <div class="stat-change">
+                    <span>📊</span>
+                    <span>Sample data</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-title">Active Signals</span>
+                    <div class="stat-icon" style="background: rgba(16, 185, 129, 0.2); color: var(--success);">🎯</div>
+                </div>
+                <div class="stat-value" id="activeSignals">1</div>
+                <div class="stat-change positive">
+                    <span>✅</span>
+                    <span>1 moderate signal</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-title">Avg Win Rate</span>
+                    <div class="stat-icon" style="background: rgba(245, 158, 11, 0.2); color: var(--warning);">📊</div>
+                </div>
+                <div class="stat-value" id="avgWinRate">67.5%</div>
+                <div class="stat-change">
+                    <span>📈</span>
+                    <span>Expected performance</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-title">Risk Level</span>
+                    <div class="stat-icon" style="background: rgba(239, 68, 68, 0.2); color: var(--danger);">⚠️</div>
+                </div>
+                <div class="stat-value" id="riskLevel">LOW</div>
+                <div class="stat-change">
+                    <span>🛡️</span>
+                    <span>Portfolio protection</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notice -->
+        <div class="notice">
+            <strong>🧪 Test Mode:</strong> This is a test version with embedded sample data. 
+            The real dashboard will load data from your assets directory when deployed to GitHub Pages.
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="section-header">
+                <h2 class="section-title">Crypto Analysis Signals</h2>
+                <div class="filters">
+                    <select class="filter-select" id="timeframeFilter">
+                        <option value="all">All Timeframes</option>
+                        <option value="1h">1 Hour</option>
+                        <option value="4h">4 Hours</option>
+                        <option value="8h">8 Hours</option>
+                    </select>
+                    <select class="filter-select" id="signalFilter">
+                        <option value="all">All Signals</option>
+                        <option value="MODERATE">Moderate</option>
+                        <option value="HIGH">High</option>
+                        <option value="NO_SIGNAL">No Signal</option>
+                    </select>
+                    <select class="filter-select" id="trendFilter">
+                        <option value="all">All Trends</option>
+                        <option value="BULLISH">Bullish</option>
+                        <option value="BEARISH">Bearish</option>
+                        <option value="NEUTRAL">Neutral</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Pairs Grid -->
+            <div id="pairsGrid" class="pairs-grid">
+                <!-- Sample data will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data embedded for testing
+        const sampleData = [
+            {
+                pair: "ICP-USDT",
+                timeframe: "4h",
+                signal: {
+                    classification: {
+                        type: "MODERATE",
+                        confidence: "MEDIUM",
+                        confluence_score: "6/10",
+                        expected_win_rate: "70%",
+                        frequency_tier: "MEDIUM"
+                    },
+                    recommendation: {
+                        action: "WAIT",
+                        timeframe: "SWING",
+                        entry_range: [4.884, 4.957],
+                        stop_loss: 4.7619,
+                        take_profit: [5.15, 5.29, 5.58],
+                        risk_reward_ratio: 2.5,
+                        max_drawdown: "-2.5%"
+                    },
+                    technical_analysis: {
+                        primary_timeframe: "4h",
+                        timeframes_aligned: 2,
+                        trend_direction: "BULLISH",
+                        volume_confirmation: "STRONG",
+                        key_level_proximity: "AT_LEVEL",
+                        pattern_strength: "STRONG"
+                    },
+                    position_sizing: {
+                        confidence_tier: "LOW",
+                        base_position_percent: 0.5,
+                        max_portfolio_risk: 1,
+                        volatility_adjustment: "NORMAL"
+                    },
+                    risk_management: {
+                        stop_loss_type: "TECHNICAL",
+                        reward_targets: [
+                            {"price": 5.15, "probability": "60%"},
+                            {"price": 5.29, "probability": "20%"},
+                            {"price": 5.58, "probability": "10%"}
+                        ]
+                    }
+                }
+            },
+            {
+                pair: "SOL-USDT",
+                timeframe: "1h",
+                signal: {
+                    classification: {
+                        type: "NO_SIGNAL",
+                        confidence: "LOW",
+                        confluence_score: "7/10",
+                        expected_win_rate: "65%",
+                        frequency_tier: "MEDIUM"
+                    },
+                    recommendation: {
+                        action: "WAIT",
+                        timeframe: "SWING",
+                        entry_range: [null, null],
+                        stop_loss: null,
+                        take_profit: [],
+                        risk_reward_ratio: null,
+                        max_drawdown: null
+                    },
+                    technical_analysis: {
+                        primary_timeframe: "1h",
+                        timeframes_aligned: 2,
+                        trend_direction: "BEARISH",
+                        volume_confirmation: "STRONG",
+                        key_level_proximity: "NEAR",
+                        pattern_strength: "WEAK"
+                    },
+                    position_sizing: {
+                        confidence_tier: "LOW",
+                        base_position_percent: 0.5,
+                        max_portfolio_risk: 1,
+                        volatility_adjustment: "NORMAL"
+                    },
+                    risk_management: {
+                        stop_loss_type: "TECHNICAL",
+                        reward_targets: [],
+                        exit_strategy: "N/A"
+                    }
+                }
+            }
+        ];
+
+        class CryptoDashboard {
+            constructor() {
+                this.data = sampleData;
+                this.filteredData = [...this.data];
+                this.currentFilters = {
+                    timeframe: 'all',
+                    signal: 'all',
+                    trend: 'all'
+                };
+                
+                this.init();
+            }
+
+            async init() {
+                this.setupEventListeners();
+                this.updateStats();
+                this.renderPairs();
+            }
+
+            setupEventListeners() {
+                document.getElementById('refreshBtn').addEventListener('click', () => this.refreshData());
+                document.getElementById('exportBtn').addEventListener('click', () => this.exportData());
+                
+                document.getElementById('timeframeFilter').addEventListener('change', (e) => {
+                    this.currentFilters.timeframe = e.target.value;
+                    this.applyFilters();
+                });
+                
+                document.getElementById('signalFilter').addEventListener('change', (e) => {
+                    this.currentFilters.signal = e.target.value;
+                    this.applyFilters();
+                });
+                
+                document.getElementById('trendFilter').addEventListener('change', (e) => {
+                    this.currentFilters.trend = e.target.value;
+                    this.applyFilters();
+                });
+            }
+
+            applyFilters() {
+                this.filteredData = this.data.filter(item => {
+                    const signal = item.signal;
+                    
+                    // Timeframe filter
+                    if (this.currentFilters.timeframe !== 'all' && 
+                        signal.technical_analysis?.primary_timeframe !== this.currentFilters.timeframe) {
+                        return false;
+                    }
+                    
+                    // Signal type filter
+                    if (this.currentFilters.signal !== 'all' && 
+                        signal.classification?.type !== this.currentFilters.signal) {
+                        return false;
+                    }
+                    
+                    // Trend filter
+                    if (this.currentFilters.trend !== 'all' && 
+                        signal.technical_analysis?.trend_direction !== this.currentFilters.trend) {
+                        return false;
+                    }
+                    
+                    return true;
+                });
+                
+                this.renderPairs();
+            }
+
+            updateStats() {
+                const totalPairs = this.data.length;
+                const activeSignals = this.data.filter(item => 
+                    item.signal.classification?.type !== 'NO_SIGNAL'
+                ).length;
+                
+                const winRates = this.data
+                    .map(item => item.signal.classification?.expected_win_rate)
+                    .filter(rate => rate)
+                    .map(rate => parseInt(rate.replace('%', '')));
+                
+                const avgWinRate = winRates.length > 0 
+                    ? Math.round(winRates.reduce((a, b) => a + b, 0) / winRates.length)
+                    : 0;
+                
+                const riskLevels = this.data
+                    .map(item => item.signal.position_sizing?.confidence_tier)
+                    .filter(level => level);
+                
+                const avgRiskLevel = riskLevels.length > 0 
+                    ? this.calculateAverageRiskLevel(riskLevels)
+                    : 'MEDIUM';
+                
+                document.getElementById('totalPairs').textContent = totalPairs;
+                document.getElementById('activeSignals').textContent = activeSignals;
+                document.getElementById('avgWinRate').textContent = avgWinRate + '%';
+                document.getElementById('riskLevel').textContent = avgRiskLevel;
+            }
+
+            calculateAverageRiskLevel(levels) {
+                const riskMap = { 'LOW': 1, 'MEDIUM': 2, 'HIGH': 3 };
+                const avg = levels.reduce((sum, level) => sum + (riskMap[level] || 2), 0) / levels.length;
+                
+                if (avg <= 1.5) return 'LOW';
+                if (avg <= 2.5) return 'MEDIUM';
+                return 'HIGH';
+            }
+
+            renderPairs() {
+                const grid = document.getElementById('pairsGrid');
+                
+                if (this.filteredData.length === 0) {
+                    grid.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">🔍</div>
+                            <h3>No signals found</h3>
+                            <p>Try adjusting your filters or refresh the data</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                grid.innerHTML = this.filteredData.map(item => this.renderPairCard(item)).join('');
+            }
+
+            renderPairCard(item) {
+                const signal = item.signal;
+                const classification = signal.classification || {};
+                const recommendation = signal.recommendation || {};
+                const technical = signal.technical_analysis || {};
+                const position = signal.position_sizing || {};
+                const risk = signal.risk_management || {};
+                
+                const signalType = classification.type || 'NO_SIGNAL';
+                const confidence = classification.confidence || 'LOW';
+                const trend = technical.trend_direction || 'NEUTRAL';
+                const action = recommendation.action || 'WAIT';
+                
+                return `
+                    <div class="pair-card">
+                        <div class="pair-header">
+                            <div class="pair-symbol">
+                                <span class="symbol-name">${item.pair}</span>
+                                <span class="signal-badge ${signalType.toLowerCase().replace('_', '-')}">${signalType}</span>
+                            </div>
+                            <div class="pair-meta">
+                                <div class="meta-item">
+                                    <span class="meta-label">Timeframe</span>
+                                    <span class="meta-value">${technical.primary_timeframe || 'N/A'}</span>
+                                </div>
+                                <div class="meta-item">
+                                    <span class="meta-label">Confidence</span>
+                                    <span class="meta-value confidence-${confidence.toLowerCase()}">${confidence}</span>
+                                </div>
+                                <div class="meta-item">
+                                    <span class="meta-label">Win Rate</span>
+                                    <span class="meta-value">${classification.expected_win_rate || 'N/A'}</span>
+                                </div>
+                                <div class="meta-item">
+                                    <span class="meta-label">Confluence</span>
+                                    <span class="meta-value">${classification.confluence_score || 'N/A'}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="pair-body">
+                            <div class="analysis-section">
+                                <h3 class="analysis-title">📊 Technical Analysis</h3>
+                                <div class="analysis-grid">
+                                    <div class="analysis-item">
+                                        <div class="analysis-label">Trend</div>
+                                        <div class="analysis-value trend-${trend.toLowerCase()}">${trend}</div>
+                                    </div>
+                                    <div class="analysis-item">
+                                        <div class="analysis-label">Volume</div>
+                                        <div class="analysis-value">${technical.volume_confirmation || 'N/A'}</div>
+                                    </div>
+                                    <div class="analysis-item">
+                                        <div class="analysis-label">Pattern</div>
+                                        <div class="analysis-value">${technical.pattern_strength || 'N/A'}</div>
+                                    </div>
+                                    <div class="analysis-item">
+                                        <div class="analysis-label">Levels</div>
+                                        <div class="analysis-value">${technical.key_level_proximity || 'N/A'}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="analysis-section">
+                                <h3 class="analysis-title">💰 Position Sizing</h3>
+                                <div class="analysis-grid">
+                                    <div class="analysis-item">
+                                        <div class="analysis-label">Confidence</div>
+                                        <div class="analysis-value confidence-${position.confidence_tier?.toLowerCase() || 'low'}">${position.confidence_tier || 'N/A'}</div>
+                                    </div>
+                                    <div class="analysis-item">
+                                        <div class="analysis-label">Base Position</div>
+                                        <div class="analysis-value">${position.base_position_percent || 'N/A'}%</div>
+                                    </div>
+                                    <div class="analysis-item">
+                                        <div class="analysis-label">Max Risk</div>
+                                        <div class="analysis-value">${position.max_portfolio_risk || 'N/A'}%</div>
+                                    </div>
+                                    <div class="analysis-item">
+                                        <div class="analysis-label">Volatility</div>
+                                        <div class="analysis-value">${position.volatility_adjustment || 'N/A'}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="pair-footer">
+                            <div class="recommendation">
+                                <span class="action-badge ${action.toLowerCase()}">${action}</span>
+                                <span class="meta-value">${recommendation.timeframe || 'N/A'}</span>
+                            </div>
+                            
+                            <div class="risk-reward">
+                                <div class="rr-item">
+                                    <span class="rr-label">Risk/Reward</span>
+                                    <span class="rr-value">${recommendation.risk_reward_ratio || 'N/A'}</span>
+                                </div>
+                                <div class="rr-item">
+                                    <span class="rr-label">Max Drawdown</span>
+                                    <span class="rr-value">${recommendation.max_drawdown || 'N/A'}</span>
+                                </div>
+                                <div class="rr-item">
+                                    <span class="rr-label">Entry Range</span>
+                                    <span class="rr-value">${this.formatEntryRange(recommendation.entry_range)}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            formatEntryRange(range) {
+                if (!range || !Array.isArray(range) || range.length < 2) return 'N/A';
+                const [min, max] = range;
+                if (min === null || max === null) return 'N/A';
+                return `${min} - ${max}`;
+            }
+
+            refreshData() {
+                // In test mode, just re-render the sample data
+                this.renderPairs();
+            }
+
+            exportData() {
+                const dataStr = JSON.stringify(this.filteredData, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(dataBlob);
+                
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `crypto-analysis-test-${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            }
+        }
+
+        // Initialize dashboard when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            new CryptoDashboard();
+        });
+    </script>
+</body>
+</html>
