@@ -855,10 +855,20 @@ body {
     border-bottom: 1px solid var(--border);
     cursor: pointer;
     transition: all 0.2s ease;
+    /* Mobile touch improvements */
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    user-select: none;
 }
 
 .timeframe-header:hover {
     background: var(--bg-secondary);
+}
+
+/* Mobile-specific touch feedback */
+.timeframe-header:active {
+    background: var(--bg-secondary);
+    transform: scale(0.98);
 }
 
 .timeframe-header h5 {
@@ -869,6 +879,8 @@ body {
     display: flex;
     align-items: center;
     gap: 8px;
+    /* Ensure text doesn't interfere with touch */
+    pointer-events: none;
 }
 
 .timeframe-toggle {
@@ -885,6 +897,10 @@ body {
     justify-content: center;
     width: 24px;
     height: 24px;
+    /* Mobile touch improvements */
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    pointer-events: none; /* Let the header handle all touch events */
 }
 
 .timeframe-toggle:hover {
@@ -1143,5 +1159,27 @@ body {
     
     .console-signal-card .data-grid {
         grid-template-columns: 1fr;
+    }
+}
+
+/* Mobile-specific improvements */
+@media (max-width: 768px) {
+    .timeframe-header {
+        padding: 20px; /* Larger touch target on mobile */
+        min-height: 60px; /* Ensure minimum touch target size */
+    }
+    
+    .timeframe-header h5 {
+        font-size: 1.1rem; /* Slightly larger text on mobile */
+    }
+    
+    .timeframe-toggle {
+        width: 32px; /* Larger touch target for toggle button */
+        height: 32px;
+        font-size: 1.4rem;
+    }
+    
+    .timeframe-metrics {
+        padding: 24px; /* More padding on mobile for better readability */
     }
 }

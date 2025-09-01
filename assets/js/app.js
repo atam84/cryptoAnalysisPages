@@ -1022,11 +1022,32 @@ class ConsoleTradingDashboard {
     }
 
     setupTimeframeEventListeners(timeframesTab) {
-        // Use event delegation for timeframe headers
-        timeframesTab.addEventListener('click', (event) => {
+        // Use event delegation for both click and touch events
+        const events = ['click', 'touchstart'];
+        
+        events.forEach(eventType => {
+            timeframesTab.addEventListener(eventType, (event) => {
+                // Prevent default behavior for touch events to avoid double-triggering
+                if (eventType === 'touchstart') {
+                    event.preventDefault();
+                }
+                
+                const header = event.target.closest('.timeframe-header');
+                if (header && header.dataset.action === 'toggle') {
+                    this.toggleTimeframeSection(header);
+                }
+            }, { passive: false });
+        });
+        
+        // Add specific mobile touch handling
+        timeframesTab.addEventListener('touchend', (event) => {
             const header = event.target.closest('.timeframe-header');
             if (header && header.dataset.action === 'toggle') {
-                this.toggleTimeframeSection(header);
+                // Add visual feedback for mobile
+                header.style.backgroundColor = 'var(--bg-secondary)';
+                setTimeout(() => {
+                    header.style.backgroundColor = '';
+                }, 150);
             }
         });
     }
