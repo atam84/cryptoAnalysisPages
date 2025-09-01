@@ -21,7 +21,7 @@
 }
 
 /* Light Theme */
-[data-theme="light"] {
+html[data-theme="light"] {
     --bg-primary: #ffffff;
     --bg-secondary: #f8f9fa;
     --bg-card: #ffffff;
@@ -41,7 +41,7 @@
 }
 
 /* Dark Theme */
-[data-theme="dark"] {
+html[data-theme="dark"] {
     --bg-primary: #0a0a0a;
     --bg-secondary: #1a1a1a;
     --bg-card: #252525;
@@ -74,6 +74,7 @@ body {
     font-size: 14px;
     overflow-x: hidden;
     transition: background-color 0.3s ease, color 0.3s ease;
+    min-height: 100vh;
 }
 
 .container {
@@ -81,6 +82,8 @@ body {
     margin: 0 auto;
     padding: 24px 32px;
     transition: all 0.3s ease;
+    background: var(--bg-console);
+    min-height: 100vh;
 }
 
 /* Header */
