@@ -28,8 +28,13 @@ class ConsoleTradingDashboard {
         this.updateVersionDisplay();
         console.log('✅ Version display updated');
         
-        await this.loadData();
-        console.log('✅ Data loaded');
+        try {
+            await this.loadData();
+            console.log('✅ Data loaded');
+        } catch (error) {
+            console.error('❌ Error loading data:', error);
+            console.log('⚠️ Continuing with dashboard initialization despite data loading error');
+        }
         
         this.updateStats();
         console.log('✅ Stats updated');
