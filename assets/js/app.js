@@ -1467,5 +1467,13 @@ class ConsoleTradingDashboard {
 
 // Initialize dashboard when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    window.dashboard = new ConsoleTradingDashboard();
+    console.log('🌐 DOM fully loaded, creating dashboard instance...');
+    console.log('🔍 Theme switcher element exists:', !!document.getElementById('themeSwitcher'));
+    console.log('🔍 Header actions element exists:', !!document.querySelector('.header-actions'));
+    
+    // Wait a bit more to ensure all elements are fully rendered
+    setTimeout(() => {
+        console.log('⏰ Delayed initialization, creating dashboard...');
+        window.dashboard = new ConsoleTradingDashboard();
+    }, 100);
 });
