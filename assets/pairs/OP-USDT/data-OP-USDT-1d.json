@@ -1,0 +1,18 @@
+{
+ "symbol": "OP-USDT",
+ "timeframe": "1d",
+ "support": "0.66",
+ "resistance": "0.74",
+ "highest": "0.88",
+ "Lowest": "0.46",
+ "Amplitude_HL": "0.05",
+ "Candles": "75",
+ "Variations": {
+	"Open_Close": "0.01",
+	"Open_Close_pct": "1.74",
+	"From_High": "-0.02",
+	"Open_Close_pct": "-2.9",
+	"From_Low": "0.03", 
+	"Open_Close_pct": "4.61"
+  }
+}
