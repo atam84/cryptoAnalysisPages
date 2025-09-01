@@ -1,0 +1,636 @@
+// Console-Style Trading Signals Dashboard
+class ConsoleTradingDashboard {
+    constructor() {
+        this.data = [];
+        this.filteredData = [];
+        this.pairs = [];
+        this.dataCache = new Map();
+        this.currentFilters = {
+            pair: 'all',
+            timeframe: 'all',
+            trend: 'all',
+            action: 'all'
+        };
+        this.isLoading = false;
+        
+        this.init();
+    }
+
+    async init() {
+        this.setupEventListeners();
+        this.updateVersionDisplay();
+        await this.loadData();
+        this.updateStats();
+        this.renderSignals();
+    }
+
+    updateVersionDisplay() {
+        // Update version display
+        const versionElement = document.getElementById('dashboardVersion');
+        const dateElement = document.getElementById('lastUpdateDate');
+        
+        if (versionElement) {
+            versionElement.textContent = DASHBOARD_VERSION;
+        }
+        
+        if (dateElement) {
+            const today = new Date().toISOString().split('T')[0];
+            dateElement.textContent = today;
+        }
+        
+        console.log(`📊 Console Dashboard initialized - Version ${DASHBOARD_VERSION}`);
+    }
+
+    incrementVersion() {
+        // This method should be called before pushing changes
+        const newVersion = incrementVersion();
+        console.log(`🚀 Version increment required before push: ${DASHBOARD_VERSION} → ${newVersion}`);
+        console.log(`📝 Update DASHBOARD_VERSION constant and add to VERSION_HISTORY`);
+        return newVersion;
+    }
+
+    showVersionInfoModal() {
+        this.populateVersionInfo();
+        document.getElementById('versionInfoModal').style.display = 'block';
+    }
+
+    hideVersionInfoModal() {
+        document.getElementById('versionInfoModal').style.display = 'none';
+    }
+
+    populateVersionInfo() {
+        // Update modal version display
+        const modalVersion = document.getElementById('modalVersion');
+        const modalDate = document.getElementById('modalDate');
+        
+        if (modalVersion) modalVersion.textContent = DASHBOARD_VERSION;
+        if (modalDate) modalDate.textContent = new Date().toISOString().split('T')[0];
+        
+        // Populate version history
+        const historyList = document.getElementById('versionHistoryList');
+        if (historyList) {
+            historyList.innerHTML = VERSION_HISTORY.map(version => `
+                <div class="version-item">
+                    <span class="version">v${version.version}</span>
+                    <span class="date">${version.date}</span>
+                    <span class="changes">${version.changes}</span>
+                </div>
+            `).join('');
+        }
+    }
+
+    setupEventListeners() {
+        // Populate pair filter options
+        this.populatePairFilter();
+        
+        // Setup filter event listeners
+        document.getElementById('pairFilter').addEventListener('change', (e) => {
+            this.currentFilters.pair = e.target.value;
+            this.applyFilters();
+        });
+        
+        document.getElementById('timeframeFilter').addEventListener('change', (e) => {
+            this.currentFilters.timeframe = e.target.value;
+            this.applyFilters();
+        });
+        
+        document.getElementById('trendFilter').addEventListener('change', (e) => {
+            this.currentFilters.trend = e.target.value;
+            this.applyFilters();
+        });
+        
+        document.getElementById('actionFilter').addEventListener('change', (e) => {
+            this.currentFilters.action = e.target.value;
+            this.applyFilters();
+        });
+        
+        // Setup refresh button
+        document.getElementById('refreshBtn').addEventListener('click', () => {
+            this.refreshData();
+        });
+
+        // Setup data status modal
+        document.getElementById('dataStatusBtn').addEventListener('click', () => {
+            this.showDataStatusModal();
+        });
+
+        document.getElementById('closeDataStatusModal').addEventListener('click', () => {
+            this.hideDataStatusModal();
+        });
+
+        // Setup version info modal
+        document.getElementById('versionInfoBtn').addEventListener('click', () => {
+            this.showVersionInfoModal();
+        });
+
+        document.getElementById('closeVersionInfoModal').addEventListener('click', () => {
+            this.hideVersionInfoModal();
+        });
+
+        document.getElementById('versionIncrementBtn').addEventListener('click', () => {
+            this.incrementVersion();
+        });
+
+        // Setup details modal
+        document.getElementById('closeDetailsModal').addEventListener('click', () => {
+            this.hideDetailsModal();
+        });
+
+        // Setup details modal tab switching
+        document.querySelectorAll('.detail-tab-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const tabName = e.target.dataset.tab;
+                this.switchDetailsTab(tabName);
+            });
+        });
+
+        // Close modals when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal')) {
+                this.hideDataStatusModal();
+                this.hideDetailsModal();
+                this.hideVersionInfoModal();
+            }
+        });
+    }
+
+    async loadData() {
+        try {
+            this.setLoadingState(true);
+            console.log('🔄 Loading trading signals...');
+            console.log(`🚀 Console Dashboard version: ${DASHBOARD_VERSION} - Dual Data Type Support with Main Data Files`);
+            
+            // Load pairs configuration with cache busting
+            const pairsResponse = await fetch('./config/pairs.json?v=' + Date.now());
+            if (!pairsResponse.ok) {
+                throw new Error('Failed to load pairs configuration');
+            }
+            
+            const pairsConfig = await pairsResponse.json();
+            this.pairs = pairsConfig.pairs;
+            
+            console.log(`📊 Loaded ${this.pairs.length} trading pairs`);
+            
+            // Load data for each pair
+            const allSignals = [];
+            
+            for (const pair of this.pairs) {
+                try {
+                    // Try to load main data file first
+                    const mainDataUrl = `./assets/pairs/${pair.symbol}/data-${pair.symbol}.json`;
+                    const mainResponse = await fetch(mainDataUrl + '?v=' + Date.now());
+                    
+                    if (mainResponse.ok) {
+                        const mainData = await mainResponse.json();
+                        console.log(`✅ Loaded main data for ${pair.symbol}`);
+                        
+                        // Transform main data to signal format
+                        const signalData = this.transformMainDataToSignal(mainData, pair.symbol);
+                        if (signalData) {
+                            allSignals.push(signalData);
+                        }
+                    } else {
+                        console.log(`⚠️ Main data not available for ${pair.symbol}, loading timeframe data`);
+                        
+                        // Load timeframe-specific data
+                        const timeframeSignals = await this.loadTimeframeData(pair);
+                        if (timeframeSignals.length > 0) {
+                            allSignals.push(...timeframeSignals);
+                        }
+                    }
+                } catch (error) {
+                    console.error(`❌ Error loading data for ${pair.symbol}:`, error);
+                }
+            }
+            
+            this.data = allSignals;
+            this.filteredData = [...this.data];
+            
+            console.log(`📊 Total signals loaded: ${this.data.length}`);
+            
+        } catch (error) {
+            console.error('❌ Error loading data:', error);
+            this.showError('Failed to load trading signals. Please try again.');
+        } finally {
+            this.setLoadingState(false);
+        }
+    }
+
+    transformMainDataToSignal(mainData, pairSymbol) {
+        try {
+            // Extract the main signal data
+            const signalData = mainData.signal || mainData;
+            
+            if (!signalData) {
+                console.warn(`⚠️ No signal data found in main data for ${pairSymbol}`);
+                return null;
+            }
+
+            // Create a comprehensive signal object
+            const signal = {
+                pair: pairSymbol,
+                timestamp: mainData.timestamp || new Date().toISOString(),
+                classification: signalData.classification || {},
+                recommendation: signalData.recommendation || {},
+                position_sizing: signalData.position_sizing || {},
+                technical_analysis: signalData.technical_analysis || {},
+                risk_management: signalData.risk_management || {},
+                reasoning: signalData.reasoning || 'No reasoning provided',
+                trend: this.determineTrend(signalData),
+                action: this.determineAction(signalData),
+                dataType: 'main'
+            };
+
+            return signal;
+        } catch (error) {
+            console.error(`❌ Error transforming main data for ${pairSymbol}:`, error);
+            return null;
+        }
+    }
+
+    determineTrend(signalData) {
+        const classification = signalData.classification || {};
+        const type = classification.type || '';
+        
+        if (type.includes('BULLISH') || type.includes('BUY')) return 'bullish';
+        if (type.includes('BEARISH') || type.includes('SELL')) return 'bearish';
+        return 'neutral';
+    }
+
+    determineAction(signalData) {
+        const recommendation = signalData.recommendation || {};
+        const action = recommendation.action || '';
+        
+        if (action.includes('BUY') || action.includes('LONG')) return 'buy';
+        if (action.includes('SELL') || action.includes('SHORT')) return 'sell';
+        return 'wait';
+    }
+
+    async loadTimeframeData(pair) {
+        const timeframes = ['1h', '8h', '1d'];
+        const signals = [];
+        
+        for (const timeframe of timeframes) {
+            try {
+                const url = `./assets/pairs/${pair.symbol}/data-${pair.symbol}-${timeframe}.json`;
+                const response = await fetch(url + '?v=' + Date.now());
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const signal = this.transformTimeframeData(data, pair.symbol, timeframe);
+                    if (signal) {
+                        signals.push(signal);
+                    }
+                }
+            } catch (error) {
+                console.log(`⚠️ No data available for ${pair.symbol} ${timeframe}`);
+            }
+        }
+        
+        return signals;
+    }
+
+    transformTimeframeData(data, pairSymbol, timeframe) {
+        try {
+            const signalData = data.signal || data;
+            
+            if (!signalData) return null;
+
+            return {
+                pair: pairSymbol,
+                timeframe: timeframe,
+                timestamp: data.timestamp || new Date().toISOString(),
+                classification: signalData.classification || {},
+                recommendation: signalData.recommendation || {},
+                position_sizing: signalData.position_sizing || {},
+                technical_analysis: signalData.technical_analysis || {},
+                risk_management: signalData.risk_management || {},
+                reasoning: signalData.reasoning || 'No reasoning provided',
+                trend: this.determineTrend(signalData),
+                action: this.determineAction(signalData),
+                dataType: 'timeframe'
+            };
+        } catch (error) {
+            console.error(`❌ Error transforming timeframe data for ${pairSymbol} ${timeframe}:`, error);
+            return null;
+        }
+    }
+
+    createConsoleSignalCard(signal) {
+        const trend = signal.trend || 'neutral';
+        const action = signal.action || 'wait';
+        
+        // Format data for display
+        const classification = signal.classification || {};
+        const recommendation = signal.recommendation || {};
+        const positionSizing = signal.position_sizing || {};
+        const technical = signal.technical_analysis || {};
+        const riskManagement = signal.risk_management || {};
+        
+        // Format entry range
+        const entryRange = recommendation.entry_range ? 
+            `${recommendation.entry_range.min || 'N/A'} - ${recommendation.entry_range.max || 'N/A'}` : 'N/A';
+        
+        // Format targets
+        const targets = recommendation.targets ? 
+            recommendation.targets.map(t => t.price || 'N/A').join(' - ') : 'N/A';
+        
+        // Format stop loss
+        const stopLoss = riskManagement.stop_loss ? 
+            (riskManagement.stop_loss.price || riskManagement.stop_loss.percentage || 'N/A') : 'N/A';
+        
+        // Format win rate
+        const winRate = classification.win_rate ? 
+            `${classification.win_rate}%` : 'N/A';
+        
+        // Format risk/reward
+        const riskReward = riskManagement.risk_reward_ratio ? 
+            riskManagement.risk_reward_ratio : 'N/A';
+        
+        // Format position size
+        const positionSize = positionSizing.position_size ? 
+            `${positionSizing.position_size}%` : 'N/A';
+        
+        // Format confluence score
+        const confluenceScore = classification.confluence_score ? 
+            `${classification.confluence_score}/10` : 'N/A';
+        
+        // Format reasoning (truncate if too long)
+        const reasoning = signal.reasoning || 'No reasoning provided';
+        const shortReasoning = reasoning.length > 200 ? reasoning.substring(0, 200) + '...' : reasoning;
+        
+        return `
+            <div class="console-signal-card ${trend} ${action}">
+                <div class="card-header">
+                    <div class="pair-name">${signal.pair}</div>
+                    <div class="signal-status">
+                        <span class="status-badge ${trend}">
+                            ${trend === 'bullish' ? '🐂 BULLISH' : trend === 'bearish' ? '🐻 BEARISH' : '⏸️ NEUTRAL'}
+                        </span>
+                        <span class="confidence-badge ${classification.confidence ? classification.confidence.toLowerCase() : 'low'}">
+                            ${classification.confidence || 'LOW'}
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="data-section">
+                    <div class="section-title">📊 Classification</div>
+                    <div class="data-grid">
+                        <div class="data-item">
+                            <span class="data-label">Type:</span>
+                            <span class="data-value">${classification.type || 'N/A'}</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">Confidence:</span>
+                            <span class="data-value ${classification.confidence ? classification.confidence.toLowerCase() : 'low'}">${classification.confidence || 'LOW'}</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">Confluence:</span>
+                            <span class="data-value info">${confluenceScore}</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">Win Rate:</span>
+                            <span class="data-value ${winRate !== 'N/A' ? 'success' : ''}">${winRate}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="data-section">
+                    <div class="section-title">🎯 Recommendation</div>
+                    <div class="data-grid">
+                        <div class="data-item">
+                            <span class="data-label">Action:</span>
+                            <span class="data-value ${action === 'buy' ? 'success' : action === 'sell' ? 'danger' : 'warning'}">${recommendation.action || 'N/A'}</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">Entry Range:</span>
+                            <span class="data-value">${entryRange}</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">Targets:</span>
+                            <span class="data-value">${targets}</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">Stop Loss:</span>
+                            <span class="data-value danger">${stopLoss}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="data-section">
+                    <div class="section-title">💰 Position Sizing</div>
+                    <div class="data-grid">
+                        <div class="data-item">
+                            <span class="data-label">Confidence Tier:</span>
+                            <span class="data-value">${positionSizing.confidence_tier || 'N/A'}</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">Position Size:</span>
+                            <span class="data-value info">${positionSize}</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">Portfolio Risk:</span>
+                            <span class="data-value">${positionSizing.portfolio_risk || 'N/A'}</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">Risk/Reward:</span>
+                            <span class="data-value ${riskReward !== 'N/A' ? 'success' : ''}">${riskReward}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="data-section">
+                    <div class="section-title">🔧 Technical Analysis</div>
+                    <div class="data-grid">
+                        <div class="data-item">
+                            <span class="data-label">Primary TF:</span>
+                            <span class="data-value">${technical.primary_timeframe || 'N/A'}</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">Trend:</span>
+                            <span class="data-value">${technical.trend || 'N/A'}</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">Volume:</span>
+                            <span class="data-value ${technical.volume_confirmation ? technical.volume_confirmation.toLowerCase() : ''}">${technical.volume_confirmation || 'N/A'}</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">Pattern:</span>
+                            <span class="data-value">${technical.pattern_strength || 'N/A'}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="data-section">
+                    <div class="section-title">⚠️ Risk Management</div>
+                    <div class="data-grid">
+                        <div class="data-item">
+                            <span class="data-label">Stop Loss Type:</span>
+                            <span class="data-value">${riskManagement.stop_loss_type || 'N/A'}</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">Reward Targets:</span>
+                            <span class="data-value">${riskManagement.reward_targets ? riskManagement.reward_targets.length : 'N/A'}</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">Exit Strategy:</span>
+                            <span class="data-value">${riskManagement.exit_strategy || 'N/A'}</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">Max Drawdown:</span>
+                            <span class="data-value danger">${riskManagement.max_drawdown || 'N/A'}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="analysis-section">
+                    <div class="section-title">🧠 Analysis & Reasoning</div>
+                    <div class="analysis-content">${shortReasoning}</div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="action-btn" onclick="dashboard.openDetailsModal('${signal.pair}', ${JSON.stringify([signal]).replace(/"/g, '&quot;')})">
+                        📋 Details
+                    </button>
+                    <button class="action-btn" onclick="dashboard.openDetailsModalWithGraphs('${signal.pair}', ${JSON.stringify([signal]).replace(/"/g, '&quot;')})">
+                        📊 Charts
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+    renderSignals() {
+        const grid = document.getElementById('signalsGrid');
+        if (!grid) return;
+        
+        if (this.filteredData.length === 0) {
+            grid.innerHTML = '<div class="loading">No signals found matching the current filters.</div>';
+            return;
+        }
+        
+        const cards = this.filteredData.map(signal => this.createConsoleSignalCard(signal));
+        grid.innerHTML = cards.join('');
+    }
+
+    // ... rest of the methods remain the same as in the original dashboard
+    // (applyFilters, updateStats, showDataStatusModal, etc.)
+    
+    setLoadingState(loading) {
+        this.isLoading = loading;
+        const grid = document.getElementById('signalsGrid');
+        if (grid) {
+            grid.innerHTML = loading ? '<div class="loading">Loading trading signals...</div>' : '';
+        }
+    }
+
+    populatePairFilter() {
+        const filter = document.getElementById('pairFilter');
+        if (!filter) return;
+        
+        filter.innerHTML = '<option value="all">All Pairs</option>';
+        this.pairs.forEach(pair => {
+            const option = document.createElement('option');
+            option.value = pair.symbol;
+            option.textContent = pair.symbol;
+            filter.appendChild(option);
+        });
+    }
+
+    applyFilters() {
+        this.filteredData = this.data.filter(signal => {
+            const pairMatch = this.currentFilters.pair === 'all' || signal.pair === this.currentFilters.pair;
+            const timeframeMatch = this.currentFilters.timeframe === 'all' || signal.timeframe === this.currentFilters.timeframe;
+            const trendMatch = this.currentFilters.trend === 'all' || signal.trend === this.currentFilters.trend;
+            const actionMatch = this.currentFilters.action === 'all' || signal.action === this.currentFilters.action;
+            
+            return pairMatch && timeframeMatch && trendMatch && actionMatch;
+        });
+        
+        this.renderSignals();
+        this.updateStats();
+    }
+
+    updateStats() {
+        const totalSignals = this.filteredData.length;
+        const bullishSignals = this.filteredData.filter(s => s.trend === 'bullish').length;
+        const bearishSignals = this.filteredData.filter(s => s.trend === 'bearish').length;
+        const waitSignals = this.filteredData.filter(s => s.action === 'wait').length;
+        
+        document.getElementById('totalSignals').textContent = totalSignals;
+        document.getElementById('bullishSignals').textContent = bullishSignals;
+        document.getElementById('bearishSignals').textContent = bearishSignals;
+        document.getElementById('waitSignals').textContent = waitSignals;
+    }
+
+    refreshData() {
+        this.loadData();
+    }
+
+    showDataStatusModal() {
+        this.populateDataStatusModal();
+        document.getElementById('dataStatusModal').style.display = 'block';
+    }
+
+    hideDataStatusModal() {
+        document.getElementById('dataStatusModal').style.display = 'none';
+    }
+
+    populateDataStatusModal() {
+        const modalBody = document.getElementById('dataStatusModalBody');
+        if (!modalBody) return;
+        
+        let statusHTML = '<div class="data-status">';
+        statusHTML += '<h4>📊 Data Availability Status</h4>';
+        
+        this.pairs.forEach(pair => {
+            const hasMainData = this.data.some(s => s.pair === pair.symbol && s.dataType === 'main');
+            const timeframeData = this.data.filter(s => s.pair === pair.symbol && s.dataType === 'timeframe');
+            
+            statusHTML += `
+                <div class="pair-status">
+                    <span class="pair-name">${pair.symbol}</span>
+                    <span class="status ${hasMainData ? 'success' : 'warning'}">
+                        ${hasMainData ? '✅ Main Data' : '⚠️ Timeframe Data Only'}
+                    </span>
+                    <span class="timeframes">
+                        ${timeframeData.map(s => s.timeframe).join(', ') || 'No timeframe data'}
+                    </span>
+                </div>
+            `;
+        });
+        
+        statusHTML += '</div>';
+        modalBody.innerHTML = statusHTML;
+    }
+
+    showError(message) {
+        const grid = document.getElementById('signalsGrid');
+        if (grid) {
+            grid.innerHTML = `<div class="error">❌ ${message}</div>`;
+        }
+    }
+
+    openDetailsModal(pair, signals) {
+        // Implementation for details modal
+        console.log(`Opening details modal for ${pair}`, signals);
+    }
+
+    openDetailsModalWithGraphs(pair, signals) {
+        // Implementation for charts modal
+        console.log(`Opening charts modal for ${pair}`, signals);
+    }
+
+    hideDetailsModal() {
+        // Implementation for hiding details modal
+    }
+
+    switchDetailsTab(tabName) {
+        // Implementation for tab switching
+    }
+}
+
+// Initialize dashboard when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    window.dashboard = new ConsoleTradingDashboard();
+});
