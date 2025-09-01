@@ -3,42 +3,42 @@
     "symbol": "BTC-USDT",
     "style": ["1h", "8h", "1d"],
     "candles_soft_limit": 150,
-    "candles_hard_limit": 200,
+    "candles_hard_limit": 200
   },
   {
     "symbol": "ETH-USDT",
     "style": ["1h", "8h", "1d"],
     "candles_soft_limit": 150,
-    "candles_hard_limit": 200,
+    "candles_hard_limit": 200
   },
   {
     "symbol": "BNB-USDT",
     "style": ["1h", "8h", "1d"],
     "candles_soft_limit": 150,
-    "candles_hard_limit": 200,
+    "candles_hard_limit": 200
   },
   {
     "symbol": "OP-USDT",
     "style": ["1h", "8h", "1d"],
     "candles_soft_limit": 150,
-    "candles_hard_limit": 200,
+    "candles_hard_limit": 200
   },
   {
     "symbol": "ADA-USDT",
     "style": ["1h", "8h", "1d"],
     "candles_soft_limit": 150,
-    "candles_hard_limit": 200,
+    "candles_hard_limit": 200
   },
   {
     "symbol": "SUI-USDT",
     "style": ["1h", "8h", "1d"],
     "candles_soft_limit": 150,
-    "candles_hard_limit": 200,
+    "candles_hard_limit": 200
   },
   {
     "symbol": "ARB-USDT",
     "style": ["1h", "8h", "1d"],
     "candles_soft_limit": 150,
-    "candles_hard_limit": 200,
+    "candles_hard_limit": 200
   }
 ]
