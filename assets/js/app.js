@@ -19,11 +19,24 @@ class ConsoleTradingDashboard {
 
     async init() {
         console.log('🔄 Initializing dashboard...');
+        console.log('🔍 DOM ready state:', document.readyState);
+        console.log('🔍 Theme switcher element exists:', !!document.getElementById('themeSwitcher'));
+        
         this.setupEventListeners();
+        console.log('✅ Event listeners setup complete');
+        
         this.updateVersionDisplay();
+        console.log('✅ Version display updated');
+        
         await this.loadData();
+        console.log('✅ Data loaded');
+        
         this.updateStats();
+        console.log('✅ Stats updated');
+        
         this.renderSignals();
+        console.log('✅ Signals rendered');
+        
         console.log('✅ Dashboard initialization complete');
     }
 
@@ -183,19 +196,29 @@ class ConsoleTradingDashboard {
     }
 
     setupThemeSwitcher() {
+        console.log('🔧 Setting up theme switcher...');
         const themeSwitcher = document.getElementById('themeSwitcher');
-        if (!themeSwitcher) return;
+        console.log('🎯 Theme switcher element:', themeSwitcher);
+        
+        if (!themeSwitcher) {
+            console.error('❌ Theme switcher element not found!');
+            return;
+        }
 
         // Initialize theme from localStorage, system preference, or default to dark
         const savedTheme = localStorage.getItem('theme');
         const systemTheme = this.getSystemTheme();
         const currentTheme = savedTheme || systemTheme || 'dark';
         
+        console.log('🎨 Initial theme setup:', { savedTheme, systemTheme, currentTheme });
+        
         this.setTheme(currentTheme);
 
         // Add click event listener
         themeSwitcher.addEventListener('click', () => {
+            console.log('🖱️ Theme switcher clicked!');
             const newTheme = this.currentTheme === 'dark' ? 'light' : 'dark';
+            console.log('🔄 Switching theme from', this.currentTheme, 'to', newTheme);
             this.setTheme(newTheme);
         });
         
@@ -209,6 +232,8 @@ class ConsoleTradingDashboard {
                 }
             });
         }
+        
+        console.log('✅ Theme switcher setup complete');
     }
 
     getSystemTheme() {
@@ -219,9 +244,17 @@ class ConsoleTradingDashboard {
     }
 
     setTheme(theme) {
+        console.log('🎨 setTheme called with:', theme);
         this.currentTheme = theme;
+        
+        // Apply theme to document
         document.documentElement.setAttribute('data-theme', theme);
+        console.log('📝 Set data-theme attribute to:', theme);
+        console.log('🔍 Document element data-theme:', document.documentElement.getAttribute('data-theme'));
+        
+        // Save to localStorage
         localStorage.setItem('theme', theme);
+        console.log('💾 Saved theme to localStorage:', theme);
         
         // Update theme switcher display
         const themeSwitcher = document.getElementById('themeSwitcher');
@@ -236,6 +269,10 @@ class ConsoleTradingDashboard {
                 themeIcon.textContent = '🌙';
                 themeText.textContent = 'Dark Mode';
             }
+            
+            console.log('🔄 Updated theme switcher display:', { icon: themeIcon.textContent, text: themeText.textContent });
+        } else {
+            console.error('❌ Theme switcher not found in setTheme');
         }
         
         console.log(`🎨 Theme switched to: ${theme}`);
@@ -899,4 +936,536 @@ class ConsoleTradingDashboard {
             }
             
             // Update modal title
-            modalTitle.textContent = `
+            modalTitle.textContent = `Trading Details: ${pair}`;
+            
+            // Show modal
+            modal.style.display = 'block';
+            
+            // Populate timeframe data
+            if (timeframesTab) {
+                this.populateTimeframesTab(timeframesTab, signals);
+            }
+            
+            // Populate graphs tab
+            if (graphsTab) {
+                this.populateGraphsTab(graphsTab, pair);
+            }
+            
+            // Populate analysis tab
+            if (analysisTab) {
+                this.populateAnalysisTab(analysisTab, signals);
+            }
+            
+        } catch (error) {
+            console.error('❌ Error opening details modal:', error);
+        }
+    }
+
+    openDetailsModalWithGraphs(pair, signals) {
+        // This method can be used for future graph functionality
+        this.openDetailsModal(pair, signals);
+    }
+
+    populateTimeframesTab(tabElement, signals) {
+        if (!signals || signals.length === 0) {
+            tabElement.innerHTML = '<div class="no-data">No timeframe data available</div>';
+            return;
+        }
+
+        let html = '<div class="timeframe-sections">';
+        
+        signals.forEach(signal => {
+            const timeframe = signal.timeframe || 'Unknown';
+            const data = signal.data || {};
+            
+            html += `
+                <div class="timeframe-section">
+                    <div class="timeframe-header" data-timeframe="${timeframe}">
+                        <h4>⏰ ${timeframe.toUpperCase()}</h4>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="timeframe-content" data-timeframe="${timeframe}">
+                        <div class="timeframe-metrics">
+                            ${this.renderTimeframeMetrics(data, signal)}
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        html += '</div>';
+        tabElement.innerHTML = html;
+        
+        // Setup collapsible functionality
+        this.setupCollapsibleTimeframes();
+    }
+
+    renderTimeframeMetrics(data, signal) {
+        if (signal.dataType === 'signal') {
+            return this.renderSignalMetrics(data);
+        } else {
+            return this.renderPriceMetrics(data);
+        }
+    }
+
+    renderSignalMetrics(data) {
+        if (!data) return '<div class="no-data">No signal data available</div>';
+        
+        return `
+            <div class="metrics-grid">
+                <div class="metric-item">
+                    <span class="metric-label">Classification:</span>
+                    <span class="metric-value">${data.classification || 'N/A'}</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Recommendation:</span>
+                    <span class="metric-value">${data.recommendation || 'N/A'}</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Position Sizing:</span>
+                    <span class="metric-value">${data.positionSizing || 'N/A'}</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Technical Analysis:</span>
+                    <span class="metric-value">${data.technicalAnalysis || 'N/A'}</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Risk Management:</span>
+                    <span class="metric-value">${data.riskManagement || 'N/A'}</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Analysis & Reasoning:</span>
+                    <span class="metric-value">${data.analysisAndReasoning || 'N/A'}</span>
+                </div>
+            </div>
+        `;
+    }
+
+    renderPriceMetrics(data) {
+        if (!data) return '<div class="no-data">No price data available</div>';
+        
+        return `
+            <div class="metrics-grid">
+                <div class="metric-item">
+                    <span class="metric-label">Support:</span>
+                    <span class="metric-value">${data.support || 'N/A'}</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Resistance:</span>
+                    <span class="metric-value">${data.resistance || 'N/A'}</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Highest:</span>
+                    <span class="metric-value">${data.highest || 'N/A'}</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Lowest:</span>
+                    <span class="metric-value">${data.lowest || 'N/A'}</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Amplitude:</span>
+                    <span class="metric-value">${data.amplitude || 'N/A'}</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Candles:</span>
+                    <span class="metric-value">${data.candles || 'N/A'}</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Variations:</span>
+                    <span class="metric-value">${data.variations || 'N/A'}</span>
+                </div>
+            </div>
+        `;
+    }
+
+    populateGraphsTab(tabElement, pair) {
+        tabElement.innerHTML = `
+            <div class="graphs-content">
+                <h4>📊 Charts for ${pair}</h4>
+                <p>Chart functionality coming soon...</p>
+                <div class="chart-placeholder">
+                    <div class="chart-icon">📈</div>
+                    <p>Interactive charts will be displayed here</p>
+                </div>
+            </div>
+        `;
+    }
+
+    populateAnalysisTab(tabElement, signals) {
+        if (!signals || signals.length === 0) {
+            tabElement.innerHTML = '<div class="no-data">No analysis data available</div>';
+            return;
+        }
+
+        let html = '<div class="analysis-content">';
+        html += '<h4>🔍 Technical Analysis</h4>';
+        
+        signals.forEach(signal => {
+            const timeframe = signal.timeframe || 'Unknown';
+            const data = signal.data || {};
+            
+            html += `
+                <div class="analysis-section">
+                    <h5>${timeframe.toUpperCase()} Analysis</h5>
+                    <div class="analysis-data">
+                        ${this.renderAnalysisData(data, signal)}
+                    </div>
+                </div>
+            `;
+        });
+        
+        html += '</div>';
+        tabElement.innerHTML = html;
+    }
+
+    renderAnalysisData(data, signal) {
+        if (signal.dataType === 'signal') {
+            return `
+                <div class="analysis-metrics">
+                    <p><strong>Trend:</strong> ${signal.trend || 'N/A'}</p>
+                    <p><strong>Action:</strong> ${signal.action || 'N/A'}</p>
+                    <p><strong>Confidence:</strong> ${data.confidence || 'N/A'}</p>
+                    <p><strong>Risk Level:</strong> ${data.riskLevel || 'N/A'}</p>
+                </div>
+            `;
+        } else {
+            return `
+                <div class="analysis-metrics">
+                    <p><strong>Price Trend:</strong> ${this.getPriceTrend(data)}</p>
+                    <p><strong>Volatility:</strong> ${this.getVolatilityLevel(data)}</p>
+                    <p><strong>Support Level:</strong> ${data.support || 'N/A'}</p>
+                    <p><strong>Resistance Level:</strong> ${data.resistance || 'N/A'}</p>
+                </div>
+            `;
+        }
+    }
+
+    getPriceTrend(data) {
+        if (!data.highest || !data.lowest) return 'N/A';
+        const range = parseFloat(data.highest) - parseFloat(data.lowest);
+        if (range > 0) return 'Bullish';
+        if (range < 0) return 'Bearish';
+        return 'Neutral';
+    }
+
+    getVolatilityLevel(data) {
+        if (!data.amplitude) return 'N/A';
+        const amplitude = parseFloat(data.amplitude);
+        if (amplitude > 10) return 'High';
+        if (amplitude > 5) return 'Medium';
+        return 'Low';
+    }
+
+    setupCollapsibleTimeframes() {
+        const headers = document.querySelectorAll('.timeframe-header');
+        
+        headers.forEach(header => {
+            header.addEventListener('click', (e) => {
+                const timeframe = header.dataset.timeframe;
+                const content = document.querySelector(`.timeframe-content[data-timeframe="${timeframe}"]`);
+                const toggleIcon = header.querySelector('.toggle-icon');
+                
+                if (content && toggleIcon) {
+                    const isCollapsed = content.style.display === 'none';
+                    
+                    if (isCollapsed) {
+                        content.style.display = 'block';
+                        toggleIcon.textContent = '▼';
+                    } else {
+                        content.style.display = 'none';
+                        toggleIcon.textContent = '▶';
+                    }
+                }
+            });
+        });
+    }
+
+    switchDetailsTab(tabName) {
+        // Hide all tabs
+        const tabs = document.querySelectorAll('.tab-content');
+        tabs.forEach(tab => tab.style.display = 'none');
+        
+        // Remove active class from all tab buttons
+        const tabButtons = document.querySelectorAll('.detail-tab-btn');
+        tabButtons.forEach(btn => btn.classList.remove('active'));
+        
+        // Show selected tab
+        const selectedTab = document.getElementById(tabName + 'Tab');
+        if (selectedTab) {
+            selectedTab.style.display = 'block';
+        }
+        
+        // Add active class to clicked button
+        const clickedButton = document.querySelector(`[data-tab="${tabName}"]`);
+        if (clickedButton) {
+            clickedButton.classList.add('active');
+        }
+    }
+
+    hideDetailsModal() {
+        const modal = document.getElementById('detailsModal');
+        if (modal) {
+            modal.style.display = 'none';
+        }
+    }
+
+    setLoadingState(loading) {
+        this.isLoading = loading;
+        const grid = document.getElementById('signalsGrid');
+        
+        if (loading) {
+            if (grid) {
+                grid.innerHTML = '<div class="loading">Loading trading pairs...</div>';
+            }
+        }
+    }
+
+    renderSignals() {
+        if (!this.filteredData || this.filteredData.length === 0) {
+            this.showError('No trading signals available');
+            return;
+        }
+
+        const grid = document.getElementById('signalsGrid');
+        if (!grid) return;
+
+        let html = '';
+        
+        this.filteredData.forEach(signal => {
+            html += this.createConsoleSignalCard(signal);
+        });
+        
+        grid.innerHTML = html;
+    }
+
+    createConsoleSignalCard(signal) {
+        if (!signal || !signal.pair) {
+            console.warn('⚠️ Invalid signal data:', signal);
+            return '';
+        }
+
+        const trendClass = signal.trend || 'neutral';
+        const actionClass = signal.action || 'wait';
+        const timeframe = signal.timeframe || 'N/A';
+        
+        return `
+            <div class="signal-card ${trendClass} ${actionClass}">
+                <div class="card-header">
+                    <div class="pair-info">
+                        <span class="pair-symbol">${signal.pair}</span>
+                        <span class="timeframe">${timeframe}</span>
+                    </div>
+                    <div class="trend-indicator ${trendClass}">
+                        ${this.getTrendIcon(trendClass)}
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <div class="signal-summary">
+                        <div class="trend-badge ${trendClass}">
+                            ${trendClass.toUpperCase()}
+                        </div>
+                        <div class="action-badge ${actionClass}">
+                            ${actionClass.toUpperCase()}
+                        </div>
+                    </div>
+                    
+                    <div class="signal-details">
+                        <p class="signal-description">
+                            ${this.getSignalDescription(signal)}
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="card-actions">
+                    <button class="action-btn" onclick="dashboard.openDetailsModal('${signal.pair}', ${JSON.stringify([signal]).replace(/"/g, '&quot;')})">
+                        📊 Details
+                    </button>
+                    <button class="action-btn" onclick="dashboard.openDetailsModalWithGraphs('${signal.pair}', ${JSON.stringify([signal]).replace(/"/g, '&quot;')})">
+                        📈 Charts
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+    getTrendIcon(trend) {
+        switch (trend) {
+            case 'bullish': return '📈';
+            case 'bearish': return '📉';
+            default: return '➡️';
+        }
+    }
+
+    getSignalDescription(signal) {
+        if (signal.dataType === 'signal' && signal.data) {
+            return signal.data.recommendation || 'No recommendation available';
+        } else if (signal.dataType === 'price' && signal.data) {
+            return `Price analysis for ${signal.pair}`;
+        }
+        return 'Signal data available';
+    }
+
+    populatePairFilter() {
+        const pairFilter = document.getElementById('pairFilter');
+        if (!pairFilter) return;
+
+        // Clear existing options
+        pairFilter.innerHTML = '<option value="all">All Pairs</option>';
+        
+        // Add pair options
+        if (this.pairs && this.pairs.length > 0) {
+            this.pairs.forEach(pair => {
+                if (pair && pair.symbol) {
+                    const option = document.createElement('option');
+                    option.value = pair.symbol;
+                    option.textContent = pair.symbol;
+                    pairFilter.appendChild(option);
+                }
+            });
+        }
+    }
+
+    transformMainDataToSignal(mainData, pairSymbol) {
+        if (!mainData || !pairSymbol) return null;
+
+        try {
+            // Check if it's signal data structure
+            if (mainData.classification || mainData.recommendation) {
+                return {
+                    pair: pairSymbol,
+                    timeframe: '1d', // Default timeframe for main data
+                    trend: this.determineTrend(mainData),
+                    action: this.determineAction(mainData),
+                    data: mainData,
+                    dataType: 'signal'
+                };
+            }
+            // Check if it's price data structure
+            else if (mainData.support || mainData.resistance) {
+                return {
+                    pair: pairSymbol,
+                    timeframe: '1d', // Default timeframe for main data
+                    trend: this.determinePriceTrend(mainData),
+                    action: 'wait', // Default action for price data
+                    data: mainData,
+                    dataType: 'price'
+                };
+            }
+            
+            return null;
+        } catch (error) {
+            console.error(`❌ Error transforming main data for ${pairSymbol}:`, error);
+            return null;
+        }
+    }
+
+    determineTrend(data) {
+        if (data.classification) {
+            const classification = data.classification.toLowerCase();
+            if (classification.includes('bull') || classification.includes('buy')) return 'bullish';
+            if (classification.includes('bear') || classification.includes('sell')) return 'bearish';
+        }
+        return 'neutral';
+    }
+
+    determineAction(data) {
+        if (data.recommendation) {
+            const recommendation = data.recommendation.toLowerCase();
+            if (recommendation.includes('buy')) return 'buy';
+            if (recommendation.includes('sell')) return 'sell';
+        }
+        return 'wait';
+    }
+
+    determinePriceTrend(data) {
+        if (data.highest && data.lowest) {
+            const high = parseFloat(data.highest);
+            const low = parseFloat(data.lowest);
+            if (high > low) return 'bullish';
+            if (high < low) return 'bearish';
+        }
+        return 'neutral';
+    }
+
+    async loadTimeframeData(pair) {
+        const timeframes = ['1h', '8h', '1d'];
+        const signals = [];
+
+        for (const timeframe of timeframes) {
+            try {
+                const url = `./assets/pairs/${pair.symbol}/data-${pair.symbol}-${timeframe}.json`;
+                const response = await fetch(url + '?v=' + Date.now());
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const signal = this.transformTimeframeDataToSignal(data, pair.symbol, timeframe);
+                    if (signal) {
+                        signals.push(signal);
+                    }
+                }
+            } catch (error) {
+                console.log(`⚠️ No ${timeframe} data for ${pair.symbol}`);
+            }
+        }
+
+        return signals;
+    }
+
+    transformTimeframeDataToSignal(timeframeData, pairSymbol, timeframe) {
+        if (!timeframeData || !pairSymbol || !timeframe) return null;
+
+        try {
+            // Check if it's signal data structure
+            if (timeframeData.classification || timeframeData.recommendation) {
+                return {
+                    pair: pairSymbol,
+                    timeframe: timeframe,
+                    trend: this.determineTrend(timeframeData),
+                    action: this.determineAction(timeframeData),
+                    data: timeframeData,
+                    dataType: 'signal'
+                };
+            }
+            // Check if it's price data structure
+            else if (timeframeData.support || timeframeData.resistance) {
+                return {
+                    pair: pairSymbol,
+                    timeframe: timeframe,
+                    trend: this.determinePriceTrend(timeframeData),
+                    action: 'wait',
+                    data: timeframeData,
+                    dataType: 'price'
+                };
+            }
+            
+            return null;
+        } catch (error) {
+            console.error(`❌ Error transforming timeframe data for ${pairSymbol}-${timeframe}:`, error);
+            return null;
+        }
+    }
+
+    createSampleSignal() {
+        return {
+            pair: 'BTC-USDT',
+            timeframe: '1d',
+            trend: 'bullish',
+            action: 'buy',
+            data: {
+                classification: 'Bullish',
+                recommendation: 'Buy on dips',
+                positionSizing: 'Medium',
+                technicalAnalysis: 'Strong support at current levels',
+                riskManagement: 'Stop loss below support',
+                analysisAndReasoning: 'Technical indicators show bullish momentum'
+            },
+            dataType: 'signal'
+        };
+    }
+}
+
+// Initialize dashboard when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    window.dashboard = new ConsoleTradingDashboard();
+});
