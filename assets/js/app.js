@@ -289,19 +289,20 @@ class ConsoleTradingDashboard {
                 classification: {
                     type: 'BULLISH',
                     confidence: 'HIGH',
-                    confluence_score: 8,
-                    win_rate: 75
+                    confluence_score: '8/10',
+                    win_rate: '75%'
                 },
                 recommendation: {
                     action: 'BUY',
-                    entry_range: { min: 45000, max: 46000 },
-                    targets: [{ price: 48000 }, { price: 50000 }, { price: 52000 }],
-                    stop_loss: { price: 44000 }
+                    entry_range: '45000 - 46000',
+                    targets: '48000 - 50000 - 52000',
+                    stop_loss: '44000',
+                    risk_reward_ratio: '2.5:1'
                 },
                 position_sizing: {
                     confidence_tier: 'HIGH',
-                    position_size: 2.5,
-                    portfolio_risk: 1.5
+                    position_size: '2.5%',
+                    portfolio_risk: '1.5%'
                 },
                 technical_analysis: {
                     primary_timeframe: '1d',
@@ -313,7 +314,7 @@ class ConsoleTradingDashboard {
                     stop_loss_type: 'FIXED',
                     reward_targets: 3,
                     exit_strategy: 'GRADUAL',
-                    max_drawdown: 2.5
+                    max_drawdown: '2.5%'
                 },
                 reasoning: 'Sample signal data for testing purposes. This is a bullish BTC-USDT signal with high confidence and strong technical indicators.',
                 trend: 'bullish',
@@ -476,47 +477,39 @@ class ConsoleTradingDashboard {
     }
 
     createConsoleSignalCard(signal) {
-        const trend = signal.trend || 'neutral';
-        const action = signal.action || 'wait';
-        
-        // Format data for display
-        const classification = signal.classification || {};
-        const recommendation = signal.recommendation || {};
-        const positionSizing = signal.position_sizing || {};
-        const technical = signal.technical_analysis || {};
-        const riskManagement = signal.risk_management || {};
-        
-        // Format entry range
-        const entryRange = recommendation.entry_range ? 
-            `${recommendation.entry_range.min || 'N/A'} - ${recommendation.entry_range.max || 'N/A'}` : 'N/A';
-        
-        // Format targets
-        const targets = recommendation.targets ? 
-            recommendation.targets.map(t => t.price || 'N/A').join(' - ') : 'N/A';
-        
-        // Format stop loss
-        const stopLoss = riskManagement.stop_loss ? 
-            (riskManagement.stop_loss.price || riskManagement.stop_loss.percentage || 'N/A') : 'N/A';
-        
-        // Format win rate
-        const winRate = classification.win_rate ? 
-            `${classification.win_rate}%` : 'N/A';
-        
-        // Format risk/reward
-        const riskReward = riskManagement.risk_reward_ratio ? 
-            riskManagement.risk_reward_ratio : 'N/A';
-        
-        // Format position size
-        const positionSize = positionSizing.position_size ? 
-            `${positionSizing.position_size}%` : 'N/A';
-        
-        // Format confluence score
-        const confluenceScore = classification.confluence_score ? 
-            `${classification.confluence_score}/10` : 'N/A';
-        
-        // Format reasoning (truncate if too long)
-        const reasoning = signal.reasoning || 'No reasoning provided';
-        const shortReasoning = reasoning.length > 200 ? reasoning.substring(0, 200) + '...' : reasoning;
+        try {
+            const trend = signal.trend || 'neutral';
+            const action = signal.action || 'wait';
+            
+            // Format data for display with safe fallbacks
+            const classification = signal.classification || {};
+            const recommendation = signal.recommendation || {};
+            const positionSizing = signal.position_sizing || {};
+            const technical = signal.technical_analysis || {};
+            const riskManagement = signal.risk_management || {};
+            
+            // Entry range and targets are already formatted as strings by transformMainDataToSignal
+            const entryRange = recommendation.entry_range || 'N/A';
+            const targets = recommendation.targets || 'N/A';
+            
+            // Format stop loss
+            const stopLoss = recommendation.stop_loss || 'N/A';
+            
+            // Format win rate
+            const winRate = classification.win_rate || 'N/A';
+            
+            // Format risk/reward
+            const riskReward = recommendation.risk_reward_ratio || 'N/A';
+            
+            // Format position size
+            const positionSize = positionSizing.position_size || 'N/A';
+            
+            // Format confluence score
+            const confluenceScore = classification.confluence_score || 'N/A';
+            
+            // Format reasoning (truncate if too long)
+            const reasoning = signal.reasoning || 'No reasoning provided';
+            const shortReasoning = reasoning.length > 200 ? reasoning.substring(0, 200) + '...' : reasoning;
         
         return `
             <div class="console-signal-card ${trend} ${action}">
@@ -657,6 +650,25 @@ class ConsoleTradingDashboard {
                 </div>
             </div>
         `;
+        } catch (error) {
+            console.error('❌ Error creating console signal card:', error);
+            console.error('Signal data:', signal);
+            return `
+                <div class="console-signal-card error">
+                    <div class="card-header">
+                        <div class="pair-name">${signal.pair || 'Unknown'}</div>
+                        <div class="signal-status">
+                            <span class="status-badge error">⚠️ ERROR</span>
+                        </div>
+                    </div>
+                    <div class="error-content">
+                        <p>Error displaying signal data. Please check the console for details.</p>
+                        <p><strong>Pair:</strong> ${signal.pair || 'Unknown'}</p>
+                        <p><strong>Error:</strong> ${error.message}</p>
+                    </div>
+                </div>
+            `;
+        }
     }
 
     renderSignals() {
@@ -804,42 +816,11 @@ class ConsoleTradingDashboard {
             
             // Populate timeframes tab
             if (timeframesTab) {
-                let timeframesHTML = '<div class="timeframe-data">';
-                timeframesHTML += '<h4>⏰ Timeframe Analysis</h4>';
+                console.log(`🔍 Opening modal for ${pair}, populating timeframes tab...`);
+                timeframesTab.innerHTML = '<div class="loading">Loading timeframe data...</div>';
                 
-                if (signals && signals.length > 0) {
-                    signals.forEach(signal => {
-                        const timeframe = signal.timeframe || 'Main';
-                        timeframesHTML += `
-                            <div class="timeframe-item">
-                                <h5>${timeframe} Timeframe</h5>
-                                <div class="timeframe-metrics">
-                                    <div class="metric-row">
-                                        <span class="metric-label">Trend:</span>
-                                        <span class="metric-value ${signal.trend}">${signal.trend?.toUpperCase() || 'N/A'}</span>
-                                    </div>
-                                    <div class="metric-row">
-                                        <span class="metric-label">Action:</span>
-                                        <span class="metric-value ${signal.action}">${signal.action?.toUpperCase() || 'N/A'}</span>
-                                    </div>
-                                    <div class="metric-row">
-                                        <span class="metric-label">Confidence:</span>
-                                        <span class="metric-value">${signal.classification?.confidence || 'N/A'}</span>
-                                    </div>
-                                    <div class="metric-row">
-                                        <span class="metric-label">Win Rate:</span>
-                                        <span class="metric-value">${signal.classification?.win_rate || 'N/A'}%</span>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                    });
-                } else {
-                    timeframesHTML += '<p>No timeframe data available</p>';
-                }
-                
-                timeframesHTML += '</div>';
-                timeframesTab.innerHTML = timeframesHTML;
+                // Load and display actual timeframe data files
+                this.loadTimeframeDataForModal(pair, timeframesTab);
             }
             
             // Populate graphs tab
@@ -890,12 +871,9 @@ class ConsoleTradingDashboard {
                             <div class="analysis-section">
                                 <h5>🎯 Recommendation</h5>
                                 <p><strong>Action:</strong> ${signal.recommendation?.action || 'N/A'}</p>
-                                <p><strong>Entry Range:</strong> ${signal.recommendation?.entry_range ? 
-                                    `${signal.recommendation.entry_range.min || 'N/A'} - ${signal.recommendation.entry_range.max || 'N/A'}` : 'N/A'}</p>
-                                <p><strong>Targets:</strong> ${signal.recommendation?.targets ? 
-                                    signal.recommendation.targets.map(t => t.price || 'N/A').join(' - ') : 'N/A'}</p>
-                                <p><strong>Stop Loss:</strong> ${signal.risk_management?.stop_loss ? 
-                                    (signal.risk_management.stop_loss.price || signal.risk_management.stop_loss.percentage || 'N/A') : 'N/A'}</p>
+                                <p><strong>Entry Range:</strong> ${signal.recommendation?.entry_range || 'N/A'}</p>
+                                <p><strong>Targets:</strong> ${signal.recommendation?.targets || 'N/A'}</p>
+                                <p><strong>Stop Loss:</strong> ${signal.recommendation?.stop_loss || 'N/A'}</p>
                             </div>
                             
                             <div class="analysis-section">
@@ -938,6 +916,264 @@ class ConsoleTradingDashboard {
         if (modal) {
             modal.style.display = 'none';
         }
+    }
+
+    async loadTimeframeDataForModal(pair, timeframesTab) {
+        try {
+            console.log(`🔍 Loading timeframe data for ${pair}...`);
+            const timeframes = ['1h', '8h', '1d'];
+            let timeframesHTML = '<div class="timeframe-data">';
+            timeframesHTML += '<h4>⏰ Timeframe Analysis</h4>';
+            
+            // Try to load main data first
+            const mainDataUrl = `./assets/pairs/${pair}/data-${pair}.json`;
+            console.log(`📊 Attempting to load main data: ${mainDataUrl}`);
+            const mainResponse = await fetch(mainDataUrl + '?v=' + Date.now());
+            
+            if (mainResponse.ok) {
+                const mainData = await mainResponse.json();
+                console.log(`✅ Main data loaded for ${pair}:`, mainData);
+                timeframesHTML += `
+                    <div class="timeframe-item main-timeframe">
+                        <h5>📊 Main Data</h5>
+                        <div class="timeframe-metrics">
+                            ${this.createTimeframeMetrics(mainData)}
+                        </div>
+                    </div>
+                `;
+            } else {
+                console.log(`⚠️ Main data not available for ${pair}`);
+            }
+            
+            // Load timeframe-specific data
+            for (const timeframe of timeframes) {
+                try {
+                    const url = `./assets/pairs/${pair}/data-${pair}-${timeframe}.json`;
+                    console.log(`⏰ Loading ${timeframe} data: ${url}`);
+                    const response = await fetch(url + '?v=' + Date.now());
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        console.log(`✅ ${timeframe} data loaded for ${pair}:`, data);
+                        timeframesHTML += `
+                            <div class="timeframe-item">
+                                <h5>⏰ ${timeframe} Timeframe</h5>
+                                <div class="timeframe-metrics">
+                                    ${this.createTimeframeMetrics(data, timeframe)}
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        console.log(`⚠️ ${timeframe} data not available for ${pair}`);
+                        timeframesHTML += `
+                            <div class="timeframe-item unavailable">
+                                <h5>⏰ ${timeframe} Timeframe</h5>
+                                <div class="timeframe-status">
+                                    <span class="status warning">⚠️ Data not available</span>
+                                </div>
+                            </div>
+                        `;
+                    }
+                } catch (error) {
+                    console.log(`❌ Error loading ${timeframe} data for ${pair}:`, error);
+                    timeframesHTML += `
+                        <div class="timeframe-item unavailable">
+                            <h5>⏰ ${timeframe} Timeframe</h5>
+                            <div class="timeframe-status">
+                                <span class="status warning">⚠️ Error loading data</span>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+            
+            timeframesHTML += '</div>';
+            timeframesTab.innerHTML = timeframesHTML;
+            console.log(`✅ Timeframe modal populated for ${pair}`);
+            
+        } catch (error) {
+            console.error('❌ Error loading timeframe data for modal:', error);
+            timeframesTab.innerHTML = '<div class="error">Error loading timeframe data. Please try again.</div>';
+        }
+    }
+
+    createTimeframeMetrics(data, timeframe = null) {
+        try {
+            console.log(`🔍 Creating metrics for ${timeframe || 'main'} data:`, data);
+            const signalData = data.signal || data;
+            if (!signalData) {
+                console.log(`⚠️ No signal data found in ${timeframe || 'main'} data`);
+                return '<p>No signal data available</p>';
+            }
+            
+            let metricsHTML = '';
+            
+            // Classification metrics
+            if (signalData.classification) {
+                metricsHTML += `
+                    <div class="metric-section">
+                        <h6>📊 Classification</h6>
+                        <div class="metric-row">
+                            <span class="metric-label">Type:</span>
+                            <span class="metric-value">${signalData.classification.type || 'N/A'}</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Confidence:</span>
+                            <span class="metric-value">${signalData.classification.confidence || 'N/A'}</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Confluence Score:</span>
+                            <span class="metric-value">${signalData.classification.confluence_score || 'N/A'}</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Win Rate:</span>
+                            <span class="metric-value">${signalData.classification.expected_win_rate || signalData.classification.win_rate || 'N/A'}</span>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Recommendation metrics
+            if (signalData.recommendation) {
+                metricsHTML += `
+                    <div class="metric-section">
+                        <h6>🎯 Recommendation</h6>
+                        <div class="metric-row">
+                            <span class="metric-label">Action:</span>
+                            <span class="metric-value ${signalData.recommendation.action ? signalData.recommendation.action.toLowerCase() : ''}">${signalData.recommendation.action || 'N/A'}</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Entry Range:</span>
+                            <span class="metric-value">${this.formatEntryRange(signalData.recommendation.entry_range)}</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Stop Loss:</span>
+                            <span class="metric-value">${this.formatStopLoss(signalData.recommendation.stop_loss)}</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Take Profit:</span>
+                            <span class="metric-value">${this.formatTakeProfit(signalData.recommendation.take_profit)}</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Risk/Reward:</span>
+                            <span class="metric-value">${signalData.recommendation.risk_reward_ratio || 'N/A'}</span>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Technical analysis metrics
+            if (signalData.technical_analysis) {
+                metricsHTML += `
+                    <div class="metric-section">
+                        <h6>🔧 Technical Analysis</h6>
+                        <div class="metric-row">
+                            <span class="metric-label">Primary TF:</span>
+                            <span class="metric-value">${signalData.technical_analysis.primary_timeframe || 'N/A'}</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Trend:</span>
+                            <span class="metric-value">${signalData.technical_analysis.trend_direction || 'N/A'}</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Volume:</span>
+                            <span class="metric-value">${signalData.technical_analysis.volume_confirmation || 'N/A'}</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Pattern Strength:</span>
+                            <span class="metric-value">${signalData.technical_analysis.pattern_strength || 'N/A'}</span>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Add position sizing if available
+            if (signalData.position_sizing) {
+                metricsHTML += `
+                    <div class="metric-section">
+                        <h6>💰 Position Sizing</h6>
+                        <div class="metric-row">
+                            <span class="metric-label">Confidence Tier:</span>
+                            <span class="metric-value">${signalData.position_sizing.confidence_tier || 'N/A'}</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Position Size:</span>
+                            <span class="metric-value">${signalData.position_sizing.suggested_position_size || signalData.position_sizing.position_size || 'N/A'}</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Portfolio Risk:</span>
+                            <span class="metric-value">${signalData.position_sizing.max_portfolio_risk || signalData.position_sizing.portfolio_risk || 'N/A'}</span>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Add risk management if available
+            if (signalData.risk_management) {
+                metricsHTML += `
+                    <div class="metric-section">
+                        <h6>⚠️ Risk Management</h6>
+                        <div class="metric-row">
+                            <span class="metric-label">Stop Loss Type:</span>
+                            <span class="metric-value">${signalData.risk_management.stop_loss_type || 'N/A'}</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Exit Strategy:</span>
+                            <span class="metric-value">${signalData.risk_management.exit_strategy || 'N/A'}</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Max Drawdown:</span>
+                            <span class="metric-value">${signalData.risk_management.max_drawdown || 'N/A'}</span>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Add reasoning if available
+            if (signalData.reasoning) {
+                metricsHTML += `
+                    <div class="metric-section">
+                        <h6>🧠 Analysis & Reasoning</h6>
+                        <div class="reasoning-content">
+                            <p>${signalData.reasoning}</p>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            console.log(`✅ Metrics created successfully for ${timeframe || 'main'}`);
+            return metricsHTML;
+            
+        } catch (error) {
+            console.error('❌ Error creating timeframe metrics:', error);
+            return '<p>Error processing data</p>';
+        }
+    }
+
+    formatEntryRange(entryRange) {
+        if (!entryRange) return 'N/A';
+        if (Array.isArray(entryRange)) {
+            return `${entryRange[0]} - ${entryRange[1]}`;
+        } else if (typeof entryRange === 'object') {
+            return `${entryRange.min || 'N/A'} - ${entryRange.max || 'N/A'}`;
+        }
+        return entryRange;
+    }
+
+    formatStopLoss(stopLoss) {
+        if (!stopLoss) return 'N/A';
+        if (typeof stopLoss === 'object') {
+            return stopLoss.price || stopLoss.percentage || 'N/A';
+        }
+        return stopLoss;
+    }
+
+    formatTakeProfit(takeProfit) {
+        if (!takeProfit) return 'N/A';
+        if (Array.isArray(takeProfit)) {
+            return takeProfit.join(' - ');
+        }
+        return takeProfit;
     }
 
     switchDetailsTab(tabName) {
