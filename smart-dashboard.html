@@ -635,48 +635,65 @@
 
             async loadData() {
                 try {
+                    console.log('🔄 Starting data load...');
                     const response = await fetch('./data.json');
                     if (!response.ok) {
                         throw new Error('Failed to load data.json');
                     }
                     
                     const rawData = await response.json();
-                    console.log('Raw data loaded:', rawData);
+                    console.log('📥 Raw data loaded:', rawData);
+                    console.log('📊 Raw data structure:', {
+                        type: typeof rawData,
+                        isArray: Array.isArray(rawData),
+                        length: rawData.length,
+                        firstItem: rawData[0]
+                    });
                     
                     // Parse the Telegram message format
                     this.data = this.parseTelegramData(rawData);
-                    console.log('Parsed data:', this.data);
+                    console.log('✅ Parsed data array:', this.data);
+                    console.log('📈 Total signals parsed:', this.data.length);
                     
                     this.filteredData = [...this.data];
                     
                 } catch (error) {
-                    console.error('Failed to load data:', error);
+                    console.error('❌ Failed to load data:', error);
                     this.showError('Failed to load crypto analysis data.');
                 }
             }
 
             parseTelegramData(rawData) {
                 const signals = [];
+                console.log('🔍 Starting Telegram data parsing...');
                 
                 try {
                     // Handle the nested structure from data.json
                     const messages = rawData[0]?.result || rawData;
+                    console.log('📨 Messages to parse:', messages);
+                    console.log('📨 Messages length:', messages.length);
                     
                     messages.forEach((message, index) => {
                         try {
+                            console.log(`\n📝 Processing message ${index + 1}/${messages.length}`);
                             const text = message.text || '';
                             const signal = this.parseSignalText(text, message.date || Date.now() / 1000);
                             
                             if (signal) {
                                 signals.push(signal);
+                                console.log(`✅ Signal ${index + 1} parsed successfully`);
+                            } else {
+                                console.log(`❌ Signal ${index + 1} failed to parse`);
                             }
                         } catch (error) {
-                            console.warn(`Failed to parse message ${index}:`, error);
+                            console.warn(`⚠️ Failed to parse message ${index}:`, error);
                         }
                     });
                     
+                    console.log(`🎯 Total signals successfully parsed: ${signals.length}`);
+                    
                 } catch (error) {
-                    console.error('Failed to parse telegram data:', error);
+                    console.error('❌ Failed to parse telegram data:', error);
                 }
                 
                 return signals;
@@ -684,15 +701,23 @@
 
             parseSignalText(text, timestamp) {
                 try {
+                    console.log('=== Parsing Signal Text ===');
+                    console.log('Raw text:', text);
+                    
                     // Extract pair from text - look for [PAIR/USDT] format
                     const pairMatch = text.match(/\[([A-Z]+\/[A-Z]+)\]/);
-                    if (!pairMatch) return null;
+                    if (!pairMatch) {
+                        console.log('❌ No pair found');
+                        return null;
+                    }
                     
                     const pair = pairMatch[1];
+                    console.log('✅ Pair found:', pair);
                     
                     // Extract trend from "Trend: bullish/bearish"
                     const trendMatch = text.match(/Trend:\s*(bullish|bearish)/i);
                     const trend = trendMatch ? trendMatch[1].toLowerCase() : 'neutral';
+                    console.log('✅ Trend found:', trend);
                     
                     // Extract OHLC data from "Dernière bougie 4h" section
                     const openMatch = text.match(/🟢\s*Open\s*:\s*([\d.]+)/i);
@@ -700,9 +725,21 @@
                     const highMatch = text.match(/📈\s*High\s*:\s*([\d.]+)/i);
                     const lowMatch = text.match(/📉\s*Low\s*:\s*([\d.]+)/i);
                     
+                    console.log('OHLC Matches:', {
+                        open: openMatch ? openMatch[1] : 'N/A',
+                        close: closeMatch ? closeMatch[1] : 'N/A',
+                        high: highMatch ? highMatch[1] : 'N/A',
+                        low: lowMatch ? lowMatch[1] : 'N/A'
+                    });
+                    
                     // Extract support and resistance from "Support" and "Résistance" sections
                     const supportMatch = text.match(/🟠\s*Support\s*:\s*([\d.]+)/i);
                     const resistanceMatch = text.match(/🛑\s*Résistance\s*:\s*([\d.]+)/i);
+                    
+                    console.log('Support/Resistance:', {
+                        support: supportMatch ? supportMatch[1] : 'N/A',
+                        resistance: resistanceMatch ? resistanceMatch[1] : 'N/A'
+                    });
                     
                     // Extract action from the trading recommendation section
                     let action = 'wait';
@@ -718,6 +755,8 @@
                         action = 'sell';
                     }
                     
+                    console.log('✅ Action detected:', action);
+                    
                     // Extract entry range from "Achat entre [X $ - Y $]" or "Vente entre [X $ - Y $]"
                     const entryMatch = text.match(/(?:Achat|Vente)\s+entre\s*\[([\d.\s-]+)\s*\$/i);
                     
@@ -730,6 +769,13 @@
                     // Extract win percentage from "Target min win X%" or "win X%"
                     const winMatch = text.match(/(?:Target min win|win)\s*([\d.]+)%/i);
                     
+                    console.log('Trading Details:', {
+                        entry: entryMatch ? entryMatch[1] : 'N/A',
+                        target: targetMatch ? targetMatch[1] : 'N/A',
+                        stopLoss: stopLossMatch ? stopLossMatch[1] : 'N/A',
+                        winPercentage: winMatch ? winMatch[1] : 'N/A'
+                    });
+                    
                     // Extract ATH and ATL values
                     const athMatch = text.match(/🔺\s*ATH\s*:\s*([\d.]+)/i);
                     const atlMatch = text.match(/🔻\s*ATL\s*:\s*([\d.]+)/i);
@@ -737,7 +783,13 @@
                     // Extract amplitude H/L
                     const amplitudeMatch = text.match(/↔️\s*Amplitude H\/L\s*:\s*([\d.]+)\s*USDT/i);
                     
-                    return {
+                    console.log('Market Context:', {
+                        ath: athMatch ? athMatch[1] : 'N/A',
+                        atl: atlMatch ? atlMatch[1] : 'N/A',
+                        amplitude: amplitudeMatch ? amplitudeMatch[1] : 'N/A'
+                    });
+                    
+                    const parsedData = {
                         pair,
                         trend,
                         timestamp,
@@ -760,8 +812,13 @@
                         rawText: text
                     };
                     
+                    console.log('✅ Final parsed data:', parsedData);
+                    console.log('=== End Parsing ===\n');
+                    
+                    return parsedData;
+                    
                 } catch (error) {
-                    console.error('Failed to parse signal text:', error);
+                    console.error('❌ Failed to parse signal text:', error);
                     return null;
                 }
             }
