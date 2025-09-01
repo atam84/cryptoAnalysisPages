@@ -105,6 +105,50 @@
             letter-spacing: 0.5px;
         }
 
+        /* Data Status */
+        .data-status {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .data-status h4 {
+            margin: 0 0 16px 0;
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .pair-status {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .pair-status:last-child {
+            border-bottom: none;
+        }
+
+        .pair-status strong {
+            min-width: 80px;
+            color: var(--text-primary);
+        }
+
+        .pair-status .available {
+            color: var(--success);
+            font-weight: 500;
+        }
+
+        .pair-status .missing {
+            color: var(--danger);
+            font-weight: 500;
+        }
+
         /* Enhanced Filters */
         .filters {
             display: flex;
@@ -626,6 +670,11 @@
             </div>
         </div>
 
+        <!-- Data Availability Status -->
+        <div class="data-status" id="dataStatus">
+            <div class="loading">Loading data availability...</div>
+        </div>
+
         <!-- Enhanced Filters -->
         <div class="filters">
             <div class="filter-group">
@@ -755,52 +804,82 @@
                         throw new Error('Invalid pairs configuration format');
                     }
                     
-                    // Load data for each pair
+                    // Load data for each pair and timeframe
                     const allData = [];
+                    const pairStatus = {};
                     
                     for (const pair of this.pairs) {
                         try {
                             console.log(`📊 Loading data for ${pair.symbol}...`);
                             console.log(`🔍 Pair config:`, pair);
-                            console.log(`📁 Data file: ${pair.dataFile}`);
                             
                             // Validate pair configuration
-                            if (!pair.symbol || !pair.dataFile) {
+                            if (!pair.symbol || !pair.style || !Array.isArray(pair.style)) {
                                 console.error(`❌ Invalid pair configuration for ${pair.symbol}:`, pair);
                                 continue;
                             }
                             
-                            // Check cache first
-                            if (this.dataCache.has(pair.symbol)) {
-                                const cachedData = this.dataCache.get(pair.symbol);
-                                console.log(`✅ Using cached data for ${pair.symbol}`);
-                                const transformedData = this.transformPairData(cachedData, pair);
-                                if (transformedData) {
-                                    allData.push(transformedData);
+                            pairStatus[pair.symbol] = {
+                                available: [],
+                                missing: [],
+                                errors: []
+                            };
+                            
+                            // Load data for each timeframe
+                            for (const timeframe of pair.style) {
+                                try {
+                                    const dataFileName = `data-${pair.symbol}-${timeframe}.json`;
+                                    console.log(`📁 Loading ${timeframe} data: ${dataFileName}`);
+                                    
+                                    // Check cache first
+                                    const cacheKey = `${pair.symbol}-${timeframe}`;
+                                    if (this.dataCache.has(cacheKey)) {
+                                        const cachedData = this.dataCache.get(cacheKey);
+                                        console.log(`✅ Using cached ${timeframe} data for ${pair.symbol}`);
+                                        const transformedData = this.transformPairData(cachedData, pair, timeframe);
+                                        if (transformedData) {
+                                            allData.push(transformedData);
+                                            pairStatus[pair.symbol].available.push(timeframe);
+                                        }
+                                        continue;
+                                    }
+                                    
+                                    const dataResponse = await fetch(`./assets/pairs/${pair.symbol}/${dataFileName}?v=${Date.now()}`);
+                                    if (dataResponse.ok) {
+                                        const pairData = await dataResponse.json();
+                                        console.log(`✅ ${timeframe} data loaded for ${pair.symbol}:`, pairData);
+                                        
+                                        // Cache the data
+                                        this.dataCache.set(cacheKey, pairData);
+                                        
+                                        const transformedData = this.transformPairData(pairData, pair, timeframe);
+                                        if (transformedData) {
+                                            allData.push(transformedData);
+                                            pairStatus[pair.symbol].available.push(timeframe);
+                                            console.log(`✅ ${timeframe} data transformed for ${pair.symbol}`);
+                                        }
+                                    } else {
+                                        console.warn(`⚠️ Failed to load ${timeframe} data for ${pair.symbol}: ${dataResponse.status}`);
+                                        pairStatus[pair.symbol].missing.push(timeframe);
+                                    }
+                                } catch (error) {
+                                    console.warn(`⚠️ Error loading ${timeframe} data for ${pair.symbol}:`, error);
+                                    pairStatus[pair.symbol].errors.push({ timeframe, error: error.message });
                                 }
-                                continue;
                             }
                             
-                            const dataResponse = await fetch(`./assets/pairs/${pair.symbol}/${pair.dataFile}?v=${Date.now()}`);
-                            if (dataResponse.ok) {
-                                const pairData = await dataResponse.json();
-                                console.log(`✅ Data loaded for ${pair.symbol}:`, pairData);
-                                
-                                // Cache the data
-                                this.dataCache.set(pair.symbol, pairData);
-                                
-                                const transformedData = this.transformPairData(pairData, pair);
-                                if (transformedData) {
-                                    allData.push(transformedData);
-                                    console.log(`✅ Data transformed for ${pair.symbol}`);
-                                }
-                            } else {
-                                console.warn(`⚠️ Failed to load data for ${pair.symbol}: ${dataResponse.status}`);
-                            }
+                            // Log pair status summary
+                            console.log(`📊 ${pair.symbol} status:`, pairStatus[pair.symbol]);
+                            
                         } catch (error) {
-                            console.warn(`⚠️ Error loading data for ${pair.symbol}:`, error);
+                            console.warn(`⚠️ Error processing pair ${pair.symbol}:`, error);
+                            pairStatus[pair.symbol] = { available: [], missing: [], errors: [error.message] };
                         }
                     }
+                    
+                    // Log overall loading summary
+                    console.log('🎯 Overall loading summary:', pairStatus);
+                    console.log('🎯 Final data array:', allData);
                     
                     console.log('🎯 Final data array:', allData);
                     this.data = allData;
@@ -814,30 +893,25 @@
                 }
             }
 
-            transformPairData(pairData, pairConfig) {
+            transformPairData(pairData, pairConfig, timeframe) {
                 try {
-                    console.log(`🔄 Transforming data for ${pairConfig.symbol}...`);
+                    console.log(`🔄 Transforming ${timeframe} data for ${pairConfig.symbol}...`);
                     
-                    // Handle pairs with signal data
-                    if (pairConfig.hasSignals && pairData.signal) {
-                        return this.transformSignalData(pairData, pairConfig);
+                    // Check if this is signal data (has signal property)
+                    if (pairData.signal) {
+                        return this.transformSignalData(pairData, pairConfig, timeframe);
                     }
                     
-                    // Handle pairs with simple price data
-                    if (!pairConfig.hasSignals) {
-                        return this.transformPriceData(pairData, pairConfig);
-                    }
-                    
-                    console.warn(`⚠️ No signal data found for ${pairConfig.symbol}`);
-                    return null;
+                    // Handle simple price data
+                    return this.transformPriceData(pairData, pairConfig, timeframe);
                     
                 } catch (error) {
-                    console.error(`❌ Failed to transform data for ${pairConfig.symbol}:`, error);
+                    console.error(`❌ Failed to transform ${timeframe} data for ${pairConfig.symbol}:`, error);
                     return null;
                 }
             }
 
-            transformSignalData(pairData, pairConfig) {
+            transformSignalData(pairData, pairConfig, timeframe) {
                 const signal = pairData.signal;
                 const classification = signal.classification || {};
                 const recommendation = signal.recommendation || {};
@@ -887,6 +961,7 @@
                 
                 const transformed = {
                     pair: pairConfig.symbol,
+                    timeframe: timeframe,
                     trend,
                     action,
                     entryRange,
@@ -895,7 +970,7 @@
                     winPercentage,
                     confidence: classification.confidence || 'LOW',
                     confluenceScore: classification.confluence_score || 'N/A',
-                    timeframe: technical.primary_timeframe || 'N/A',
+                    technicalTimeframe: technical.primary_timeframe || 'N/A',
                     volumeConfirmation: technical.volume_confirmation || 'N/A',
                     keyLevelProximity: technical.key_level_proximity || 'N/A',
                     patternStrength: technical.pattern_strength || 'N/A',
@@ -907,11 +982,11 @@
                     rawData: pairData
                 };
                 
-                console.log(`✅ Transformed signal data for ${pairConfig.symbol}:`, transformed);
+                console.log(`✅ Transformed ${timeframe} signal data for ${pairConfig.symbol}:`, transformed);
                 return transformed;
             }
 
-            transformPriceData(pairData, pairConfig) {
+            transformPriceData(pairData, pairConfig, timeframe) {
                 // Transform simple price data into a compatible format
                 const support = pairData.support || 'N/A';
                 const resistance = pairData.resistance || 'N/A';
@@ -923,6 +998,7 @@
                 
                 const transformed = {
                     pair: pairConfig.symbol,
+                    timeframe: timeframe,
                     trend: 'neutral', // Default for price data
                     action: 'wait', // Default for price data
                     entryRange: `${support} - ${resistance}`,
@@ -931,13 +1007,12 @@
                     winPercentage: null,
                     confidence: 'N/A',
                     confluenceScore: 'N/A',
-                    timeframe: pairData.timeframe || 'N/A',
                     volumeConfirmation: 'N/A',
                     keyLevelProximity: 'N/A',
                     patternStrength: 'N/A',
                     confidenceTier: 'N/A',
                     suggestedPositionSize: 'N/A',
-                    reasoning: `Price analysis: Support at ${support}, Resistance at ${resistance}. Current range: ${lowest} - ${highest}.`,
+                    reasoning: `Price analysis (${timeframe}): Support at ${support}, Resistance at ${resistance}. Current range: ${lowest} - ${highest}.`,
                     timestamp: Date.now() / 1000,
                     dataType: 'price',
                     support,
@@ -950,7 +1025,7 @@
                     rawData: pairData
                 };
                 
-                console.log(`✅ Transformed price data for ${pairConfig.symbol}:`, transformed);
+                console.log(`✅ Transformed ${timeframe} price data for ${pairConfig.symbol}:`, transformed);
                 return transformed;
             }
 
@@ -980,6 +1055,33 @@
                 document.getElementById('bullishSignals').textContent = bullish;
                 document.getElementById('bearishSignals').textContent = bearish;
                 document.getElementById('waitSignals').textContent = wait;
+                
+                // Update data availability status
+                this.updateDataAvailabilityStatus();
+            }
+
+            updateDataAvailabilityStatus() {
+                if (!this.pairs) return;
+                
+                const statusContainer = document.getElementById('dataStatus');
+                if (!statusContainer) return;
+                
+                let statusHTML = '<h4>📊 Data Availability Status</h4>';
+                
+                for (const pair of this.pairs) {
+                    const availableTimeframes = this.data.filter(d => d.pair === pair.symbol).map(d => d.timeframe);
+                    const missingTimeframes = pair.style.filter(tf => !availableTimeframes.includes(tf));
+                    
+                    statusHTML += `
+                        <div class="pair-status">
+                            <strong>${pair.symbol}:</strong>
+                            <span class="available">✅ ${availableTimeframes.join(', ') || 'None'}</span>
+                            ${missingTimeframes.length > 0 ? `<span class="missing">❌ Missing: ${missingTimeframes.join(', ')}</span>` : ''}
+                        </div>
+                    `;
+                }
+                
+                statusContainer.innerHTML = statusHTML;
             }
 
             renderSignals() {
@@ -1043,16 +1145,16 @@
                         
                         <div class="market-data">
                             <div class="data-item">
+                                <div class="data-label">Timeframe</div>
+                                <div class="data-value">${signal.timeframe}</div>
+                            </div>
+                            <div class="data-item">
                                 <div class="data-label">Confidence</div>
                                 <div class="data-value">${signal.confidence}</div>
                             </div>
                             <div class="data-item">
                                 <div class="data-label">Confluence</div>
                                 <div class="data-value">${signal.confluenceScore}</div>
-                            </div>
-                            <div class="data-item">
-                                <div class="data-label">Timeframe</div>
-                                <div class="data-value">${signal.timeframe}</div>
                             </div>
                             <div class="data-item">
                                 <div class="data-label">Volume</div>
@@ -1081,7 +1183,6 @@
                         
                         <div class="card-footer">
                             <div class="timestamp">${timestamp}</div>
-                            <div class="source">From: ia_agent_007_bot · Analysis Dashboard</div>
                         </div>
                     </div>
                 `;
@@ -1102,16 +1203,16 @@
                         
                         <div class="market-data">
                             <div class="data-item">
+                                <div class="data-label">Timeframe</div>
+                                <div class="data-value">${signal.timeframe}</div>
+                            </div>
+                            <div class="data-item">
                                 <div class="data-label">Support</div>
                                 <div class="data-value">${signal.support}</div>
                             </div>
                             <div class="data-item">
                                 <div class="data-label">Resistance</div>
                                 <div class="data-value">${signal.resistance}</div>
-                            </div>
-                            <div class="data-item">
-                                <div class="data-label">Timeframe</div>
-                                <div class="data-value">${signal.timeframe}</div>
                             </div>
                             <div class="data-item">
                                 <div class="data-label">Candles</div>
@@ -1140,7 +1241,6 @@
                         
                         <div class="card-footer">
                             <div class="timestamp">${timestamp}</div>
-                            <div class="source">From: Price Analysis Dashboard</div>
                         </div>
                     </div>
                 `;
