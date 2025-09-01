@@ -934,10 +934,15 @@ class ConsoleTradingDashboard {
                 const mainData = await mainResponse.json();
                 console.log(`✅ Main data loaded for ${pair}:`, mainData);
                 timeframesHTML += `
-                    <div class="timeframe-item main-timeframe">
-                        <h5>📊 Main Data</h5>
-                        <div class="timeframe-metrics">
-                            ${this.createTimeframeMetrics(mainData)}
+                    <div class="timeframe-item" data-timeframe="main">
+                        <div class="timeframe-header" onclick="dashboard.toggleTimeframeSection(this)">
+                            <h5>📊 Main Data</h5>
+                            <button class="timeframe-toggle" title="Toggle section">▼</button>
+                        </div>
+                        <div class="timeframe-content">
+                            <div class="timeframe-metrics">
+                                ${this.createTimeframeMetrics(mainData)}
+                            </div>
                         </div>
                     </div>
                 `;
@@ -956,20 +961,30 @@ class ConsoleTradingDashboard {
                         const data = await response.json();
                         console.log(`✅ ${timeframe} data loaded for ${pair}:`, data);
                         timeframesHTML += `
-                            <div class="timeframe-item">
-                                <h5>⏰ ${timeframe} Timeframe</h5>
-                                <div class="timeframe-metrics">
-                                    ${this.createTimeframeMetrics(data, timeframe)}
+                            <div class="timeframe-item" data-timeframe="${timeframe}">
+                                <div class="timeframe-header" onclick="dashboard.toggleTimeframeSection(this)">
+                                    <h5>⏰ ${timeframe} Timeframe</h5>
+                                    <button class="timeframe-toggle" title="Toggle section">▼</button>
+                                </div>
+                                <div class="timeframe-content">
+                                    <div class="timeframe-metrics">
+                                        ${this.createTimeframeMetrics(data, timeframe)}
+                                    </div>
                                 </div>
                             </div>
                         `;
                     } else {
                         console.log(`⚠️ ${timeframe} data not available for ${pair}`);
                         timeframesHTML += `
-                            <div class="timeframe-item unavailable">
-                                <h5>⏰ ${timeframe} Timeframe</h5>
-                                <div class="timeframe-status">
-                                    <span class="status warning">⚠️ Data not available</span>
+                            <div class="timeframe-item unavailable" data-timeframe="${timeframe}">
+                                <div class="timeframe-header" onclick="dashboard.toggleTimeframeSection(this)">
+                                    <h5>⏰ ${timeframe} Timeframe</h5>
+                                    <button class="timeframe-toggle" title="Toggle section">▼</button>
+                                </div>
+                                <div class="timeframe-content">
+                                    <div class="timeframe-status">
+                                        <span class="status warning">⚠️ Error loading data</span>
+                                    </div>
                                 </div>
                             </div>
                         `;
@@ -977,10 +992,15 @@ class ConsoleTradingDashboard {
                 } catch (error) {
                     console.log(`❌ Error loading ${timeframe} data for ${pair}:`, error);
                     timeframesHTML += `
-                        <div class="timeframe-item unavailable">
-                            <h5>⏰ ${timeframe} Timeframe</h5>
-                            <div class="timeframe-status">
-                                <span class="status warning">⚠️ Error loading data</span>
+                        <div class="timeframe-item unavailable" data-timeframe="${timeframe}">
+                            <div class="timeframe-header" onclick="dashboard.toggleTimeframeSection(this)">
+                                <h5>⏰ ${timeframe} Timeframe</h5>
+                                <button class="timeframe-toggle" title="Toggle section">▼</button>
+                                </div>
+                            <div class="timeframe-content">
+                                <div class="timeframe-status">
+                                    <span class="status warning">⚠️ Error loading data</span>
+                                </div>
                             </div>
                         </div>
                     `;
@@ -989,7 +1009,7 @@ class ConsoleTradingDashboard {
             
             timeframesHTML += '</div>';
             timeframesTab.innerHTML = timeframesHTML;
-            console.log(`✅ Timeframe modal populated for ${pair}`);
+            console.log(`✅ Timeframe modal populated for ${pair} with collapsible sections`);
             
         } catch (error) {
             console.error('❌ Error loading timeframe data for modal:', error);
@@ -997,152 +1017,240 @@ class ConsoleTradingDashboard {
         }
     }
 
+    toggleTimeframeSection(headerElement) {
+        const content = headerElement.parentElement.querySelector('.timeframe-content');
+        const toggle = headerElement.querySelector('.timeframe-toggle');
+        
+        if (content && toggle) {
+            content.classList.toggle('collapsed');
+            toggle.classList.toggle('collapsed');
+            
+            // Update toggle button text
+            if (content.classList.contains('collapsed')) {
+                toggle.textContent = '▶';
+                toggle.title = 'Expand section';
+            } else {
+                toggle.textContent = '▼';
+                toggle.title = 'Collapse section';
+            }
+        }
+    }
+
     createTimeframeMetrics(data, timeframe = null) {
         try {
             console.log(`🔍 Creating metrics for ${timeframe || 'main'} data:`, data);
-            const signalData = data.signal || data;
-            if (!signalData) {
-                console.log(`⚠️ No signal data found in ${timeframe || 'main'} data`);
-                return '<p>No signal data available</p>';
-            }
             
-            let metricsHTML = '';
+            // Check if this is signal data or simple timeframe data
+            const isSignalData = data.signal || (data.classification && data.recommendation);
+            const isTimeframeData = data.support && data.resistance && data.highest && data.Lowest;
             
-            // Classification metrics
-            if (signalData.classification) {
+            if (isSignalData) {
+                // Handle signal data structure
+                const signalData = data.signal || data;
+                if (!signalData) {
+                    console.log(`⚠️ No signal data found in ${timeframe || 'main'} data`);
+                    return '<p>No signal data available</p>';
+                }
+                
+                let metricsHTML = '';
+                
+                // Classification metrics
+                if (signalData.classification) {
+                    metricsHTML += `
+                        <div class="metric-section">
+                            <h6>📊 Classification</h6>
+                            <div class="metric-row">
+                                <span class="metric-label">Type:</span>
+                                <span class="metric-value">${signalData.classification.type || 'N/A'}</span>
+                            </div>
+                            <div class="metric-row">
+                                <span class="metric-label">Confidence:</span>
+                                <span class="metric-value">${signalData.classification.confidence || 'N/A'}</span>
+                            </div>
+                            <div class="metric-row">
+                                <span class="metric-label">Confluence Score:</span>
+                                <span class="metric-value">${signalData.classification.confluence_score || 'N/A'}</span>
+                            </div>
+                            <div class="metric-row">
+                                <span class="metric-label">Win Rate:</span>
+                                <span class="metric-value">${signalData.classification.expected_win_rate || signalData.classification.win_rate || 'N/A'}</span>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                // Recommendation metrics
+                if (signalData.recommendation) {
+                    metricsHTML += `
+                        <div class="metric-section">
+                            <h6>🎯 Recommendation</h6>
+                            <div class="metric-row">
+                                <span class="metric-label">Action:</span>
+                                <span class="metric-value ${signalData.recommendation.action ? signalData.recommendation.action.toLowerCase() : ''}">${signalData.recommendation.action || 'N/A'}</span>
+                            </div>
+                            <div class="metric-row">
+                                <span class="metric-label">Entry Range:</span>
+                                <span class="metric-value">${this.formatEntryRange(signalData.recommendation.entry_range)}</span>
+                            </div>
+                            <div class="metric-row">
+                                <span class="metric-label">Stop Loss:</span>
+                                <span class="metric-value">${this.formatStopLoss(signalData.recommendation.stop_loss)}</span>
+                            </div>
+                            <div class="metric-row">
+                                <span class="metric-label">Take Profit:</span>
+                                <span class="metric-value">${this.formatTakeProfit(signalData.recommendation.take_profit)}</span>
+                            </div>
+                            <div class="metric-row">
+                                <span class="metric-label">Risk/Reward:</span>
+                                <span class="metric-value">${signalData.recommendation.risk_reward_ratio || 'N/A'}</span>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                // Technical analysis metrics
+                if (signalData.technical_analysis) {
+                    metricsHTML += `
+                        <div class="metric-section">
+                            <h6>🔧 Technical Analysis</h6>
+                            <div class="metric-row">
+                                <span class="metric-label">Primary TF:</span>
+                                <span class="metric-value">${signalData.technical_analysis.primary_timeframe || 'N/A'}</span>
+                            </div>
+                            <div class="metric-row">
+                                <span class="metric-label">Trend:</span>
+                                <span class="metric-value">${signalData.technical_analysis.trend_direction || 'N/A'}</span>
+                            </div>
+                            <div class="metric-row">
+                                <span class="metric-label">Volume:</span>
+                                <span class="metric-value">${signalData.technical_analysis.volume_confirmation || 'N/A'}</span>
+                            </div>
+                            <div class="metric-row">
+                                <span class="metric-label">Pattern Strength:</span>
+                                <span class="metric-value">${signalData.technical_analysis.pattern_strength || 'N/A'}</span>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                // Add position sizing if available
+                if (signalData.position_sizing) {
+                    metricsHTML += `
+                        <div class="metric-section">
+                            <h6>💰 Position Sizing</h6>
+                            <div class="metric-row">
+                                <span class="metric-label">Confidence Tier:</span>
+                                <span class="metric-value">${signalData.position_sizing.confidence_tier || 'N/A'}</span>
+                            </div>
+                            <div class="metric-row">
+                                <span class="metric-label">Position Size:</span>
+                                <span class="metric-value">${signalData.position_sizing.suggested_position_size || 'N/A'}</span>
+                            </div>
+                            <div class="metric-row">
+                                <span class="metric-label">Portfolio Risk:</span>
+                                <span class="metric-value">${signalData.position_sizing.max_portfolio_risk || 'N/A'}</span>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                // Add risk management if available
+                if (signalData.risk_management) {
+                    metricsHTML += `
+                        <div class="metric-section">
+                            <h6>⚠️ Risk Management</h6>
+                            <div class="metric-row">
+                                <span class="metric-label">Stop Loss Type:</span>
+                                <span class="metric-value">${signalData.risk_management.stop_loss_type || 'N/A'}</span>
+                            </div>
+                            <div class="metric-row">
+                                <span class="metric-label">Exit Strategy:</span>
+                                <span class="metric-value">${signalData.risk_management.exit_strategy || 'N/A'}</span>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                // Add reasoning if available
+                if (signalData.reasoning) {
+                    metricsHTML += `
+                        <div class="metric-section">
+                            <h6>🧠 Analysis & Reasoning</h6>
+                            <div class="metric-content">
+                                <p>${signalData.reasoning}</p>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                return metricsHTML;
+                
+            } else if (isTimeframeData) {
+                // Handle simple timeframe data structure (support, resistance, etc.)
+                let metricsHTML = '';
+                
                 metricsHTML += `
                     <div class="metric-section">
-                        <h6>📊 Classification</h6>
+                        <h6>📊 Price Levels</h6>
                         <div class="metric-row">
-                            <span class="metric-label">Type:</span>
-                            <span class="metric-value">${signalData.classification.type || 'N/A'}</span>
+                            <span class="metric-label">Support:</span>
+                            <span class="metric-value">${data.support || 'N/A'}</span>
                         </div>
                         <div class="metric-row">
-                            <span class="metric-label">Confidence:</span>
-                            <span class="metric-value">${signalData.classification.confidence || 'N/A'}</span>
+                            <span class="metric-label">Resistance:</span>
+                            <span class="metric-value">${data.resistance || 'N/A'}</span>
                         </div>
                         <div class="metric-row">
-                            <span class="metric-label">Confluence Score:</span>
-                            <span class="metric-value">${signalData.classification.confluence_score || 'N/A'}</span>
+                            <span class="metric-label">Highest:</span>
+                            <span class="metric-value">${data.highest || 'N/A'}</span>
                         </div>
                         <div class="metric-row">
-                            <span class="metric-label">Win Rate:</span>
-                            <span class="metric-value">${signalData.classification.expected_win_rate || signalData.classification.win_rate || 'N/A'}</span>
+                            <span class="metric-label">Lowest:</span>
+                            <span class="metric-value">${data.Lowest || 'N/A'}</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Amplitude:</span>
+                            <span class="metric-value">${data.Amplitude_HL || 'N/A'}</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Candles:</span>
+                            <span class="metric-value">${data.Candles || 'N/A'}</span>
                         </div>
                     </div>
                 `;
+                
+                // Add variations if available
+                if (data.Variations) {
+                    metricsHTML += `
+                        <div class="metric-section">
+                            <h6>📈 Variations</h6>
+                            <div class="metric-row">
+                                <span class="metric-label">Open-Close:</span>
+                                <span class="metric-value">${data.Variations.Open_Close || 'N/A'}</span>
+                            </div>
+                            <div class="metric-row">
+                                <span class="metric-label">Open-Close %:</span>
+                                <span class="metric-value">${data.Variations.Open_Close_pct || 'N/A'}</span>
+                            </div>
+                            <div class="metric-row">
+                                <span class="metric-label">From High:</span>
+                                <span class="metric-value">${data.Variations.From_High || 'N/A'}</span>
+                            </div>
+                            <div class="metric-row">
+                                <span class="metric-label">From Low:</span>
+                                <span class="metric-value">${data.Variations.From_Low || 'N/A'}</span>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                return metricsHTML;
+                
+            } else {
+                // Unknown data structure
+                console.log(`⚠️ Unknown data structure for ${timeframe || 'main'} data:`, data);
+                return '<p>Data structure not recognized</p>';
             }
-            
-            // Recommendation metrics
-            if (signalData.recommendation) {
-                metricsHTML += `
-                    <div class="metric-section">
-                        <h6>🎯 Recommendation</h6>
-                        <div class="metric-row">
-                            <span class="metric-label">Action:</span>
-                            <span class="metric-value ${signalData.recommendation.action ? signalData.recommendation.action.toLowerCase() : ''}">${signalData.recommendation.action || 'N/A'}</span>
-                        </div>
-                        <div class="metric-row">
-                            <span class="metric-label">Entry Range:</span>
-                            <span class="metric-value">${this.formatEntryRange(signalData.recommendation.entry_range)}</span>
-                        </div>
-                        <div class="metric-row">
-                            <span class="metric-label">Stop Loss:</span>
-                            <span class="metric-value">${this.formatStopLoss(signalData.recommendation.stop_loss)}</span>
-                        </div>
-                        <div class="metric-row">
-                            <span class="metric-label">Take Profit:</span>
-                            <span class="metric-value">${this.formatTakeProfit(signalData.recommendation.take_profit)}</span>
-                        </div>
-                        <div class="metric-row">
-                            <span class="metric-label">Risk/Reward:</span>
-                            <span class="metric-value">${signalData.recommendation.risk_reward_ratio || 'N/A'}</span>
-                        </div>
-                    </div>
-                `;
-            }
-            
-            // Technical analysis metrics
-            if (signalData.technical_analysis) {
-                metricsHTML += `
-                    <div class="metric-section">
-                        <h6>🔧 Technical Analysis</h6>
-                        <div class="metric-row">
-                            <span class="metric-label">Primary TF:</span>
-                            <span class="metric-value">${signalData.technical_analysis.primary_timeframe || 'N/A'}</span>
-                        </div>
-                        <div class="metric-row">
-                            <span class="metric-label">Trend:</span>
-                            <span class="metric-value">${signalData.technical_analysis.trend_direction || 'N/A'}</span>
-                        </div>
-                        <div class="metric-row">
-                            <span class="metric-label">Volume:</span>
-                            <span class="metric-value">${signalData.technical_analysis.volume_confirmation || 'N/A'}</span>
-                        </div>
-                        <div class="metric-row">
-                            <span class="metric-label">Pattern Strength:</span>
-                            <span class="metric-value">${signalData.technical_analysis.pattern_strength || 'N/A'}</span>
-                        </div>
-                    </div>
-                `;
-            }
-            
-            // Add position sizing if available
-            if (signalData.position_sizing) {
-                metricsHTML += `
-                    <div class="metric-section">
-                        <h6>💰 Position Sizing</h6>
-                        <div class="metric-row">
-                            <span class="metric-label">Confidence Tier:</span>
-                            <span class="metric-value">${signalData.position_sizing.confidence_tier || 'N/A'}</span>
-                        </div>
-                        <div class="metric-row">
-                            <span class="metric-label">Position Size:</span>
-                            <span class="metric-value">${signalData.position_sizing.suggested_position_size || signalData.position_sizing.position_size || 'N/A'}</span>
-                        </div>
-                        <div class="metric-row">
-                            <span class="metric-label">Portfolio Risk:</span>
-                            <span class="metric-value">${signalData.position_sizing.max_portfolio_risk || signalData.position_sizing.portfolio_risk || 'N/A'}</span>
-                        </div>
-                    </div>
-                `;
-            }
-            
-            // Add risk management if available
-            if (signalData.risk_management) {
-                metricsHTML += `
-                    <div class="metric-section">
-                        <h6>⚠️ Risk Management</h6>
-                        <div class="metric-row">
-                            <span class="metric-label">Stop Loss Type:</span>
-                            <span class="metric-value">${signalData.risk_management.stop_loss_type || 'N/A'}</span>
-                        </div>
-                        <div class="metric-row">
-                            <span class="metric-label">Exit Strategy:</span>
-                            <span class="metric-value">${signalData.risk_management.exit_strategy || 'N/A'}</span>
-                        </div>
-                        <div class="metric-row">
-                            <span class="metric-label">Max Drawdown:</span>
-                            <span class="metric-value">${signalData.risk_management.max_drawdown || 'N/A'}</span>
-                        </div>
-                    </div>
-                `;
-            }
-            
-            // Add reasoning if available
-            if (signalData.reasoning) {
-                metricsHTML += `
-                    <div class="metric-section">
-                        <h6>🧠 Analysis & Reasoning</h6>
-                        <div class="reasoning-content">
-                            <p>${signalData.reasoning}</p>
-                        </div>
-                    </div>
-                `;
-            }
-            
-            console.log(`✅ Metrics created successfully for ${timeframe || 'main'}`);
-            return metricsHTML;
             
         } catch (error) {
             console.error('❌ Error creating timeframe metrics:', error);

@@ -831,6 +831,104 @@ body {
     min-height: 200px;
 }
 
+/* Collapsible Timeframe Sections */
+.timeframe-item {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.timeframe-item:hover {
+    border-color: var(--border-light);
+    box-shadow: var(--shadow);
+}
+
+.timeframe-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.timeframe-header:hover {
+    background: var(--bg-secondary);
+}
+
+.timeframe-header h5 {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.timeframe-toggle {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+}
+
+.timeframe-toggle:hover {
+    color: var(--text-accent);
+    background: var(--bg-secondary);
+}
+
+.timeframe-toggle.collapsed {
+    transform: rotate(-90deg);
+}
+
+.timeframe-content {
+    max-height: 1000px;
+    opacity: 1;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.timeframe-content.collapsed {
+    max-height: 0;
+    opacity: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.timeframe-metrics {
+    padding: 20px;
+}
+
+.timeframe-item.unavailable .timeframe-header {
+    background: rgba(248, 81, 73, 0.1);
+    border-color: var(--danger);
+}
+
+.timeframe-item.unavailable .timeframe-header h5 {
+    color: var(--danger);
+}
+
+.timeframe-status {
+    padding: 20px;
+    text-align: center;
+    color: var(--warning);
+}
+
 /* Loading State */
 .loading {
     text-align: center;

@@ -12,7 +12,7 @@
     <!-- Version Management -->
     <script>
         // Dashboard Version Management
-        const DASHBOARD_VERSION = '1.6';
+        const DASHBOARD_VERSION = '1.8';
         const VERSION_HISTORY = [
             { version: '1.0', date: '2025-01-01', changes: 'Initial release with comprehensive signal cards and modal system' },
             { version: '1.1', date: '2025-01-01', changes: 'Console-style redesign with external CSS/JS and improved data organization' },
@@ -20,7 +20,9 @@
             { version: '1.3', date: '2025-01-01', changes: 'Fixed data transformation for actual JSON structure and ensured single card per pair' },
             { version: '1.4', date: '2025-01-01', changes: 'Fixed createConsoleSignalCard function to work with transformed data structure' },
             { version: '1.5', date: '2025-01-01', changes: 'Enhanced timeframe data display in modals and improved modern spacing layout' },
-            { version: '1.6', date: '2025-01-01', changes: 'Enhanced timeframe data display with comprehensive metrics and improved debugging' }
+            { version: '1.6', date: '2025-01-01', changes: 'Enhanced timeframe data display with comprehensive metrics and improved debugging' },
+            { version: '1.7', date: '2025-01-01', changes: 'Fixed timeframe data display to properly handle both signal and price data structures' },
+            { version: '1.8', date: '2025-01-01', changes: 'Added collapsible timeframe sections in modals for better organization and user experience' }
         ];
         
         // Function to increment version before push
@@ -41,7 +43,7 @@
         // Display version info
         console.log(`📊 Console Trading Dashboard v${DASHBOARD_VERSION}`);
         console.log(`📝 Remember to increment version before pushing changes`);
-        console.log(`🔧 Version 1.6: Enhanced timeframe data display with comprehensive metrics and improved debugging`);
+        console.log(`🔧 Version 1.8: Added collapsible timeframe sections in modals for better organization and user experience`);
     </script>
     
     <!-- External CSS -->
@@ -57,7 +59,7 @@
             </h1>
             <p>Terminal-Style Cryptocurrency Trading Analysis</p>
             <div class="version-info">
-                <span class="version-badge">v<span id="dashboardVersion">1.6</span></span>
+                <span class="version-badge">v<span id="dashboardVersion">1.8</span></span>
                 <span class="version-date">Updated: <span id="lastUpdateDate">2025-01-01</span></span>
                 <button class="version-info-btn" id="versionInfoBtn" title="Version Information">ℹ️</button>
             </div>
