@@ -192,11 +192,18 @@ class ConsoleTradingDashboard {
             
             // Load data for each pair
             const allSignals = [];
+            const loadedPairs = new Set(); // Track loaded pairs to avoid duplicates
             
             for (const pair of this.pairs) {
                 try {
                     if (!pair || !pair.symbol) {
                         console.warn('⚠️ Invalid pair configuration:', pair);
+                        continue;
+                    }
+                    
+                    // Skip if we already loaded this pair
+                    if (loadedPairs.has(pair.symbol)) {
+                        console.log(`⚠️ Skipping ${pair.symbol} - already loaded`);
                         continue;
                     }
                     
@@ -212,6 +219,8 @@ class ConsoleTradingDashboard {
                         const signalData = this.transformMainDataToSignal(mainData, pair.symbol);
                         if (signalData) {
                             allSignals.push(signalData);
+                            loadedPairs.add(pair.symbol);
+                            console.log(`✅ Created signal card for ${pair.symbol}`);
                         }
                     } else {
                         console.log(`⚠️ Main data not available for ${pair.symbol}, loading timeframe data`);
@@ -219,7 +228,11 @@ class ConsoleTradingDashboard {
                         // Load timeframe-specific data
                         const timeframeSignals = await this.loadTimeframeData(pair);
                         if (timeframeSignals && timeframeSignals.length > 0) {
-                            allSignals.push(...timeframeSignals);
+                            // Only take the first timeframe signal to avoid duplicates
+                            const firstSignal = timeframeSignals[0];
+                            allSignals.push(firstSignal);
+                            loadedPairs.add(pair.symbol);
+                            console.log(`✅ Created timeframe signal card for ${pair.symbol}`);
                         }
                     }
                 } catch (error) {
@@ -323,15 +336,64 @@ class ConsoleTradingDashboard {
                 return null;
             }
 
+            // Handle different entry_range formats
+            let entryRange = 'N/A';
+            if (signalData.recommendation?.entry_range) {
+                if (Array.isArray(signalData.recommendation.entry_range)) {
+                    // Format: [min, max]
+                    entryRange = `${signalData.recommendation.entry_range[0]} - ${signalData.recommendation.entry_range[1]}`;
+                } else if (typeof signalData.recommendation.entry_range === 'object') {
+                    // Format: {min: x, max: y}
+                    entryRange = `${signalData.recommendation.entry_range.min || 'N/A'} - ${signalData.recommendation.entry_range.max || 'N/A'}`;
+                }
+            }
+
+            // Handle different targets formats
+            let targets = 'N/A';
+            if (signalData.recommendation?.take_profit) {
+                if (Array.isArray(signalData.recommendation.take_profit)) {
+                    targets = signalData.recommendation.take_profit.join(' - ');
+                }
+            } else if (signalData.recommendation?.targets) {
+                if (Array.isArray(signalData.recommendation.targets)) {
+                    targets = signalData.recommendation.targets.map(t => t.price || t).join(' - ');
+                }
+            }
+
             // Create a comprehensive signal object
             const signal = {
                 pair: pairSymbol,
                 timestamp: mainData.timestamp || new Date().toISOString(),
-                classification: signalData.classification || {},
-                recommendation: signalData.recommendation || {},
-                position_sizing: signalData.position_sizing || {},
-                technical_analysis: signalData.technical_analysis || {},
-                risk_management: signalData.risk_management || {},
+                classification: {
+                    type: signalData.classification?.type || 'N/A',
+                    confidence: signalData.classification?.confidence || 'LOW',
+                    confluence_score: signalData.classification?.confluence_score || 'N/A',
+                    win_rate: signalData.classification?.expected_win_rate || signalData.classification?.win_rate || 'N/A'
+                },
+                recommendation: {
+                    action: signalData.recommendation?.action || 'N/A',
+                    entry_range: entryRange,
+                    targets: targets,
+                    stop_loss: signalData.recommendation?.stop_loss || 'N/A',
+                    risk_reward_ratio: signalData.recommendation?.risk_reward_ratio || 'N/A'
+                },
+                position_sizing: {
+                    confidence_tier: signalData.position_sizing?.confidence_tier || 'N/A',
+                    position_size: signalData.position_sizing?.suggested_position_size || signalData.position_sizing?.position_size || 'N/A',
+                    portfolio_risk: signalData.position_sizing?.max_portfolio_risk || signalData.position_sizing?.portfolio_risk || 'N/A'
+                },
+                technical_analysis: {
+                    primary_timeframe: signalData.technical_analysis?.primary_timeframe || 'N/A',
+                    trend: signalData.technical_analysis?.trend_direction || signalData.technical_analysis?.trend || 'N/A',
+                    volume_confirmation: signalData.technical_analysis?.volume_confirmation || 'N/A',
+                    pattern_strength: signalData.technical_analysis?.pattern_strength || 'N/A'
+                },
+                risk_management: {
+                    stop_loss_type: signalData.risk_management?.stop_loss_type || 'N/A',
+                    reward_targets: signalData.risk_management?.reward_targets?.length || signalData.recommendation?.take_profit?.length || 'N/A',
+                    exit_strategy: signalData.risk_management?.exit_strategy || 'N/A',
+                    max_drawdown: signalData.recommendation?.max_drawdown || signalData.risk_management?.max_drawdown || 'N/A'
+                },
                 reasoning: signalData.reasoning || 'No reasoning provided',
                 trend: this.determineTrend(signalData),
                 action: this.determineAction(signalData),
