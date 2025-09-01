@@ -3,8 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trading Signals Dashboard</title>
+    <title>Trading Signals Dashboard v2.0</title>
     <meta name="description" content="Live Cryptocurrency Trading Analysis Dashboard">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -734,15 +737,23 @@
                 try {
                     this.setLoadingState(true);
                     console.log('🔄 Loading trading signals...');
+                    console.log('🚀 Dashboard version: 2.0 - Dual Data Type Support');
                     
-                    // Load pairs configuration
-                    const pairsResponse = await fetch('./config/pairs.json');
+                    // Load pairs configuration with cache busting
+                    const pairsResponse = await fetch('./config/pairs.json?v=' + Date.now());
                     if (!pairsResponse.ok) {
                         throw new Error('Failed to load pairs configuration');
                     }
                     
                     this.pairs = await pairsResponse.json();
                     console.log('📋 Pairs configuration loaded:', this.pairs);
+                    console.log('🔍 First pair config:', this.pairs[0]);
+                    console.log('🔍 All pairs dataFile values:', this.pairs.map(p => ({ symbol: p.symbol, dataFile: p.dataFile })));
+                    
+                    // Validate configuration
+                    if (!Array.isArray(this.pairs) || this.pairs.length === 0) {
+                        throw new Error('Invalid pairs configuration format');
+                    }
                     
                     // Load data for each pair
                     const allData = [];
@@ -750,6 +761,14 @@
                     for (const pair of this.pairs) {
                         try {
                             console.log(`📊 Loading data for ${pair.symbol}...`);
+                            console.log(`🔍 Pair config:`, pair);
+                            console.log(`📁 Data file: ${pair.dataFile}`);
+                            
+                            // Validate pair configuration
+                            if (!pair.symbol || !pair.dataFile) {
+                                console.error(`❌ Invalid pair configuration for ${pair.symbol}:`, pair);
+                                continue;
+                            }
                             
                             // Check cache first
                             if (this.dataCache.has(pair.symbol)) {
@@ -762,7 +781,7 @@
                                 continue;
                             }
                             
-                            const dataResponse = await fetch(`./assets/pairs/${pair.symbol}/${pair.dataFile}`);
+                            const dataResponse = await fetch(`./assets/pairs/${pair.symbol}/${pair.dataFile}?v=${Date.now()}`);
                             if (dataResponse.ok) {
                                 const pairData = await dataResponse.json();
                                 console.log(`✅ Data loaded for ${pair.symbol}:`, pairData);
