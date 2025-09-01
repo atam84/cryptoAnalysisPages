@@ -355,11 +355,19 @@ class ConsoleTradingDashboard {
                         // Load timeframe-specific data
                         const timeframeSignals = await this.loadTimeframeData(pair);
                         if (timeframeSignals && timeframeSignals.length > 0) {
-                            // Only take the first timeframe signal to avoid duplicates
-                            const firstSignal = timeframeSignals[0];
-                            allSignals.push(firstSignal);
-                            loadedPairs.add(pair.symbol);
-                            console.log(`✅ Created timeframe signal card for ${pair.symbol}`);
+                            // Create a comprehensive signal card from all timeframe data
+                            const comprehensiveSignal = this.createComprehensiveSignalFromTimeframes(pair.symbol, timeframeSignals);
+                            if (comprehensiveSignal) {
+                                allSignals.push(comprehensiveSignal);
+                                loadedPairs.add(pair.symbol);
+                                console.log(`✅ Created comprehensive signal card for ${pair.symbol} from ${timeframeSignals.length} timeframes`);
+                            } else {
+                                // Fallback to first timeframe if comprehensive creation fails
+                                const firstSignal = timeframeSignals[0];
+                                allSignals.push(firstSignal);
+                                loadedPairs.add(pair.symbol);
+                                console.log(`✅ Created timeframe signal card for ${pair.symbol}`);
+                            }
                         }
                     }
                 } catch (error) {
@@ -1464,6 +1472,110 @@ class ConsoleTradingDashboard {
                 analysisAndReasoning: 'Technical indicators show bullish momentum'
             },
             dataType: 'signal'
+        };
+    }
+
+    createComprehensiveSignalFromTimeframes(pairSymbol, timeframeSignals) {
+        if (!pairSymbol || !timeframeSignals || timeframeSignals.length === 0) {
+            console.warn('⚠️ Cannot create comprehensive signal from empty timeframe signals.');
+            return null;
+        }
+
+        try {
+            // For price-based data (like BTC-USDT), create a signal from price analysis
+            if (timeframeSignals[0].dataType === 'price') {
+                return this.createPriceBasedSignal(pairSymbol, timeframeSignals);
+            }
+            
+            // For signal-based data, aggregate the information
+            return this.createAggregatedSignal(pairSymbol, timeframeSignals);
+        } catch (error) {
+            console.error(`❌ Error creating comprehensive signal for ${pairSymbol}:`, error);
+            return null;
+        }
+    }
+
+    createPriceBasedSignal(pairSymbol, timeframeSignals) {
+        // Analyze price data across timeframes to determine trend and action
+        let overallTrend = 'neutral';
+        let action = 'wait';
+        let support = 'N/A';
+        let resistance = 'N/A';
+        let highest = 'N/A';
+        let lowest = 'N/A';
+        
+        // Aggregate price data from all timeframes
+        timeframeSignals.forEach(signal => {
+            const data = signal.data;
+            if (data) {
+                if (data.support && support === 'N/A') support = data.support;
+                if (data.resistance && resistance === 'N/A') resistance = data.resistance;
+                if (data.highest && highest === 'N/A') highest = data.highest;
+                if (data.lowest && lowest === 'N/A') lowest = data.lowest;
+            }
+        });
+
+        // Determine trend based on price movement
+        if (highest !== 'N/A' && lowest !== 'N/A') {
+            const high = parseFloat(highest);
+            const low = parseFloat(lowest);
+            if (high > low) overallTrend = 'bullish';
+            if (high < low) overallTrend = 'bearish';
+        }
+
+        // Create a comprehensive signal object
+        return {
+            pair: pairSymbol,
+            timeframe: 'Multi',
+            trend: overallTrend,
+            action: action,
+            data: {
+                support: support,
+                resistance: resistance,
+                highest: highest,
+                lowest: lowest,
+                analysis: `Price analysis across ${timeframeSignals.length} timeframes`,
+                recommendation: overallTrend === 'bullish' ? 'Consider buying on dips' : 
+                              overallTrend === 'bearish' ? 'Consider selling on rallies' : 'Wait for clearer direction'
+            },
+            dataType: 'price_aggregated'
+        };
+    }
+
+    createAggregatedSignal(pairSymbol, timeframeSignals) {
+        // For signal-based data, aggregate the classification and recommendation
+        let trend = 'neutral';
+        let action = 'wait';
+        let confidence = 'LOW';
+        let reasoning = `Analysis based on ${timeframeSignals.length} timeframes`;
+
+        // Determine overall trend and action from multiple timeframes
+        timeframeSignals.forEach(signal => {
+            if (signal.trend && signal.trend !== 'neutral') {
+                trend = signal.trend;
+            }
+            if (signal.action && signal.action !== 'wait') {
+                action = signal.action;
+            }
+            if (signal.data && signal.data.confidence) {
+                const sigConfidence = signal.data.confidence.toLowerCase();
+                if (sigConfidence.includes('high')) confidence = 'HIGH';
+                else if (sigConfidence.includes('medium') && confidence !== 'HIGH') confidence = 'MEDIUM';
+            }
+        });
+
+        return {
+            pair: pairSymbol,
+            timeframe: 'Multi',
+            trend: trend,
+            action: action,
+            data: {
+                classification: `${trend.toUpperCase()} signal`,
+                confidence: confidence,
+                recommendation: `${action.toUpperCase()} recommendation`,
+                reasoning: reasoning
+            },
+            dataType: 'signal_aggregated'
         };
     }
 }
