@@ -89,7 +89,7 @@ body {
     margin-bottom: 24px;
     padding: 20px;
     background: var(--bg-secondary);
-    border: 1px solid var(--border);
+    border: 3px solid var(--text-accent);
     border-radius: 8px;
     transition: all 0.3s ease;
 }

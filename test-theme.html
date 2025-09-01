@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theme Switcher Test</title>
+    <link rel="stylesheet" href="./assets/css/dashboard.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Theme Switcher Test</h1>
+            <div class="header-actions">
+                <button class="theme-switcher" id="themeSwitcher" title="Switch Theme">
+                    <span class="theme-icon">🌙</span>
+                    <span class="theme-text">Dark Mode</span>
+                </button>
+            </div>
+        </div>
+        
+        <div class="content">
+            <p>This is a test page for the theme switcher.</p>
+            <p>Click the theme switcher button above to test.</p>
+        </div>
+    </div>
+
+    <script>
+        // Simple theme switcher test
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🔧 DOM loaded, setting up theme switcher...');
+            
+            const themeSwitcher = document.getElementById('themeSwitcher');
+            console.log('🎯 Theme switcher element:', themeSwitcher);
+            
+            if (!themeSwitcher) {
+                console.error('❌ Theme switcher not found!');
+                return;
+            }
+            
+            // Initialize theme
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            console.log('🎨 Initial theme:', savedTheme);
+            
+            // Apply theme
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            console.log('📝 Applied theme:', document.documentElement.getAttribute('data-theme'));
+            
+            // Update display
+            updateThemeDisplay(savedTheme);
+            
+            // Add click listener
+            themeSwitcher.addEventListener('click', () => {
+                console.log('🖱️ Theme switcher clicked!');
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                
+                console.log('🔄 Switching from', currentTheme, 'to', newTheme);
+                document.documentElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+                updateThemeDisplay(newTheme);
+                
+                console.log('✅ Theme switched to:', newTheme);
+            });
+            
+            function updateThemeDisplay(theme) {
+                const themeIcon = themeSwitcher.querySelector('.theme-icon');
+                const themeText = themeSwitcher.querySelector('.theme-text');
+                
+                if (theme === 'light') {
+                    themeIcon.textContent = '☀️';
+                    themeText.textContent = 'Light Mode';
+                } else {
+                    themeIcon.textContent = '🌙';
+                    themeText.textContent = 'Dark Mode';
+                }
+            }
+            
+            console.log('✅ Theme switcher setup complete');
+        });
+    </script>
+</body>
+</html>

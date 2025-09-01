@@ -247,10 +247,13 @@ class ConsoleTradingDashboard {
         console.log('🎨 setTheme called with:', theme);
         this.currentTheme = theme;
         
-        // Apply theme to document
+        // Apply theme to both html and body elements for better compatibility
         document.documentElement.setAttribute('data-theme', theme);
-        console.log('📝 Set data-theme attribute to:', theme);
+        document.body.setAttribute('data-theme', theme);
+        console.log('📝 Set data-theme attribute to html:', theme);
+        console.log('📝 Set data-theme attribute to body:', theme);
         console.log('🔍 Document element data-theme:', document.documentElement.getAttribute('data-theme'));
+        console.log('🔍 Body data-theme:', document.body.getAttribute('data-theme'));
         
         // Save to localStorage
         localStorage.setItem('theme', theme);
