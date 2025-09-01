@@ -385,6 +385,86 @@
         .context-value.atl { color: var(--warning); }
         .context-value.amplitude { color: var(--text-secondary); }
 
+        .technical-analysis {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: var(--accent-bg);
+            border-radius: 8px;
+        }
+
+        .ta-item {
+            text-align: center;
+        }
+
+        .ta-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+        }
+
+        .ta-value {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .ta-value.confidence-high { color: var(--success); }
+        .ta-value.confidence-medium { color: var(--warning); }
+        .ta-value.confidence-low { color: var(--danger); }
+
+        .position-details {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: var(--accent-bg);
+            border-radius: 8px;
+        }
+
+        .pos-item {
+            text-align: center;
+        }
+
+        .pos-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+        }
+
+        .pos-value {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .pos-value.confidence-high { color: var(--success); }
+        .pos-value.confidence-medium { color: var(--warning); }
+        .pos-value.confidence-low { color: var(--danger); }
+
+        .reasoning-section {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: var(--accent-bg);
+            border-radius: 8px;
+        }
+
+        .reasoning-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .reasoning-text {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
         .signal-details {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -635,26 +715,46 @@
 
             async loadData() {
                 try {
-                    console.log('🔄 Starting data load...');
-                    const response = await fetch('./data.json');
-                    if (!response.ok) {
-                        throw new Error('Failed to load data.json');
+                    console.log('�� Starting data load from pair files...');
+                    
+                    // Load pairs configuration
+                    const pairsResponse = await fetch('./config/pairs.json');
+                    if (!pairsResponse.ok) {
+                        throw new Error('Failed to load pairs.json configuration');
                     }
                     
-                    const rawData = await response.json();
-                    console.log('📥 Raw data loaded:', rawData);
-                    console.log('📊 Raw data structure:', {
-                        type: typeof rawData,
-                        isArray: Array.isArray(rawData),
-                        length: rawData.length,
-                        firstItem: rawData[0]
-                    });
+                    const pairs = await pairsResponse.json();
+                    console.log('📋 Pairs configuration loaded:', pairs);
                     
-                    // Parse the Telegram message format
-                    this.data = this.parseTelegramData(rawData);
-                    console.log('✅ Parsed data array:', this.data);
-                    console.log('📈 Total signals parsed:', this.data.length);
+                    // Load data for each pair
+                    const allData = [];
                     
+                    for (const pair of pairs) {
+                        try {
+                            console.log(`\n📊 Loading data for ${pair.symbol}...`);
+                            
+                            // Load main analysis data
+                            const dataResponse = await fetch(`./assets/pairs/${pair.symbol}/${pair.dataFile}`);
+                            if (dataResponse.ok) {
+                                const pairData = await dataResponse.json();
+                                console.log(`✅ Data loaded for ${pair.symbol}:`, pairData);
+                                
+                                // Transform the data to match our dashboard format
+                                const transformedData = this.transformPairData(pairData, pair);
+                                if (transformedData) {
+                                    allData.push(transformedData);
+                                    console.log(`✅ Data transformed for ${pair.symbol}`);
+                                }
+                            } else {
+                                console.warn(`⚠️ Failed to load data for ${pair.symbol}: ${dataResponse.status}`);
+                            }
+                        } catch (error) {
+                            console.warn(`⚠️ Error loading data for ${pair.symbol}:`, error);
+                        }
+                    }
+                    
+                    console.log('🎯 Final data array:', allData);
+                    this.data = allData;
                     this.filteredData = [...this.data];
                     
                 } catch (error) {
@@ -663,162 +763,105 @@
                 }
             }
 
-            parseTelegramData(rawData) {
-                const signals = [];
-                console.log('🔍 Starting Telegram data parsing...');
-                
+            transformPairData(pairData, pairConfig) {
                 try {
-                    // Handle the nested structure from data.json
-                    const messages = rawData[0]?.result || rawData;
-                    console.log('📨 Messages to parse:', messages);
-                    console.log('📨 Messages length:', messages.length);
+                    console.log(`🔄 Transforming data for ${pairConfig.symbol}...`);
                     
-                    messages.forEach((message, index) => {
-                        try {
-                            console.log(`\n📝 Processing message ${index + 1}/${messages.length}`);
-                            const text = message.text || '';
-                            const signal = this.parseSignalText(text, message.date || Date.now() / 1000);
-                            
-                            if (signal) {
-                                signals.push(signal);
-                                console.log(`✅ Signal ${index + 1} parsed successfully`);
-                            } else {
-                                console.log(`❌ Signal ${index + 1} failed to parse`);
-                            }
-                        } catch (error) {
-                            console.warn(`⚠️ Failed to parse message ${index}:`, error);
-                        }
-                    });
-                    
-                    console.log(`🎯 Total signals successfully parsed: ${signals.length}`);
-                    
-                } catch (error) {
-                    console.error('❌ Failed to parse telegram data:', error);
-                }
-                
-                return signals;
-            }
-
-            parseSignalText(text, timestamp) {
-                try {
-                    console.log('=== Parsing Signal Text ===');
-                    console.log('Raw text:', text);
-                    
-                    // Extract pair from text - look for [PAIR/USDT] format
-                    const pairMatch = text.match(/\[([A-Z]+\/[A-Z]+)\]/);
-                    if (!pairMatch) {
-                        console.log('❌ No pair found');
+                    const signal = pairData.signal;
+                    if (!signal) {
+                        console.warn(`⚠️ No signal data found for ${pairConfig.symbol}`);
                         return null;
                     }
                     
-                    const pair = pairMatch[1];
-                    console.log('✅ Pair found:', pair);
+                    // Extract classification data
+                    const classification = signal.classification || {};
+                    const recommendation = signal.recommendation || {};
+                    const technical = signal.technical_analysis || {};
+                    const position = signal.position_sizing || {};
                     
-                    // Extract trend from "Trend: bullish/bearish"
-                    const trendMatch = text.match(/Trend:\s*(bullish|bearish)/i);
-                    const trend = trendMatch ? trendMatch[1].toLowerCase() : 'neutral';
-                    console.log('✅ Trend found:', trend);
-                    
-                    // Extract OHLC data from "Dernière bougie 4h" section
-                    const openMatch = text.match(/🟢\s*Open\s*:\s*([\d.]+)/i);
-                    const closeMatch = text.match(/🔴\s*Close\s*:\s*([\d.]+)/i);
-                    const highMatch = text.match(/📈\s*High\s*:\s*([\d.]+)/i);
-                    const lowMatch = text.match(/📉\s*Low\s*:\s*([\d.]+)/i);
-                    
-                    console.log('OHLC Matches:', {
-                        open: openMatch ? openMatch[1] : 'N/A',
-                        close: closeMatch ? closeMatch[1] : 'N/A',
-                        high: highMatch ? highMatch[1] : 'N/A',
-                        low: lowMatch ? lowMatch[1] : 'N/A'
-                    });
-                    
-                    // Extract support and resistance from "Support" and "Résistance" sections
-                    const supportMatch = text.match(/🟠\s*Support\s*:\s*([\d.]+)/i);
-                    const resistanceMatch = text.match(/🛑\s*Résistance\s*:\s*([\d.]+)/i);
-                    
-                    console.log('Support/Resistance:', {
-                        support: supportMatch ? supportMatch[1] : 'N/A',
-                        resistance: resistanceMatch ? resistanceMatch[1] : 'N/A'
-                    });
-                    
-                    // Extract action from the trading recommendation section
-                    let action = 'wait';
-                    if (text.includes('⏸️') || text.includes('Attente')) {
-                        action = 'wait';
-                    } else if (text.includes('🟢') && text.includes('Achat')) {
-                        action = 'buy';
-                    } else if (text.includes('🔴') && text.includes('Vente')) {
-                        action = 'sell';
-                    } else if (text.includes('Achat') || text.includes('Buy')) {
-                        action = 'buy';
-                    } else if (text.includes('Vente') || text.includes('Sell')) {
-                        action = 'sell';
+                    // Determine trend from technical analysis
+                    let trend = 'neutral';
+                    if (technical.trend_direction) {
+                        trend = technical.trend_direction.toLowerCase();
                     }
                     
-                    console.log('✅ Action detected:', action);
+                    // Determine action from recommendation
+                    let action = 'wait';
+                    if (recommendation.action) {
+                        const actionText = recommendation.action.toLowerCase();
+                        if (actionText === 'buy' || actionText === 'long') action = 'buy';
+                        else if (actionText === 'sell' || actionText === 'short') action = 'sell';
+                        else if (actionText === 'wait') action = 'wait';
+                    }
                     
-                    // Extract entry range from "Achat entre [X $ - Y $]" or "Vente entre [X $ - Y $]"
-                    const entryMatch = text.match(/(?:Achat|Vente)\s+entre\s*\[([\d.\s-]+)\s*\$/i);
+                    // Extract entry range
+                    let entryRange = null;
+                    if (recommendation.entry_range && Array.isArray(recommendation.entry_range)) {
+                        const [min, max] = recommendation.entry_range;
+                        if (min !== null && max !== null) {
+                            entryRange = `${min} - ${max}`;
+                        } else if (min !== null) {
+                            entryRange = `${min}`;
+                        }
+                    }
                     
-                    // Extract target from "Target [X $ - Y $]" or "Target [X $]"
-                    const targetMatch = text.match(/Target\s*\[([\d.\s-]+)\s*\$/i);
+                    // Extract target
+                    let target = null;
+                    if (recommendation.take_profit && recommendation.take_profit.length > 0) {
+                        target = recommendation.take_profit.join(' - ');
+                    }
                     
-                    // Extract stop loss from "Stop loss à X $"
-                    const stopLossMatch = text.match(/Stop loss\s*[àa]\s*([\d.]+)\s*\$/i);
+                    // Extract stop loss
+                    const stopLoss = recommendation.stop_loss;
                     
-                    // Extract win percentage from "Target min win X%" or "win X%"
-                    const winMatch = text.match(/(?:Target min win|win)\s*([\d.]+)%/i);
+                    // Extract win rate
+                    let winPercentage = null;
+                    if (classification.expected_win_rate) {
+                        winPercentage = parseFloat(classification.expected_win_rate.replace('%', ''));
+                    }
                     
-                    console.log('Trading Details:', {
-                        entry: entryMatch ? entryMatch[1] : 'N/A',
-                        target: targetMatch ? targetMatch[1] : 'N/A',
-                        stopLoss: stopLossMatch ? stopLossMatch[1] : 'N/A',
-                        winPercentage: winMatch ? winMatch[1] : 'N/A'
-                    });
-                    
-                    // Extract ATH and ATL values
-                    const athMatch = text.match(/🔺\s*ATH\s*:\s*([\d.]+)/i);
-                    const atlMatch = text.match(/🔻\s*ATL\s*:\s*([\d.]+)/i);
-                    
-                    // Extract amplitude H/L
-                    const amplitudeMatch = text.match(/↔️\s*Amplitude H\/L\s*:\s*([\d.]+)\s*USDT/i);
-                    
-                    console.log('Market Context:', {
-                        ath: athMatch ? athMatch[1] : 'N/A',
-                        atl: atlMatch ? atlMatch[1] : 'N/A',
-                        amplitude: amplitudeMatch ? amplitudeMatch[1] : 'N/A'
-                    });
-                    
-                    const parsedData = {
-                        pair,
+                    const transformed = {
+                        pair: pairConfig.symbol,
                         trend,
-                        timestamp,
+                        timestamp: signal.timestamp || Date.now() / 1000,
                         ohlc: {
-                            open: openMatch ? parseFloat(openMatch[1]) : null,
-                            close: closeMatch ? parseFloat(closeMatch[1]) : null,
-                            high: highMatch ? parseFloat(highMatch[1]) : null,
-                            low: lowMatch ? parseFloat(lowMatch[1]) : null
+                            open: null, // Not available in this data structure
+                            close: null,
+                            high: null,
+                            low: null
                         },
-                        support: supportMatch ? parseFloat(supportMatch[1]) : null,
-                        resistance: resistanceMatch ? parseFloat(resistanceMatch[1]) : null,
+                        support: null, // Not available in this data structure
+                        resistance: null, // Not available in this data structure
                         action,
-                        entryRange: entryMatch ? entryMatch[1].trim() : null,
-                        target: targetMatch ? targetMatch[1].trim() : null,
-                        stopLoss: stopLossMatch ? parseFloat(stopLossMatch[1]) : null,
-                        winPercentage: winMatch ? parseFloat(winMatch[1]) : null,
-                        ath: athMatch ? parseFloat(athMatch[1]) : null,
-                        atl: atlMatch ? parseFloat(atlMatch[1]) : null,
-                        amplitude: amplitudeMatch ? parseFloat(amplitudeMatch[1]) : null,
-                        rawText: text
+                        entryRange,
+                        target,
+                        stopLoss,
+                        winPercentage,
+                        ath: null, // Not available in this data structure
+                        atl: null, // Not available in this data structure
+                        amplitude: null, // Not available in this data structure
+                        
+                        // Additional data from the pair files
+                        confidence: classification.confidence || 'LOW',
+                        confluenceScore: classification.confluence_score || 'N/A',
+                        frequencyTier: classification.frequency_tier || 'N/A',
+                        timeframe: technical.primary_timeframe || 'N/A',
+                        timeframesAligned: technical.timeframes_aligned || 0,
+                        volumeConfirmation: technical.volume_confirmation || 'N/A',
+                        keyLevelProximity: technical.key_level_proximity || 'N/A',
+                        patternStrength: technical.pattern_strength || 'N/A',
+                        confidenceTier: position.confidence_tier || 'N/A',
+                        basePositionPercent: position.base_position_percent || 0,
+                        suggestedPositionSize: position.suggested_position_size || 'N/A',
+                        reasoning: signal.reasoning || 'No reasoning provided',
+                        rawData: pairData
                     };
                     
-                    console.log('✅ Final parsed data:', parsedData);
-                    console.log('=== End Parsing ===\n');
-                    
-                    return parsedData;
+                    console.log(`✅ Transformed data for ${pairConfig.symbol}:`, transformed);
+                    return transformed;
                     
                 } catch (error) {
-                    console.error('❌ Failed to parse signal text:', error);
+                    console.error(`❌ Failed to transform data for ${pairConfig.symbol}:`, error);
                     return null;
                 }
             }
@@ -907,48 +950,41 @@
                             </div>
                         </div>
                         
-                        <div class="ohlc-grid">
-                            <div class="ohlc-item">
-                                <div class="ohlc-label">Open</div>
-                                <div class="ohlc-value open">${signal.ohlc.open || 'N/A'}</div>
+                        <div class="technical-analysis">
+                            <div class="ta-item">
+                                <div class="ta-label">Confidence</div>
+                                <div class="ta-value confidence-${signal.confidence?.toLowerCase()}">${signal.confidence || 'N/A'}</div>
                             </div>
-                            <div class="ohlc-item">
-                                <div class="ohlc-label">High</div>
-                                <div class="ohlc-value high">${signal.ohlc.high || 'N/A'}</div>
+                            <div class="ta-item">
+                                <div class="ta-label">Confluence</div>
+                                <div class="ta-value">${signal.confluenceScore || 'N/A'}</div>
                             </div>
-                            <div class="ohlc-item">
-                                <div class="ohlc-label">Low</div>
-                                <div class="ohlc-value low">${signal.ohlc.low || 'N/A'}</div>
+                            <div class="ta-item">
+                                <div class="ta-label">Timeframe</div>
+                                <div class="ta-value">${signal.timeframe || 'N/A'}</div>
                             </div>
-                            <div class="ohlc-item">
-                                <div class="ohlc-label">Close</div>
-                                <div class="ohlc-value close">${signal.ohlc.close || 'N/A'}</div>
-                            </div>
-                        </div>
-                        
-                        <div class="support-resistance">
-                            <div class="sr-item">
-                                <div class="sr-label">Support</div>
-                                <div class="sr-value support">${signal.support || 'N/A'}</div>
-                            </div>
-                            <div class="sr-item">
-                                <div class="sr-label">Resistance</div>
-                                <div class="sr-value resistance">${signal.resistance || 'N/A'}</div>
+                            <div class="ta-item">
+                                <div class="ta-label">Volume</div>
+                                <div class="ta-value">${signal.volumeConfirmation || 'N/A'}</div>
                             </div>
                         </div>
                         
-                        <div class="market-context">
-                            <div class="context-item">
-                                <div class="context-label">ATH</div>
-                                <div class="context-value ath">${signal.ath || 'N/A'}</div>
+                        <div class="position-details">
+                            <div class="pos-item">
+                                <div class="pos-label">Position Size</div>
+                                <div class="pos-value">${signal.suggestedPositionSize || 'N/A'}</div>
                             </div>
-                            <div class="context-item">
-                                <div class="context-label">ATL</div>
-                                <div class="context-value atl">${signal.atl || 'N/A'}</div>
+                            <div class="pos-item">
+                                <div class="pos-label">Confidence Tier</div>
+                                <div class="pos-value confidence-${signal.confidenceTier?.toLowerCase()}">${signal.confidenceTier || 'N/A'}</div>
                             </div>
-                            <div class="context-item">
-                                <div class="context-label">Amplitude</div>
-                                <div class="context-value amplitude">${signal.amplitude ? signal.amplitude + ' USDT' : 'N/A'}</div>
+                            <div class="pos-item">
+                                <div class="pos-label">Pattern Strength</div>
+                                <div class="pos-value">${signal.patternStrength || 'N/A'}</div>
+                            </div>
+                            <div class="pos-item">
+                                <div class="pos-label">Key Levels</div>
+                                <div class="pos-value">${signal.keyLevelProximity || 'N/A'}</div>
                             </div>
                         </div>
                         
@@ -958,6 +994,11 @@
                                 <div class="target-label">Entry: ${signal.entryRange || 'N/A'}</div>
                                 <div class="target-value">Target: ${signal.target || 'N/A'}</div>
                             </div>
+                        </div>
+                        
+                        <div class="reasoning-section">
+                            <div class="reasoning-label">Analysis Reasoning</div>
+                            <div class="reasoning-text">${signal.reasoning}</div>
                         </div>
                     </div>
                 `;
