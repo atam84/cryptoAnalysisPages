@@ -354,20 +354,28 @@ class ConsoleTradingDashboard {
                         
                         // Load timeframe-specific data
                         const timeframeSignals = await this.loadTimeframeData(pair);
+                        console.log(`🔍 Timeframe signals for ${pair.symbol}:`, timeframeSignals);
+                        
                         if (timeframeSignals && timeframeSignals.length > 0) {
                             // Create a comprehensive signal card from all timeframe data
+                            console.log(`🔄 Creating comprehensive signal for ${pair.symbol} from ${timeframeSignals.length} timeframes`);
                             const comprehensiveSignal = this.createComprehensiveSignalFromTimeframes(pair.symbol, timeframeSignals);
+                            console.log(`🔍 Comprehensive signal created:`, comprehensiveSignal);
+                            
                             if (comprehensiveSignal) {
                                 allSignals.push(comprehensiveSignal);
                                 loadedPairs.add(pair.symbol);
                                 console.log(`✅ Created comprehensive signal card for ${pair.symbol} from ${timeframeSignals.length} timeframes`);
                             } else {
                                 // Fallback to first timeframe if comprehensive creation fails
+                                console.log(`⚠️ Comprehensive signal creation failed, falling back to first timeframe`);
                                 const firstSignal = timeframeSignals[0];
                                 allSignals.push(firstSignal);
                                 loadedPairs.add(pair.symbol);
                                 console.log(`✅ Created timeframe signal card for ${pair.symbol}`);
                             }
+                        } else {
+                            console.log(`⚠️ No timeframe data available for ${pair.symbol}`);
                         }
                     }
                 } catch (error) {
@@ -1476,6 +1484,9 @@ class ConsoleTradingDashboard {
     }
 
     createComprehensiveSignalFromTimeframes(pairSymbol, timeframeSignals) {
+        console.log(`🔧 createComprehensiveSignalFromTimeframes called for ${pairSymbol} with ${timeframeSignals.length} signals`);
+        console.log(`🔍 First signal data:`, timeframeSignals[0]);
+        
         if (!pairSymbol || !timeframeSignals || timeframeSignals.length === 0) {
             console.warn('⚠️ Cannot create comprehensive signal from empty timeframe signals.');
             return null;
@@ -1484,10 +1495,12 @@ class ConsoleTradingDashboard {
         try {
             // For price-based data (like BTC-USDT), create a signal from price analysis
             if (timeframeSignals[0].dataType === 'price') {
+                console.log(`💰 Creating price-based signal for ${pairSymbol}`);
                 return this.createPriceBasedSignal(pairSymbol, timeframeSignals);
             }
             
             // For signal-based data, aggregate the information
+            console.log(`📊 Creating aggregated signal for ${pairSymbol}`);
             return this.createAggregatedSignal(pairSymbol, timeframeSignals);
         } catch (error) {
             console.error(`❌ Error creating comprehensive signal for ${pairSymbol}:`, error);
