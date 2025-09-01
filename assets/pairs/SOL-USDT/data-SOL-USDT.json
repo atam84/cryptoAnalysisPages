@@ -1,0 +1,57 @@
+{
+  "signal": {
+    "symbol": "SOL-USDT",
+    "timestamp": 1756719743.781,
+    "analysis_time": "2025-09-01T10:42:23.781+01:00",
+    
+    "classification": {
+      "type": "NO_SIGNAL",
+      "confidence": "LOW",
+      "confluence_score": "7/10",
+      "expected_win_rate": "65%",
+      "frequency_tier": "MEDIUM"
+    },
+    
+    "recommendation": {
+      "action": "WAIT",
+      "timeframe": "SWING",
+      "entry_range": [
+        null,
+        null
+      ],
+      "stop_loss": null,
+      "take_profit": [],
+      "risk_reward_ratio": null,
+      "max_drawdown": null
+    },
+    
+    "position_sizing": {
+      "confidence_tier": "LOW",
+      "base_position_percent": 0.5,
+      "max_portfolio_risk": 1,
+      "volatility_adjustment": "NORMAL",
+      "suggested_position_size": "0.5%"
+    },
+    
+    "technical_analysis": {
+      "primary_timeframe": "1h",
+      "timeframes_aligned": 2,
+      "trend_direction": "BEARISH",
+      "volume_confirmation": "STRONG",
+      "key_level_proximity": "NEAR",
+      "pattern_strength": "WEAK"
+    },
+    
+    "risk_management": {
+      "stop_loss_type": "TECHNICAL",
+      "reward_targets": [],
+      "exit_strategy": "N/A",
+      "risk_factors": [
+        "Market volatility",
+        "Economic news impact"
+      ]
+    },
+    
+    "reasoning": "Based on recent win rate of 65% and current losing streak of 0, this signal does not meet the qualifications for a moderate or high-quality entry. The current streak is favorable, and the confluence score of 7/10 suggests potential but is insufficient to warrant an immediate trading action."
+  }
+}
