@@ -12,6 +12,7 @@ class ConsoleTradingDashboard {
             action: 'all'
         };
         this.isLoading = false;
+        this.currentTheme = 'dark'; // Default theme
         
         this.init();
     }
@@ -84,6 +85,9 @@ class ConsoleTradingDashboard {
     setupEventListeners() {
         // Populate pair filter options
         this.populatePairFilter();
+        
+        // Setup theme switcher
+        this.setupThemeSwitcher();
         
         // Setup filter event listeners
         document.getElementById('pairFilter').addEventListener('change', (e) => {
@@ -176,6 +180,65 @@ class ConsoleTradingDashboard {
                 this.hideDonationModal();
             }
         });
+    }
+
+    setupThemeSwitcher() {
+        const themeSwitcher = document.getElementById('themeSwitcher');
+        if (!themeSwitcher) return;
+
+        // Initialize theme from localStorage, system preference, or default to dark
+        const savedTheme = localStorage.getItem('theme');
+        const systemTheme = this.getSystemTheme();
+        const currentTheme = savedTheme || systemTheme || 'dark';
+        
+        this.setTheme(currentTheme);
+
+        // Add click event listener
+        themeSwitcher.addEventListener('click', () => {
+            const newTheme = this.currentTheme === 'dark' ? 'light' : 'dark';
+            this.setTheme(newTheme);
+        });
+        
+        // Listen for system theme changes
+        if (window.matchMedia) {
+            const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+            mediaQuery.addEventListener('change', (e) => {
+                if (!localStorage.getItem('theme')) { // Only auto-switch if user hasn't set a preference
+                    const newTheme = e.matches ? 'dark' : 'light';
+                    this.setTheme(newTheme);
+                }
+            });
+        }
+    }
+
+    getSystemTheme() {
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            return 'dark';
+        }
+        return 'light';
+    }
+
+    setTheme(theme) {
+        this.currentTheme = theme;
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+        
+        // Update theme switcher display
+        const themeSwitcher = document.getElementById('themeSwitcher');
+        if (themeSwitcher) {
+            const themeIcon = themeSwitcher.querySelector('.theme-icon');
+            const themeText = themeSwitcher.querySelector('.theme-text');
+            
+            if (theme === 'light') {
+                themeIcon.textContent = '☀️';
+                themeText.textContent = 'Light Mode';
+            } else {
+                themeIcon.textContent = '🌙';
+                themeText.textContent = 'Dark Mode';
+            }
+        }
+        
+        console.log(`🎨 Theme switched to: ${theme}`);
     }
 
     async loadData() {
@@ -836,754 +899,4 @@ class ConsoleTradingDashboard {
             }
             
             // Update modal title
-            modalTitle.textContent = `📊 ${pair} - Trading Details`;
-            
-            // Populate timeframes tab
-            if (timeframesTab) {
-                console.log(`🔍 Opening modal for ${pair}, populating timeframes tab...`);
-                timeframesTab.innerHTML = '<div class="loading">Loading timeframe data...</div>';
-                
-                // Load and display actual timeframe data files
-                this.loadTimeframeDataForModal(pair, timeframesTab);
-            }
-            
-            // Populate graphs tab
-            if (graphsTab) {
-                let graphsHTML = '<div class="graphs-data">';
-                graphsHTML += '<h4>📊 Chart Analysis</h4>';
-                
-                // Try to load chart images
-                const chartTimeframes = ['1h', '8h', '1d'];
-                chartTimeframes.forEach(tf => {
-                    const chartUrl = `./assets/pairs/${pair}/graph-${pair}-${tf}.png`;
-                    graphsHTML += `
-                        <div class="chart-item">
-                            <h5>${tf} Chart</h5>
-                            <div class="chart-container">
-                                <img src="${chartUrl}" alt="${pair} ${tf} chart" 
-                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
-                                     class="chart-image">
-                                <div class="chart-placeholder" style="display: none;">
-                                    <p>📊 Chart not available for ${tf} timeframe</p>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                });
-                
-                graphsHTML += '</div>';
-                graphsTab.innerHTML = graphsHTML;
-            }
-            
-            // Populate analysis tab
-            if (analysisTab) {
-                let analysisHTML = '<div class="analysis-data">';
-                analysisHTML += '<h4>🧠 Detailed Analysis</h4>';
-                
-                if (signals && signals.length > 0) {
-                    const signal = signals[0]; // Use first signal for analysis
-                    analysisHTML += `
-                        <div class="analysis-content">
-                            <div class="analysis-section">
-                                <h5>📊 Classification</h5>
-                                <p><strong>Type:</strong> ${signal.classification?.type || 'N/A'}</p>
-                                <p><strong>Confidence:</strong> ${signal.classification?.confidence || 'N/A'}</p>
-                                <p><strong>Confluence Score:</strong> ${signal.classification?.confluence_score || 'N/A'}/10</p>
-                                <p><strong>Win Rate:</strong> ${signal.classification?.win_rate || 'N/A'}%</p>
-                            </div>
-                            
-                            <div class="analysis-section">
-                                <h5>🎯 Recommendation</h5>
-                                <p><strong>Action:</strong> ${signal.recommendation?.action || 'N/A'}</p>
-                                <p><strong>Entry Range:</strong> ${signal.recommendation?.entry_range || 'N/A'}</p>
-                                <p><strong>Targets:</strong> ${signal.recommendation?.targets || 'N/A'}</p>
-                                <p><strong>Stop Loss:</strong> ${signal.recommendation?.stop_loss || 'N/A'}</p>
-                            </div>
-                            
-                            <div class="analysis-section">
-                                <h5>🧠 Reasoning</h5>
-                                <p>${signal.reasoning || 'No reasoning provided'}</p>
-                            </div>
-                        </div>
-                    `;
-                } else {
-                    analysisHTML += '<p>No analysis data available</p>';
-                }
-                
-                analysisHTML += '</div>';
-                analysisTab.innerHTML = analysisHTML;
-            }
-            
-            // Show modal
-            modal.style.display = 'block';
-            
-            // Switch to timeframes tab by default
-            this.switchDetailsTab('timeframes');
-            
-        } catch (error) {
-            console.error('❌ Error opening details modal:', error);
-        }
-    }
-
-    openDetailsModalWithGraphs(pair, signals) {
-        // Open the same modal but switch to graphs tab
-        this.openDetailsModal(pair, signals);
-        
-        // Switch to graphs tab after a short delay to ensure modal is loaded
-        setTimeout(() => {
-            this.switchDetailsTab('graphs');
-        }, 100);
-    }
-
-    hideDetailsModal() {
-        const modal = document.getElementById('detailsModal');
-        if (modal) {
-            modal.style.display = 'none';
-        }
-    }
-
-    async loadTimeframeDataForModal(pair, timeframesTab) {
-        try {
-            console.log(`🔍 Loading timeframe data for ${pair}...`);
-            const timeframes = ['1h', '8h', '1d'];
-            let timeframesHTML = '<div class="timeframe-data">';
-            timeframesHTML += '<h4>⏰ Timeframe Analysis</h4>';
-            
-            // Try to load main data first
-            const mainDataUrl = `./assets/pairs/${pair}/data-${pair}.json`;
-            console.log(`📊 Attempting to load main data: ${mainDataUrl}`);
-            const mainResponse = await fetch(mainDataUrl + '?v=' + Date.now());
-            
-            if (mainResponse.ok) {
-                const mainData = await mainResponse.json();
-                console.log(`✅ Main data loaded for ${pair}:`, mainData);
-                timeframesHTML += `
-                    <div class="timeframe-item" data-timeframe="main">
-                        <div class="timeframe-header" data-action="toggle">
-                            <h5>📊 Main Data</h5>
-                            <button class="timeframe-toggle" title="Toggle section">▼</button>
-                        </div>
-                        <div class="timeframe-content">
-                            <div class="timeframe-metrics">
-                                ${this.createTimeframeMetrics(mainData)}
-                            </div>
-                        </div>
-                    </div>
-                `;
-            } else {
-                console.log(`⚠️ Main data not available for ${pair}`);
-            }
-            
-            // Load timeframe-specific data
-            for (const timeframe of timeframes) {
-                try {
-                    const url = `./assets/pairs/${pair}/data-${pair}-${timeframe}.json`;
-                    console.log(`⏰ Loading ${timeframe} data: ${url}`);
-                    const response = await fetch(url + '?v=' + Date.now());
-                    
-                    if (response.ok) {
-                        const data = await response.json();
-                        console.log(`✅ ${timeframe} data loaded for ${pair}:`, data);
-                        timeframesHTML += `
-                            <div class="timeframe-item" data-timeframe="${timeframe}">
-                                <div class="timeframe-header" data-action="toggle">
-                                    <h5>⏰ ${timeframe} Timeframe</h5>
-                                    <button class="timeframe-toggle" title="Toggle section">▼</button>
-                                </div>
-                                <div class="timeframe-content">
-                                    <div class="timeframe-metrics">
-                                        ${this.createTimeframeMetrics(data, timeframe)}
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                    } else {
-                        console.log(`⚠️ ${timeframe} data not available for ${pair}`);
-                        timeframesHTML += `
-                            <div class="timeframe-item unavailable" data-timeframe="${timeframe}">
-                                <div class="timeframe-header" data-action="toggle">
-                                    <h5>⏰ ${timeframe} Timeframe</h5>
-                                    <button class="timeframe-toggle" title="Toggle section">▼</button>
-                                </div>
-                                <div class="timeframe-content">
-                                    <div class="timeframe-status">
-                                        <span class="status warning">⚠️ Data not available</span>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                    }
-                } catch (error) {
-                    console.log(`❌ Error loading ${timeframe} data for ${pair}:`, error);
-                    timeframesHTML += `
-                        <div class="timeframe-item unavailable" data-timeframe="${timeframe}">
-                            <div class="timeframe-header" data-action="toggle">
-                                <h5>⏰ ${timeframe} Timeframe</h5>
-                                <button class="timeframe-toggle" title="Toggle section">▼</button>
-                            </div>
-                            <div class="timeframe-content">
-                                <div class="timeframe-status">
-                                    <span class="status warning">⚠️ Error loading data</span>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }
-            }
-            
-            timeframesHTML += '</div>';
-            timeframesTab.innerHTML = timeframesHTML;
-            
-            // Add event listeners for collapsible functionality
-            this.setupTimeframeEventListeners(timeframesTab);
-            
-            console.log(`✅ Timeframe modal populated for ${pair} with collapsible sections`);
-            
-        } catch (error) {
-            console.error('❌ Error loading timeframe data for modal:', error);
-            timeframesTab.innerHTML = '<div class="error">Error loading timeframe data. Please try again.</div>';
-        }
-    }
-
-    setupTimeframeEventListeners(timeframesTab) {
-        // Use event delegation for both click and touch events
-        const events = ['click', 'touchstart'];
-        
-        events.forEach(eventType => {
-            timeframesTab.addEventListener(eventType, (event) => {
-                // Prevent default behavior for touch events to avoid double-triggering
-                if (eventType === 'touchstart') {
-                    event.preventDefault();
-                }
-                
-                const header = event.target.closest('.timeframe-header');
-                if (header && header.dataset.action === 'toggle') {
-                    this.toggleTimeframeSection(header);
-                }
-            }, { passive: false });
-        });
-        
-        // Add specific mobile touch handling
-        timeframesTab.addEventListener('touchend', (event) => {
-            const header = event.target.closest('.timeframe-header');
-            if (header && header.dataset.action === 'toggle') {
-                // Add visual feedback for mobile
-                header.style.backgroundColor = 'var(--bg-secondary)';
-                setTimeout(() => {
-                    header.style.backgroundColor = '';
-                }, 150);
-            }
-        });
-    }
-
-    toggleTimeframeSection(headerElement) {
-        const content = headerElement.parentElement.querySelector('.timeframe-content');
-        const toggle = headerElement.querySelector('.timeframe-toggle');
-        
-        if (content && toggle) {
-            content.classList.toggle('collapsed');
-            toggle.classList.toggle('collapsed');
-            
-            // Update toggle button text
-            if (content.classList.contains('collapsed')) {
-                toggle.textContent = '▶';
-                toggle.title = 'Expand section';
-            } else {
-                toggle.textContent = '▼';
-                toggle.title = 'Collapse section';
-            }
-        }
-    }
-
-    createTimeframeMetrics(data, timeframe = null) {
-        try {
-            console.log(`🔍 Creating metrics for ${timeframe || 'main'} data:`, data);
-            
-            // Check if this is signal data or simple timeframe data
-            const isSignalData = data.signal || (data.classification && data.recommendation);
-            const isTimeframeData = data.support && data.resistance && data.highest && data.Lowest;
-            
-            if (isSignalData) {
-                // Handle signal data structure
-                const signalData = data.signal || data;
-                if (!signalData) {
-                    console.log(`⚠️ No signal data found in ${timeframe || 'main'} data`);
-                    return '<p>No signal data available</p>';
-                }
-                
-                let metricsHTML = '';
-                
-                // Classification metrics
-                if (signalData.classification) {
-                    metricsHTML += `
-                        <div class="metric-section">
-                            <h6>📊 Classification</h6>
-                            <div class="metric-row">
-                                <span class="metric-label">Type:</span>
-                                <span class="metric-value">${signalData.classification.type || 'N/A'}</span>
-                            </div>
-                            <div class="metric-row">
-                                <span class="metric-label">Confidence:</span>
-                                <span class="metric-value">${signalData.classification.confidence || 'N/A'}</span>
-                            </div>
-                            <div class="metric-row">
-                                <span class="metric-label">Confluence Score:</span>
-                                <span class="metric-value">${signalData.classification.confluence_score || 'N/A'}</span>
-                            </div>
-                            <div class="metric-row">
-                                <span class="metric-label">Win Rate:</span>
-                                <span class="metric-value">${signalData.classification.expected_win_rate || signalData.classification.win_rate || 'N/A'}</span>
-                            </div>
-                        </div>
-                    `;
-                }
-                
-                // Recommendation metrics
-                if (signalData.recommendation) {
-                    metricsHTML += `
-                        <div class="metric-section">
-                            <h6>🎯 Recommendation</h6>
-                            <div class="metric-row">
-                                <span class="metric-label">Action:</span>
-                                <span class="metric-value ${signalData.recommendation.action ? signalData.recommendation.action.toLowerCase() : ''}">${signalData.recommendation.action || 'N/A'}</span>
-                            </div>
-                            <div class="metric-row">
-                                <span class="metric-label">Entry Range:</span>
-                                <span class="metric-value">${this.formatEntryRange(signalData.recommendation.entry_range)}</span>
-                            </div>
-                            <div class="metric-row">
-                                <span class="metric-label">Stop Loss:</span>
-                                <span class="metric-value">${this.formatStopLoss(signalData.recommendation.stop_loss)}</span>
-                            </div>
-                            <div class="metric-row">
-                                <span class="metric-label">Take Profit:</span>
-                                <span class="metric-value">${this.formatTakeProfit(signalData.recommendation.take_profit)}</span>
-                            </div>
-                            <div class="metric-row">
-                                <span class="metric-label">Risk/Reward:</span>
-                                <span class="metric-value">${signalData.recommendation.risk_reward_ratio || 'N/A'}</span>
-                            </div>
-                        </div>
-                    `;
-                }
-                
-                // Technical analysis metrics
-                if (signalData.technical_analysis) {
-                    metricsHTML += `
-                        <div class="metric-section">
-                            <h6>🔧 Technical Analysis</h6>
-                            <div class="metric-row">
-                                <span class="metric-label">Primary TF:</span>
-                                <span class="metric-value">${signalData.technical_analysis.primary_timeframe || 'N/A'}</span>
-                            </div>
-                            <div class="metric-row">
-                                <span class="metric-label">Trend:</span>
-                                <span class="metric-value">${signalData.technical_analysis.trend_direction || 'N/A'}</span>
-                            </div>
-                            <div class="metric-row">
-                                <span class="metric-label">Volume:</span>
-                                <span class="metric-value">${signalData.technical_analysis.volume_confirmation || 'N/A'}</span>
-                            </div>
-                            <div class="metric-row">
-                                <span class="metric-label">Pattern Strength:</span>
-                                <span class="metric-value">${signalData.technical_analysis.pattern_strength || 'N/A'}</span>
-                            </div>
-                        </div>
-                    `;
-                }
-                
-                // Add position sizing if available
-                if (signalData.position_sizing) {
-                    metricsHTML += `
-                        <div class="metric-section">
-                            <h6>💰 Position Sizing</h6>
-                            <div class="metric-row">
-                                <span class="metric-label">Confidence Tier:</span>
-                                <span class="metric-value">${signalData.position_sizing.confidence_tier || 'N/A'}</span>
-                            </div>
-                            <div class="metric-row">
-                                <span class="metric-label">Position Size:</span>
-                                <span class="metric-value">${signalData.position_sizing.suggested_position_size || 'N/A'}</span>
-                            </div>
-                            <div class="metric-row">
-                                <span class="metric-label">Portfolio Risk:</span>
-                                <span class="metric-value">${signalData.position_sizing.max_portfolio_risk || 'N/A'}</span>
-                            </div>
-                        </div>
-                    `;
-                }
-                
-                // Add risk management if available
-                if (signalData.risk_management) {
-                    metricsHTML += `
-                        <div class="metric-section">
-                            <h6>⚠️ Risk Management</h6>
-                            <div class="metric-row">
-                                <span class="metric-label">Stop Loss Type:</span>
-                                <span class="metric-value">${signalData.risk_management.stop_loss_type || 'N/A'}</span>
-                            </div>
-                            <div class="metric-row">
-                                <span class="metric-label">Exit Strategy:</span>
-                                <span class="metric-value">${signalData.risk_management.exit_strategy || 'N/A'}</span>
-                            </div>
-                        </div>
-                    `;
-                }
-                
-                // Add reasoning if available
-                if (signalData.reasoning) {
-                    metricsHTML += `
-                        <div class="metric-section">
-                            <h6>🧠 Analysis & Reasoning</h6>
-                            <div class="metric-content">
-                                <p>${signalData.reasoning}</p>
-                            </div>
-                        </div>
-                    `;
-                }
-                
-                return metricsHTML;
-                
-            } else if (isTimeframeData) {
-                // Handle simple timeframe data structure (support, resistance, etc.)
-                let metricsHTML = '';
-                
-                metricsHTML += `
-                    <div class="metric-section">
-                        <h6>📊 Price Levels</h6>
-                        <div class="metric-row">
-                            <span class="metric-label">Support:</span>
-                            <span class="metric-value">${data.support || 'N/A'}</span>
-                        </div>
-                        <div class="metric-row">
-                            <span class="metric-label">Resistance:</span>
-                            <span class="metric-value">${data.resistance || 'N/A'}</span>
-                        </div>
-                        <div class="metric-row">
-                            <span class="metric-label">Highest:</span>
-                            <span class="metric-value">${data.highest || 'N/A'}</span>
-                        </div>
-                        <div class="metric-row">
-                            <span class="metric-label">Lowest:</span>
-                            <span class="metric-value">${data.Lowest || 'N/A'}</span>
-                        </div>
-                        <div class="metric-row">
-                            <span class="metric-label">Amplitude:</span>
-                            <span class="metric-value">${data.Amplitude_HL || 'N/A'}</span>
-                        </div>
-                        <div class="metric-row">
-                            <span class="metric-label">Candles:</span>
-                            <span class="metric-value">${data.Candles || 'N/A'}</span>
-                        </div>
-                    </div>
-                `;
-                
-                // Add variations if available
-                if (data.Variations) {
-                    metricsHTML += `
-                        <div class="metric-section">
-                            <h6>📈 Variations</h6>
-                            <div class="metric-row">
-                                <span class="metric-label">Open-Close:</span>
-                                <span class="metric-value">${data.Variations.Open_Close || 'N/A'}</span>
-                            </div>
-                            <div class="metric-row">
-                                <span class="metric-label">Open-Close %:</span>
-                                <span class="metric-value">${data.Variations.Open_Close_pct || 'N/A'}</span>
-                            </div>
-                            <div class="metric-row">
-                                <span class="metric-label">From High:</span>
-                                <span class="metric-value">${data.Variations.From_High || 'N/A'}</span>
-                            </div>
-                            <div class="metric-row">
-                                <span class="metric-label">From Low:</span>
-                                <span class="metric-value">${data.Variations.From_Low || 'N/A'}</span>
-                            </div>
-                        </div>
-                    `;
-                }
-                
-                return metricsHTML;
-                
-            } else {
-                // Unknown data structure
-                console.log(`⚠️ Unknown data structure for ${timeframe || 'main'} data:`, data);
-                return '<p>Data structure not recognized</p>';
-            }
-            
-        } catch (error) {
-            console.error('❌ Error creating timeframe metrics:', error);
-            return '<p>Error processing data</p>';
-        }
-    }
-
-    formatEntryRange(entryRange) {
-        if (!entryRange) return 'N/A';
-        if (Array.isArray(entryRange)) {
-            return `${entryRange[0]} - ${entryRange[1]}`;
-        } else if (typeof entryRange === 'object') {
-            return `${entryRange.min || 'N/A'} - ${entryRange.max || 'N/A'}`;
-        }
-        return entryRange;
-    }
-
-    formatStopLoss(stopLoss) {
-        if (!stopLoss) return 'N/A';
-        if (typeof stopLoss === 'object') {
-            return stopLoss.price || stopLoss.percentage || 'N/A';
-        }
-        return stopLoss;
-    }
-
-    formatTakeProfit(takeProfit) {
-        if (!takeProfit) return 'N/A';
-        if (Array.isArray(takeProfit)) {
-            return takeProfit.join(' - ');
-        }
-        return takeProfit;
-    }
-
-    switchDetailsTab(tabName) {
-        try {
-            // Hide all tab contents
-            const tabContents = document.querySelectorAll('.tab-content');
-            tabContents.forEach(content => {
-                content.style.display = 'none';
-            });
-            
-            // Remove active class from all tab buttons
-            const tabButtons = document.querySelectorAll('.detail-tab-btn');
-            tabButtons.forEach(btn => {
-                btn.classList.remove('active');
-            });
-            
-            // Show selected tab content
-            const selectedTab = document.getElementById(tabName + 'Tab');
-            if (selectedTab) {
-                selectedTab.style.display = 'block';
-            }
-            
-            // Add active class to selected tab button
-            const selectedButton = document.querySelector(`[data-tab="${tabName}"]`);
-            if (selectedButton) {
-                selectedButton.classList.add('active');
-            }
-            
-        } catch (error) {
-            console.error('❌ Error switching tabs:', error);
-        }
-    }
-
-    // ===== DONATION SYSTEM METHODS =====
-
-    showDonationModal() {
-        console.log('🔄 showDonationModal called');
-        try {
-            const modal = document.getElementById('donationModal');
-            if (!modal) {
-                console.error('❌ Donation modal not found!');
-                return;
-            }
-            console.log('✅ Modal found, populating...');
-            this.populateDonationModal();
-            modal.style.display = 'block';
-            console.log('✅ Modal displayed');
-        } catch (error) {
-            console.error('❌ Error showing donation modal:', error);
-        }
-    }
-
-    hideDonationModal() {
-        document.getElementById('donationModal').style.display = 'none';
-    }
-
-    populateDonationModal() {
-        console.log('🔄 populateDonationModal called');
-        try {
-            if (typeof DONATION_CONFIG === 'undefined') {
-                console.error('❌ DONATION_CONFIG not loaded!');
-                return;
-            }
-            console.log('✅ DONATION_CONFIG loaded:', DONATION_CONFIG);
-            this.populateFiatMethods();
-            this.populateCryptoOptions();
-            this.setupDonationTabs();
-        } catch (error) {
-            console.error('❌ Error populating donation modal:', error);
-        }
-    }
-
-    populateFiatMethods() {
-        const fiatMethods = document.getElementById('fiatMethods');
-        if (!fiatMethods) return;
-
-        const currency = document.getElementById('fiatCurrency').value;
-        const methods = DONATION_CONFIG.fiat[currency];
-        
-        fiatMethods.innerHTML = Object.entries(methods).map(([key, method]) => `
-            <a href="${method.url}" target="_blank" class="donation-method">
-                <div class="donation-method-icon">${method.icon}</div>
-                <div class="donation-method-info">
-                    <h4>${method.name}</h4>
-                    <p>${method.description}</p>
-                </div>
-            </a>
-        `).join('');
-    }
-
-    populateCryptoOptions() {
-        const cryptoGrid = document.getElementById('cryptoGrid');
-        if (!cryptoGrid) return;
-
-        cryptoGrid.innerHTML = Object.entries(DONATION_CONFIG.crypto).map(([key, crypto]) => `
-            <div class="crypto-option">
-                <div class="crypto-icon">${crypto.icon}</div>
-                <div class="crypto-name">${crypto.name}</div>
-                <div class="crypto-description">${crypto.description}</div>
-                <div class="crypto-address">
-                    ${crypto.address}
-                    <div class="copy-success" id="copy-success-${key}">Copied!</div>
-                </div>
-                <div class="crypto-actions">
-                    <button class="crypto-btn copy-btn" onclick="dashboard.copyCryptoAddress('${key}')">
-                        📋 Copy Address
-                    </button>
-                    <button class="crypto-btn qr-btn" onclick="dashboard.showQRCode('${key}')">
-                        📱 QR Code
-                    </button>
-                </div>
-            </div>
-        `).join('');
-    }
-
-    setupDonationTabs() {
-        const tabButtons = document.querySelectorAll('.donation-tab-btn');
-        const tabContents = document.querySelectorAll('#donationModal .tab-content');
-        
-        tabButtons.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const tabName = e.target.dataset.tab;
-                this.switchDonationTab(tabName);
-            });
-        });
-
-        // Setup currency selector change
-        const currencySelector = document.getElementById('fiatCurrency');
-        if (currencySelector) {
-            currencySelector.addEventListener('change', () => {
-                this.populateFiatMethods();
-            });
-        }
-    }
-
-    switchDonationTab(tabName) {
-        try {
-            // Hide all tab contents
-            const tabContents = document.querySelectorAll('#donationModal .tab-content');
-            tabContents.forEach(content => {
-                content.style.display = 'none';
-            });
-            
-            // Remove active class from all tab buttons
-            const tabButtons = document.querySelectorAll('.donation-tab-btn');
-            tabButtons.forEach(btn => {
-                btn.classList.remove('active');
-            });
-            
-            // Show selected tab content
-            const selectedTab = document.getElementById(tabName + 'Tab');
-            if (selectedTab) {
-                selectedTab.style.display = 'block';
-            }
-            
-            // Add active class to selected tab button
-            const selectedButton = document.querySelector(`[data-tab="${tabName}"]`);
-            if (selectedButton) {
-                selectedButton.classList.add('active');
-            }
-            
-        } catch (error) {
-            console.error('❌ Error switching donation tabs:', error);
-        }
-    }
-
-    async copyCryptoAddress(cryptoKey) {
-        try {
-            const crypto = DONATION_CONFIG.crypto[cryptoKey];
-            if (!crypto) return;
-
-            await navigator.clipboard.writeText(crypto.address);
-            
-            // Show success message
-            const successElement = document.getElementById(`copy-success-${cryptoKey}`);
-            if (successElement) {
-                successElement.classList.add('show');
-                setTimeout(() => {
-                    successElement.classList.remove('show');
-                }, 2000);
-            }
-
-            console.log(`✅ Copied ${crypto.name} address to clipboard`);
-        } catch (error) {
-            console.error('❌ Error copying address:', error);
-            // Fallback for older browsers
-            this.fallbackCopyTextToClipboard(DONATION_CONFIG.crypto[cryptoKey].address);
-        }
-    }
-
-    fallbackCopyTextToClipboard(text) {
-        const textArea = document.createElement('textarea');
-        textArea.value = text;
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
-        
-        try {
-            document.execCommand('copy');
-            console.log('✅ Address copied using fallback method');
-        } catch (err) {
-            console.error('❌ Fallback copy failed:', err);
-        }
-        
-        document.body.removeChild(textArea);
-    }
-
-    showQRCode(cryptoKey) {
-        const crypto = DONATION_CONFIG.crypto[cryptoKey];
-        if (!crypto) return;
-
-        // Create QR code modal
-        const qrModal = document.createElement('div');
-        qrModal.className = 'modal qr-modal';
-        qrModal.innerHTML = `
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>${crypto.name} QR Code</h3>
-                    <button class="modal-close" onclick="this.closest('.modal').remove()">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <div class="qr-code">
-                        <img src="${crypto.qrCode}" alt="${crypto.name} QR Code" />
-                    </div>
-                    <p><strong>Address:</strong> ${crypto.address}</p>
-                    <p><strong>Network:</strong> ${crypto.network}</p>
-                </div>
-            </div>
-        `;
-
-        document.body.appendChild(qrModal);
-        qrModal.style.display = 'block';
-
-        // Close modal when clicking outside
-        qrModal.addEventListener('click', (e) => {
-            if (e.target === qrModal) {
-                qrModal.remove();
-            }
-        });
-    }
-}
-
-// Initialize dashboard when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    window.dashboard = new ConsoleTradingDashboard();
-});
+            modalTitle.textContent = `
