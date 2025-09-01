@@ -1078,6 +1078,31 @@
             margin-top: 4px;
         }
 
+        .pair-card .action-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .pair-card .details-btn,
+        .pair-card .charts-btn {
+            background: var(--info);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.8rem;
+        }
+
+        .pair-card .details-btn:hover,
+        .pair-card .charts-btn:hover {
+            background: #138496;
+            transform: translateY(-1px);
+        }
+
         /* Data Status Modal Styling */
         .pair-status {
             margin-bottom: 16px;
@@ -1115,21 +1140,32 @@
 
         /* New styles for comprehensive signal card */
         .comprehensive-signal-card {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            padding: 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+        }
+
+        .comprehensive-signal-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary);
         }
 
         .comprehensive-signal-card .card-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
         }
 
         .comprehensive-signal-card .pair-info h3 {
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             font-weight: 700;
             margin-bottom: 8px;
             color: var(--text-primary);
@@ -1137,135 +1173,154 @@
 
         .comprehensive-signal-card .signal-meta {
             display: flex;
-            gap: 10px;
-            align-items: center;
+            flex-direction: column;
+            gap: 8px;
+            align-items: flex-end;
         }
 
         .comprehensive-signal-card .signal-type {
             background: var(--bg-secondary);
             color: var(--text-primary);
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 0.8rem;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 0.75rem;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.3px;
+            letter-spacing: 0.5px;
         }
 
         .comprehensive-signal-card .signal-type.no-signal {
-            background: var(--bg-card);
+            background: rgba(107, 114, 128, 0.2);
             color: var(--text-muted);
         }
 
         .comprehensive-signal-card .confidence-level {
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 0.8rem;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 0.75rem;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.3px;
+            letter-spacing: 0.5px;
         }
 
         .comprehensive-signal-card .confidence-level.low {
-            background: rgba(220, 53, 69, 0.2);
+            background: rgba(239, 68, 68, 0.2);
             color: var(--danger);
         }
 
         .comprehensive-signal-card .confidence-level.medium {
-            background: rgba(255, 193, 7, 0.2);
+            background: rgba(251, 191, 36, 0.2);
             color: var(--warning);
         }
 
         .comprehensive-signal-card .confidence-level.high {
-            background: rgba(40, 167, 69, 0.2);
+            background: rgba(34, 197, 94, 0.2);
             color: var(--success);
         }
 
         .comprehensive-signal-card .key-metrics-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
+            gap: 16px;
+            margin-bottom: 20px;
         }
 
         .comprehensive-signal-card .metric-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 0.9rem;
+            background: var(--bg-secondary);
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
         }
 
         .comprehensive-signal-card .metric-label {
             color: var(--text-muted);
             font-weight: 500;
+            font-size: 0.85rem;
         }
 
         .comprehensive-signal-card .metric-value {
             color: var(--text-primary);
             font-weight: 600;
+            font-size: 0.9rem;
         }
 
         .comprehensive-signal-card .secondary-metrics {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
+            gap: 16px;
+            margin-bottom: 20px;
         }
 
         .comprehensive-signal-card .metric-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 0.9rem;
+            background: var(--bg-secondary);
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
         }
 
         .comprehensive-signal-card .technical-summary {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 20px;
         }
 
         .comprehensive-signal-card .tech-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 0.9rem;
+            background: var(--bg-secondary);
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
         }
 
         .comprehensive-signal-card .tech-label {
             color: var(--text-muted);
             font-weight: 500;
+            font-size: 0.85rem;
         }
 
         .comprehensive-signal-card .tech-value {
             color: var(--text-primary);
             font-weight: 600;
+            font-size: 0.9rem;
         }
 
         .comprehensive-signal-card .analysis-section {
-            margin-top: 16px;
-            padding-top: 16px;
+            margin-top: 20px;
+            padding-top: 20px;
             border-top: 1px solid var(--border);
         }
 
         .comprehensive-signal-card .analysis-section h4 {
             font-size: 1rem;
             font-weight: 600;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
             color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
         .comprehensive-signal-card .analysis-text {
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             color: var(--text-secondary);
-            line-height: 1.5;
+            line-height: 1.6;
+            background: var(--bg-secondary);
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
         }
 
         .comprehensive-signal-card .action-buttons {
             display: flex;
-            gap: 10px;
+            gap: 12px;
             justify-content: center;
         }
 
@@ -1274,8 +1329,8 @@
             background: var(--info);
             color: white;
             border: none;
-            border-radius: 8px;
-            padding: 10px 20px;
+            border-radius: 12px;
+            padding: 12px 24px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -1285,7 +1340,8 @@
         .comprehensive-signal-card .details-btn:hover,
         .comprehensive-signal-card .charts-btn:hover {
             background: #138496;
-            transform: translateY(-1px);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
         }
 
         /* Details Modal Styling */
@@ -2439,7 +2495,7 @@
                                 <button class="details-btn" onclick="dashboard.openDetailsModal('${pair}', ${JSON.stringify(timeframeSignals).replace(/"/g, '&quot;')})">
                                     📋 Details
                                 </button>
-                                <button class="charts-btn" onclick="dashboard.viewCharts('${pair}')">
+                                <button class="charts-btn" onclick="dashboard.openDetailsModalWithGraphs('${pair}', ${JSON.stringify(timeframeSignals).replace(/"/g, '&quot;')})">
                                     📊 Charts
                                 </button>
                             </div>
@@ -2499,9 +2555,14 @@
                                 ${timestamp}
                                 ${mainSignal ? '<span class="main-data-indicator">⭐ Main Data</span>' : ''}
                             </div>
-                            <button class="action-btn-compact" onclick="this.viewCharts('${pair}')">
-                                📊 Charts
-                            </button>
+                            <div class="action-buttons">
+                                <button class="details-btn" onclick="dashboard.openDetailsModal('${pair}', ${JSON.stringify(signals).replace(/"/g, '&quot;')})">
+                                    📋 Details
+                                </button>
+                                <button class="charts-btn" onclick="dashboard.openDetailsModalWithGraphs('${pair}', ${JSON.stringify(signals).replace(/"/g, '&quot;')})">
+                                    📊 Charts
+                                </button>
+                            </div>
                         </div>
                     </div>
                 `;
@@ -2737,6 +2798,21 @@
                 if (modal && title) {
                     title.textContent = `📋 ${pair} Trading Details`;
                     this.populateDetailsModal(pair, timeframeSignals);
+                    modal.style.display = 'block';
+                }
+            }
+
+            openDetailsModalWithGraphs(pair, timeframeSignals) {
+                const modal = document.getElementById('detailsModal');
+                const title = document.getElementById('detailsModalTitle');
+                
+                if (modal && title) {
+                    title.textContent = `📋 ${pair} Trading Details`;
+                    this.populateDetailsModal(pair, timeframeSignals);
+                    
+                    // Switch to graphs tab
+                    this.switchDetailsTab('graphs');
+                    
                     modal.style.display = 'block';
                 }
             }
