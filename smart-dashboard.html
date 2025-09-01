@@ -1106,6 +1106,12 @@
             color: var(--warning);
             font-size: 0.9rem;
         }
+
+        .main-info {
+            color: var(--info);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
     </style>
 </head>
 <body>
@@ -1408,8 +1414,8 @@
                     // Log overall loading summary
                     console.log('🎯 Overall loading summary:', pairStatus);
                     console.log('🎯 Final data array:', allData);
+                    console.log('🎯 Main data entries:', allData.filter(d => d.timeframe === 'main'));
                     
-                    console.log('🎯 Final data array:', allData);
                     this.data = allData;
                     this.filteredData = [...this.data];
                     
@@ -1566,18 +1572,59 @@
                     const signal = mainData.signal;
                     const classification = signal.classification || {};
                     const recommendation = signal.recommendation || {};
-                    const technical = signal.technical || {};
-                    const position = signal.position || {};
+                    const technical = signal.technical || signal.technical_analysis || {};
+                    const position = signal.position || signal.position_sizing || {};
+                    
+                    // Determine trend
+                    let trend = 'neutral';
+                    if (technical.trend_direction) {
+                        trend = technical.trend_direction.toLowerCase();
+                    }
+                    
+                    // Determine action
+                    let action = 'wait';
+                    if (recommendation.action) {
+                        const actionText = recommendation.action.toLowerCase();
+                        if (actionText === 'buy' || actionText === 'long') action = 'buy';
+                        else if (actionText === 'sell' || actionText === 'short') action = 'sell';
+                        else if (actionText === 'wait') action = 'wait';
+                    }
+                    
+                    // Extract entry range
+                    let entryRange = 'N/A';
+                    if (recommendation.entry_range && Array.isArray(recommendation.entry_range)) {
+                        const [min, max] = recommendation.entry_range;
+                        if (min !== null && max !== null) {
+                            entryRange = `${min} - ${max}`;
+                        } else if (min !== null) {
+                            entryRange = `${min}`;
+                        }
+                    }
+                    
+                    // Extract target
+                    let target = 'N/A';
+                    if (recommendation.take_profit && recommendation.take_profit.length > 0) {
+                        target = recommendation.take_profit[0];
+                    }
+                    
+                    // Extract stop loss
+                    const stopLoss = recommendation.stop_loss || 'N/A';
+                    
+                    // Extract win rate
+                    let winPercentage = null;
+                    if (classification.expected_win_rate) {
+                        winPercentage = parseFloat(classification.expected_win_rate.replace('%', ''));
+                    }
                     
                     const transformed = {
                         pair: pairConfig.symbol,
                         timeframe: 'main', // Special identifier for main data
-                        trend: this.mapTrend(recommendation.trend_direction || technical.trend_direction || 'neutral'),
-                        action: this.mapAction(recommendation.action || 'wait'),
-                        entryRange: recommendation.entry_range ? recommendation.entry_range.join(' - ') : 'N/A',
-                        target: recommendation.take_profit ? recommendation.take_profit[0] : 'N/A',
-                        stopLoss: recommendation.stop_loss || 'N/A',
-                        winPercentage: classification.expected_win_rate ? classification.expected_win_rate.replace('%', '') : null,
+                        trend,
+                        action,
+                        entryRange,
+                        target,
+                        stopLoss,
+                        winPercentage,
                         confidence: classification.confidence || 'N/A',
                         confluenceScore: classification.confluence_score || 'N/A',
                         technicalTimeframe: technical.primary_timeframe || 'N/A',
@@ -1585,7 +1632,7 @@
                         keyLevelProximity: technical.key_level_proximity || 'N/A',
                         patternStrength: technical.pattern_strength || 'N/A',
                         confidenceTier: position.confidence_tier || 'N/A',
-                        suggestedPositionSize: position.base_position_percent || 'N/A',
+                        suggestedPositionSize: position.base_position_percent || position.suggested_position_size || 'N/A',
                         reasoning: signal.reasoning || 'No reasoning provided',
                         timestamp: signal.timestamp || signal.analysis_time || Date.now() / 1000,
                         dataType: 'signal',
@@ -1710,6 +1757,7 @@
                             <br>
                             <span class="timeframes">Timeframes: ${availableTimeframes.length > 0 ? availableTimeframes.join(', ') : 'None'}</span>
                             ${missingTimeframes.length > 0 ? `<br><span class="missing">❌ Missing: ${missingTimeframes.join(', ')}</span>` : ''}
+                            ${mainData ? `<br><span class="main-info">📅 Main data timestamp: ${this.formatTimestamp(mainData.timestamp)}</span>` : ''}
                         </div>
                     `;
                 }
