@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Crypto Analysis Dashboard</title>
-    <meta name="description" content="Comprehensive crypto analysis dashboard with multi-timeframe data, technical indicators, and trading signals">
+    <meta name="description" content="Compact crypto analysis dashboard with real-time signals and technical analysis">
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,31 +13,26 @@
     
     <style>
         :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --secondary: #8b5cf6;
-            --success: #10b981;
-            --warning: #f59e0b;
+            --primary-bg: #0a0b0d;
+            --secondary-bg: #1a1d29;
+            --card-bg: #252a3a;
+            --accent-bg: #2d3748;
+            --border-color: #374151;
+            --text-primary: #e1e5e9;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+            --success: #22c55e;
+            --success-bg: rgba(34, 197, 94, 0.1);
             --danger: #ef4444;
+            --danger-bg: rgba(239, 68, 68, 0.1);
+            --warning: #fbbf24;
+            --warning-bg: rgba(251, 191, 36, 0.1);
             --info: #3b82f6;
-            
-            --bg-primary: #0f172a;
-            --bg-secondary: #1e293b;
-            --bg-tertiary: #334155;
-            --bg-card: #1e293b;
-            
-            --text-primary: #f8fafc;
-            --text-secondary: #cbd5e1;
-            --text-muted: #64748b;
-            
-            --border: #475569;
-            --border-light: #64748b;
-            
-            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-            
-            --radius: 8px;
-            --radius-lg: 12px;
+            --info-bg: rgba(59, 130, 246, 0.1);
+            --glass-bg: rgba(26, 29, 41, 0.95);
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-success: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+            --gradient-danger: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
         }
 
         * {
@@ -47,33 +42,33 @@
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg-primary);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--primary-bg);
+            min-height: 100vh;
             color: var(--text-primary);
-            line-height: 1.5;
+            line-height: 1.4;
+            padding-top: 80px;
         }
 
-        .container {
-            max-width: 1600px;
-            margin: 0 auto;
-            padding: 0 16px;
-        }
-
-        /* Header */
-        .header {
-            background: var(--bg-secondary);
-            border-bottom: 1px solid var(--border);
-            padding: 1rem 0;
-            position: sticky;
+        /* Top Bar */
+        .top-bar {
+            position: fixed;
             top: 0;
-            z-index: 100;
+            left: 0;
+            right: 0;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem;
+            z-index: 1000;
         }
 
-        .header-content {
+        .top-bar-content {
+            max-width: 1400px;
+            margin: 0 auto;
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            flex-wrap: wrap;
+            align-items: center;
             gap: 1rem;
         }
 
@@ -81,195 +76,207 @@
             display: flex;
             align-items: center;
             gap: 0.75rem;
-        }
-
-        .logo-icon {
-            width: 32px;
-            height: 32px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border-radius: var(--radius);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-        }
-
-        .logo-text h1 {
             font-size: 1.25rem;
             font-weight: 700;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background: var(--gradient-primary);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
 
-        .controls {
+        .stats-row {
             display: flex;
-            gap: 0.75rem;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            padding: 0.5rem 1rem;
-            border: none;
-            border-radius: var(--radius);
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-size: 0.875rem;
-            background: var(--bg-tertiary);
-            color: var(--text-primary);
-            border: 1px solid var(--border);
-        }
-
-        .btn:hover {
-            background: var(--primary);
-            border-color: var(--primary);
-        }
-
-        .btn.active {
-            background: var(--primary);
-            border-color: var(--primary);
-        }
-
-        .select {
-            padding: 0.5rem;
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            background: var(--bg-card);
-            color: var(--text-primary);
-            font-size: 0.875rem;
-        }
-
-        /* Stats Grid */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 1rem;
-            margin: 1.5rem 0;
+            align-items: center;
         }
 
-        .stat-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            padding: 1rem;
+        .stat-item {
+            background: var(--accent-bg);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-primary);
             text-align: center;
         }
 
         .stat-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 0.25rem;
-        }
-
-        .stat-label {
-            color: var(--text-secondary);
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        /* Main Grid */
-        .main-grid {
-            display: grid;
-            grid-template-columns: 1fr 400px;
-            gap: 1.5rem;
-            margin: 1.5rem 0;
-        }
-
-        @media (max-width: 1200px) {
-            .main-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Pairs Section */
-        .pairs-section {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            padding: 1.5rem;
-        }
-
-        .section-title {
-            font-size: 1.25rem;
+            font-size: 1.1rem;
             font-weight: 600;
-            margin-bottom: 1rem;
+            color: var(--success);
+        }
+
+        .search-container {
+            flex: 1;
+            max-width: 300px;
+        }
+
+        .search-input {
+            width: 100%;
+            background: var(--accent-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .search-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .search-input:focus {
+            border-color: var(--success);
+            box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+        }
+
+        .refresh-btn {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .refresh-btn:hover {
+            background: #16a34a;
+            transform: translateY(-1px);
+        }
+
+        .refresh-btn:disabled {
+            background: var(--accent-bg);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        /* Filters */
+        .filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
 
-        .pairs-grid {
+        .filter-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .filter-select {
+            background: var(--accent-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.5rem;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .filter-select:focus {
+            border-color: var(--success);
+        }
+
+        /* Signals Grid */
+        .signals-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
             gap: 1rem;
+            margin-bottom: 2rem;
         }
 
-        .pair-card {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            overflow: hidden;
+        .signal-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.25rem;
             transition: all 0.2s ease;
+            cursor: pointer;
         }
 
-        .pair-card:hover {
-            border-color: var(--primary);
+        .signal-card:hover {
             transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            border-color: var(--success);
         }
 
-        .pair-header {
-            padding: 1rem;
-            border-bottom: 1px solid var(--border);
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+        .signal-card.bullish {
+            border-left: 4px solid var(--success);
         }
 
-        .pair-title {
+        .signal-card.bearish {
+            border-left: 4px solid var(--danger);
+        }
+
+        .signal-card.wait {
+            border-left: 4px solid var(--warning);
+        }
+
+        .signal-header {
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            margin-bottom: 0.75rem;
+            align-items: flex-start;
+            margin-bottom: 1rem;
         }
 
-        .symbol {
-            font-size: 1.125rem;
+        .pair-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .pair-symbol {
+            font-size: 1.25rem;
             font-weight: 700;
+            color: var(--text-primary);
         }
 
-        .signal-badge {
-            padding: 0.25rem 0.5rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
+        .trend-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
             font-weight: 600;
             text-transform: uppercase;
         }
 
-        .signal-badge.moderate {
-            background: rgba(16, 185, 129, 0.2);
+        .trend-badge.bullish {
+            background: var(--success-bg);
             color: var(--success);
-            border: 1px solid rgba(16, 185, 129, 0.3);
         }
 
-        .signal-badge.no-signal {
-            background: rgba(100, 116, 139, 0.2);
-            color: var(--text-muted);
-            border: 1px solid rgba(100, 116, 139, 0.3);
+        .trend-badge.bearish {
+            background: var(--danger-bg);
+            color: var(--danger);
         }
 
-        .signal-badge.high {
-            background: rgba(99, 102, 241, 0.2);
-            color: var(--primary);
-            border: 1px solid rgba(99, 102, 241, 0.3);
+        .trend-badge.wait {
+            background: var(--warning-bg);
+            color: var(--warning);
         }
 
-        .pair-meta {
+        .signal-meta {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 0.75rem;
-            font-size: 0.875rem;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
         }
 
         .meta-item {
@@ -279,337 +286,284 @@
         }
 
         .meta-label {
-            color: var(--text-secondary);
+            font-size: 0.8rem;
+            color: var(--text-muted);
             font-weight: 500;
         }
 
         .meta-value {
+            font-size: 0.9rem;
+            color: var(--text-primary);
             font-weight: 600;
         }
 
-        .pair-body {
-            padding: 1rem;
-        }
-
-        .timeframe-tabs {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 0.5rem;
-        }
-
-        .timeframe-tab {
-            padding: 0.5rem 1rem;
-            border: none;
-            border-radius: var(--radius);
-            background: transparent;
-            color: var(--text-secondary);
-            cursor: pointer;
-            font-size: 0.875rem;
-            transition: all 0.2s ease;
-        }
-
-        .timeframe-tab.active {
-            background: var(--primary);
-            color: white;
-        }
-
-        .timeframe-tab:hover:not(.active) {
-            background: var(--bg-tertiary);
-            color: var(--text-primary);
-        }
-
-        .data-grid {
+        .ohlc-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            grid-template-columns: repeat(4, 1fr);
             gap: 0.75rem;
             margin-bottom: 1rem;
+            padding: 1rem;
+            background: var(--accent-bg);
+            border-radius: 8px;
         }
 
-        .data-item {
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 0.75rem;
+        .ohlc-item {
             text-align: center;
         }
 
-        .data-label {
-            color: var(--text-secondary);
+        .ohlc-label {
             font-size: 0.75rem;
-            font-weight: 500;
-            text-transform: uppercase;
-            margin-bottom: 0.5rem;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
         }
 
-        .data-value {
+        .ohlc-value {
+            font-size: 0.9rem;
             font-weight: 600;
-            font-size: 0.875rem;
+            color: var(--text-primary);
         }
 
-        .trend-bullish { color: var(--success); }
-        .trend-bearish { color: var(--danger); }
-        .trend-neutral { color: var(--warning); }
+        .ohlc-value.open { color: var(--success); }
+        .ohlc-value.high { color: var(--info); }
+        .ohlc-value.low { color: var(--danger); }
+        .ohlc-value.close { color: var(--warning); }
 
-        .confidence-high { color: var(--success); }
-        .confidence-medium { color: var(--warning); }
-        .confidence-low { color: var(--danger); }
-
-        .pair-footer {
-            padding: 1rem;
-            border-top: 1px solid var(--border);
-            background: var(--bg-tertiary);
-        }
-
-        .recommendation {
+        .support-resistance {
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            margin-bottom: 0.75rem;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: var(--accent-bg);
+            border-radius: 8px;
+        }
+
+        .sr-item {
+            text-align: center;
+        }
+
+        .sr-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+        }
+
+        .sr-value {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .sr-value.support { color: var(--success); }
+        .sr-value.resistance { color: var(--danger); }
+
+        .signal-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .detail-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .detail-value {
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .action-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: var(--accent-bg);
+            border-radius: 8px;
+            margin-top: 1rem;
         }
 
         .action-badge {
             padding: 0.5rem 1rem;
-            border-radius: var(--radius);
+            border-radius: 20px;
+            font-size: 0.9rem;
             font-weight: 600;
-            font-size: 0.875rem;
             text-transform: uppercase;
         }
 
         .action-badge.buy {
-            background: rgba(16, 185, 129, 0.2);
+            background: var(--success-bg);
             color: var(--success);
-            border: 1px solid rgba(16, 185, 129, 0.3);
         }
 
         .action-badge.sell {
-            background: rgba(239, 68, 68, 0.2);
+            background: var(--danger-bg);
             color: var(--danger);
-            border: 1px solid rgba(239, 68, 68, 0.3);
         }
 
         .action-badge.wait {
-            background: rgba(245, 158, 11, 0.2);
+            background: var(--warning-bg);
             color: var(--warning);
-            border: 1px solid rgba(245, 158, 11, 0.3);
         }
 
-        .risk-reward {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 0.75rem;
-            font-size: 0.875rem;
-        }
-
-        .rr-item {
-            text-align: center;
-        }
-
-        .rr-label {
-            color: var(--text-secondary);
-            font-weight: 500;
-            margin-bottom: 0.25rem;
-        }
-
-        .rr-value {
-            font-weight: 600;
-        }
-
-        /* Charts Section */
-        .charts-section {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            padding: 1.5rem;
-        }
-
-        .chart-container {
-            margin-bottom: 1.5rem;
-        }
-
-        .chart-title {
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
+        .entry-targets {
             display: flex;
-            align-items: center;
-            gap: 0.5rem;
+            flex-direction: column;
+            gap: 0.25rem;
+            text-align: right;
         }
 
-        .chart-image {
-            width: 100%;
-            height: auto;
-            border-radius: var(--radius);
-            border: 1px solid var(--border);
-            cursor: pointer;
-            transition: all 0.2s ease;
+        .target-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
         }
 
-        .chart-image:hover {
-            transform: scale(1.02);
-            box-shadow: var(--shadow-lg);
-        }
-
-        /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-        }
-
-        .modal-content {
-            position: relative;
-            margin: 2% auto;
-            padding: 0;
-            width: 90%;
-            max-width: 800px;
-            background: var(--bg-card);
-            border-radius: var(--radius-lg);
-            overflow: hidden;
-        }
-
-        .modal-image {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-
-        .close {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
+        .target-value {
+            font-size: 0.9rem;
             color: var(--text-primary);
-            font-size: 2rem;
-            font-weight: bold;
-            cursor: pointer;
-            background: rgba(0, 0, 0, 0.5);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            font-weight: 600;
         }
 
-        .close:hover {
-            background: rgba(0, 0, 0, 0.7);
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state p {
+            font-size: 1rem;
+        }
+
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-muted);
+        }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 50%;
+            border-top-color: var(--success);
+            animation: spin 1s ease-in-out infinite;
+            margin-left: 0.5rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
         /* Responsive */
         @media (max-width: 768px) {
-            .container {
-                padding: 0 12px;
-            }
-
-            .header-content {
+            .top-bar-content {
                 flex-direction: column;
-                align-items: flex-start;
+                gap: 1rem;
             }
-
-            .pairs-grid {
+            
+            .stats-row {
+                order: -1;
+            }
+            
+            .signals-grid {
                 grid-template-columns: 1fr;
             }
-
-            .data-grid {
+            
+            .filters {
+                flex-direction: column;
+            }
+            
+            .signal-meta,
+            .signal-details {
+                grid-template-columns: 1fr;
+            }
+            
+            .ohlc-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
-
-            .risk-reward {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .loading {
-            text-align: center;
-            padding: 2rem;
-            color: var(--text-secondary);
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 2rem;
-            color: var(--text-secondary);
         }
     </style>
 </head>
 <body>
-    <header class="header">
-        <div class="container">
-            <div class="header-content">
-                <div class="logo">
-                    <div class="logo-icon">📊</div>
-                    <div class="logo-text">
-                        <h1>Smart Crypto Dashboard</h1>
-                    </div>
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="top-bar-content">
+            <div class="logo">
+                📊 Smart Crypto Dashboard
+            </div>
+            
+            <div class="stats-row">
+                <div class="stat-item">
+                    <div class="stat-value" id="totalSignals">0</div>
+                    <div>Signals</div>
                 </div>
-                <div class="controls">
-                    <select class="select" id="pairFilter">
-                        <option value="all">All Pairs</option>
-                    </select>
-                    <select class="select" id="signalFilter">
-                        <option value="all">All Signals</option>
-                        <option value="MODERATE">Moderate</option>
-                        <option value="HIGH">High</option>
-                        <option value="NO_SIGNAL">No Signal</option>
-                    </select>
-                    <button class="btn" id="refreshBtn">🔄 Refresh</button>
+                <div class="stat-item">
+                    <div class="stat-value" id="bullishSignals">0</div>
+                    <div>Bullish</div>
                 </div>
-            </div>
-        </div>
-    </header>
-
-    <div class="container">
-        <!-- Stats Overview -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-value" id="totalPairs">-</div>
-                <div class="stat-label">Total Pairs</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="activeSignals">-</div>
-                <div class="stat-label">Active Signals</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="avgWinRate">-</div>
-                <div class="stat-label">Avg Win Rate</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="riskLevel">-</div>
-                <div class="stat-label">Risk Level</div>
-            </div>
-        </div>
-
-        <!-- Main Content -->
-        <div class="main-grid">
-            <!-- Pairs Section -->
-            <div class="pairs-section">
-                <h2 class="section-title">📈 Trading Pairs Analysis</h2>
-                <div id="pairsGrid" class="pairs-grid">
-                    <div class="loading">Loading crypto analysis data...</div>
+                <div class="stat-item">
+                    <div class="stat-value" id="bearishSignals">0</div>
+                    <div>Bearish</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="waitSignals">0</div>
+                    <div>Wait</div>
                 </div>
             </div>
-
-            <!-- Charts Section -->
-            <div class="charts-section">
-                <h2 class="section-title">📊 Technical Charts</h2>
-                <div id="chartsContainer">
-                    <div class="empty-state">Select a pair to view charts</div>
-                </div>
+            
+            <div class="search-container">
+                <input type="text" class="search-input" id="searchInput" placeholder="Search pairs...">
             </div>
+            
+            <button class="refresh-btn" id="refreshBtn">🔄 Refresh</button>
         </div>
     </div>
 
-    <!-- Modal for enlarged charts -->
-    <div id="chartModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <img id="modalImage" class="modal-image" src="" alt="Chart">
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Filters -->
+        <div class="filters">
+            <div class="filter-group">
+                <label class="filter-label">Trend:</label>
+                <select class="filter-select" id="trendFilter">
+                    <option value="all">All Trends</option>
+                    <option value="bullish">Bullish</option>
+                    <option value="bearish">Bearish</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label class="filter-label">Action:</label>
+                <select class="filter-select" id="actionFilter">
+                    <option value="all">All Actions</option>
+                    <option value="buy">Buy</option>
+                    <option value="sell">Sell</option>
+                    <option value="wait">Wait</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Signals Grid -->
+        <div class="signals-grid" id="signalsGrid">
+            <div class="loading">Loading signals...</div>
         </div>
     </div>
 
@@ -619,10 +573,10 @@
                 this.data = [];
                 this.filteredData = [];
                 this.currentFilters = {
-                    pair: 'all',
-                    signal: 'all'
+                    trend: 'all',
+                    action: 'all',
+                    search: ''
                 };
-                this.selectedPair = null;
                 
                 this.init();
             }
@@ -631,60 +585,39 @@
                 this.setupEventListeners();
                 await this.loadData();
                 this.updateStats();
-                this.renderPairs();
-                this.setupPairFilter();
+                this.renderSignals();
             }
 
             setupEventListeners() {
                 document.getElementById('refreshBtn').addEventListener('click', () => this.refreshData());
-                document.getElementById('pairFilter').addEventListener('change', (e) => {
-                    this.currentFilters.pair = e.target.value;
+                document.getElementById('trendFilter').addEventListener('change', (e) => {
+                    this.currentFilters.trend = e.target.value;
                     this.applyFilters();
                 });
-                document.getElementById('signalFilter').addEventListener('change', (e) => {
-                    this.currentFilters.signal = e.target.value;
+                document.getElementById('actionFilter').addEventListener('change', (e) => {
+                    this.currentFilters.action = e.target.value;
                     this.applyFilters();
                 });
-
-                // Modal events
-                const modal = document.getElementById('chartModal');
-                const close = document.querySelector('.close');
-                close.onclick = () => modal.style.display = 'none';
-                window.onclick = (e) => {
-                    if (e.target === modal) modal.style.display = 'none';
-                };
+                document.getElementById('searchInput').addEventListener('input', (e) => {
+                    this.currentFilters.search = e.target.value.toLowerCase();
+                    this.applyFilters();
+                });
             }
 
             async loadData() {
                 try {
-                    // Load pairs configuration
-                    const pairsResponse = await fetch('./config/pairs.json');
-                    const pairs = await pairsResponse.json();
-                    console.log('Loaded pairs config:', pairs);
-                    
-                    // Load data for each pair
-                    const allData = [];
-                    
-                    for (const pair of pairs) {
-                        try {
-                            // Load main analysis data
-                            const dataResponse = await fetch(`./assets/pairs/${pair.symbol}/data-${pair.symbol}.json`);
-                            if (dataResponse.ok) {
-                                const pairData = await dataResponse.json();
-                                console.log(`Loaded data for ${pair.symbol}:`, pairData);
-                                allData.push({
-                                    ...pairData,
-                                    pair: pair.symbol,
-                                    timeframe: pair.style || '4h'
-                                });
-                            }
-                        } catch (error) {
-                            console.warn(`Failed to load data for ${pair.symbol}:`, error);
-                        }
+                    const response = await fetch('./data.json');
+                    if (!response.ok) {
+                        throw new Error('Failed to load data.json');
                     }
                     
-                    console.log('Final data array:', allData);
-                    this.data = allData;
+                    const rawData = await response.json();
+                    console.log('Raw data loaded:', rawData);
+                    
+                    // Parse the Telegram message format
+                    this.data = this.parseTelegramData(rawData);
+                    console.log('Parsed data:', this.data);
+                    
                     this.filteredData = [...this.data];
                     
                 } catch (error) {
@@ -693,254 +626,226 @@
                 }
             }
 
-            setupPairFilter() {
-                const pairFilter = document.getElementById('pairFilter');
-                const pairs = this.data.map(item => item.pair);
+            parseTelegramData(rawData) {
+                const signals = [];
                 
-                pairs.forEach(pair => {
-                    const option = document.createElement('option');
-                    option.value = pair;
-                    option.textContent = pair;
-                    pairFilter.appendChild(option);
-                });
+                try {
+                    // Handle the nested structure from data.json
+                    const messages = rawData[0]?.result || rawData;
+                    
+                    messages.forEach((message, index) => {
+                        try {
+                            const text = message.text || '';
+                            const signal = this.parseSignalText(text, message.date || Date.now() / 1000);
+                            
+                            if (signal) {
+                                signals.push(signal);
+                            }
+                        } catch (error) {
+                            console.warn(`Failed to parse message ${index}:`, error);
+                        }
+                    });
+                    
+                } catch (error) {
+                    console.error('Failed to parse telegram data:', error);
+                }
+                
+                return signals;
+            }
+
+            parseSignalText(text, timestamp) {
+                try {
+                    // Extract pair from text
+                    const pairMatch = text.match(/\[([A-Z]+\/[A-Z]+)\]/);
+                    if (!pairMatch) return null;
+                    
+                    const pair = pairMatch[1];
+                    
+                    // Extract trend
+                    const trendMatch = text.match(/Trend:\s*(bullish|bearish)/i);
+                    const trend = trendMatch ? trendMatch[1].toLowerCase() : 'neutral';
+                    
+                    // Extract OHLC data
+                    const openMatch = text.match(/Open\s*:\s*([\d.]+)/i);
+                    const closeMatch = text.match(/Close\s*:\s*([\d.]+)/i);
+                    const highMatch = text.match(/High\s*:\s*([\d.]+)/i);
+                    const lowMatch = text.match(/Low\s*:\s*([\d.]+)/i);
+                    
+                    // Extract support and resistance
+                    const supportMatch = text.match(/Support\s*:\s*([\d.]+)/i);
+                    const resistanceMatch = text.match(/Resistance\s*:\s*([\d.]+)/i);
+                    
+                    // Extract action and targets
+                    const actionMatch = text.match(/(?:Achat|Buy|Vente|Sell|Attente|Wait)\s*:?\s*([^$]+)/i);
+                    let action = 'wait';
+                    if (actionMatch) {
+                        const actionText = actionMatch[1].toLowerCase();
+                        if (actionText.includes('achat') || actionText.includes('buy')) action = 'buy';
+                        else if (actionText.includes('vente') || actionText.includes('sell')) action = 'sell';
+                    }
+                    
+                    // Extract entry range
+                    const entryMatch = text.match(/entre\s*\[([\d.\s-]+)\]/i);
+                    const targetMatch = text.match(/Target\s*\[([\d.\s-]+)\]/i);
+                    const stopLossMatch = text.match(/Stop loss\s*[àa]\s*([\d.]+)/i);
+                    
+                    // Extract win percentage
+                    const winMatch = text.match(/(?:Target min win|win)\s*([\d.]+)%/i);
+                    
+                    return {
+                        pair,
+                        trend,
+                        timestamp,
+                        ohlc: {
+                            open: openMatch ? parseFloat(openMatch[1]) : null,
+                            close: closeMatch ? parseFloat(closeMatch[1]) : null,
+                            high: highMatch ? parseFloat(highMatch[1]) : null,
+                            low: lowMatch ? parseFloat(lowMatch[1]) : null
+                        },
+                        support: supportMatch ? parseFloat(supportMatch[1]) : null,
+                        resistance: resistanceMatch ? parseFloat(resistanceMatch[1]) : null,
+                        action,
+                        entryRange: entryMatch ? entryMatch[1].trim() : null,
+                        target: targetMatch ? targetMatch[1].trim() : null,
+                        stopLoss: stopLossMatch ? parseFloat(stopLossMatch[1]) : null,
+                        winPercentage: winMatch ? parseFloat(winMatch[1]) : null,
+                        rawText: text
+                    };
+                    
+                } catch (error) {
+                    console.error('Failed to parse signal text:', error);
+                    return null;
+                }
             }
 
             applyFilters() {
-                this.filteredData = this.data.filter(item => {
-                    // Pair filter
-                    if (this.currentFilters.pair !== 'all' && item.pair !== this.currentFilters.pair) {
+                this.filteredData = this.data.filter(signal => {
+                    // Trend filter
+                    if (this.currentFilters.trend !== 'all' && signal.trend !== this.currentFilters.trend) {
                         return false;
                     }
                     
-                    // Signal type filter
-                    if (this.currentFilters.signal !== 'all' && 
-                        item.classification?.type !== this.currentFilters.signal) {
+                    // Action filter
+                    if (this.currentFilters.action !== 'all' && signal.action !== this.currentFilters.action) {
+                        return false;
+                    }
+                    
+                    // Search filter
+                    if (this.currentFilters.search && !signal.pair.toLowerCase().includes(this.currentFilters.search)) {
                         return false;
                     }
                     
                     return true;
                 });
                 
-                this.renderPairs();
+                this.renderSignals();
             }
 
             updateStats() {
-                const totalPairs = this.data.length;
-                const activeSignals = this.data.filter(item => 
-                    item.classification?.type !== 'NO_SIGNAL'
-                ).length;
+                const total = this.data.length;
+                const bullish = this.data.filter(s => s.trend === 'bullish').length;
+                const bearish = this.data.filter(s => s.trend === 'bearish').length;
+                const wait = this.data.filter(s => s.action === 'wait').length;
                 
-                const winRates = this.data
-                    .map(item => item.classification?.expected_win_rate)
-                    .filter(rate => rate)
-                    .map(rate => parseInt(rate.replace('%', '')));
-                
-                const avgWinRate = winRates.length > 0 
-                    ? Math.round(winRates.reduce((a, b) => a + b, 0) / winRates.length)
-                    : 0;
-                
-                const riskLevels = this.data
-                    .map(item => item.position_sizing?.confidence_tier)
-                    .filter(level => level);
-                
-                const avgRiskLevel = riskLevels.length > 0 
-                    ? this.calculateAverageRiskLevel(riskLevels)
-                    : 'MEDIUM';
-                
-                document.getElementById('totalPairs').textContent = totalPairs;
-                document.getElementById('activeSignals').textContent = activeSignals;
-                document.getElementById('avgWinRate').textContent = avgWinRate + '%';
-                document.getElementById('riskLevel').textContent = avgRiskLevel;
+                document.getElementById('totalSignals').textContent = total;
+                document.getElementById('bullishSignals').textContent = bullish;
+                document.getElementById('bearishSignals').textContent = bearish;
+                document.getElementById('waitSignals').textContent = wait;
             }
 
-            calculateAverageRiskLevel(levels) {
-                const riskMap = { 'LOW': 1, 'MEDIUM': 2, 'HIGH': 3 };
-                const avg = levels.reduce((sum, level) => sum + (riskMap[level] || 2), 0) / levels.length;
-                
-                if (avg <= 1.5) return 'LOW';
-                if (avg <= 2.5) return 'MEDIUM';
-                return 'HIGH';
-            }
-
-            renderPairs() {
-                const grid = document.getElementById('pairsGrid');
+            renderSignals() {
+                const grid = document.getElementById('signalsGrid');
                 
                 if (this.filteredData.length === 0) {
                     grid.innerHTML = `
                         <div class="empty-state">
                             <h3>No signals found</h3>
-                            <p>Try adjusting your filters</p>
+                            <p>Try adjusting your filters or search terms</p>
                         </div>
                     `;
                     return;
                 }
                 
-                grid.innerHTML = this.filteredData.map(item => this.renderPairCard(item)).join('');
-                
-                // Add click events to pair cards
-                this.filteredData.forEach((item, index) => {
-                    const card = grid.children[index];
-                    card.addEventListener('click', () => this.selectPair(item));
-                });
+                grid.innerHTML = this.filteredData.map(signal => this.renderSignalCard(signal)).join('');
             }
 
-            renderPairCard(item) {
-                const classification = item.classification || {};
-                const recommendation = item.recommendation || {};
-                const technical = item.technical_analysis || {};
-                const position = item.position_sizing || {};
-                
-                const signalType = classification.type || 'NO_SIGNAL';
-                const confidence = classification.confidence || 'LOW';
-                const trend = technical.trend_direction || 'NEUTRAL';
-                const action = recommendation.action || 'WAIT';
+            renderSignalCard(signal) {
+                const trendClass = signal.trend;
+                const actionClass = signal.action;
                 
                 return `
-                    <div class="pair-card" data-pair="${item.pair}">
-                        <div class="pair-header">
-                            <div class="pair-title">
-                                <span class="symbol">${item.pair}</span>
-                                <span class="signal-badge ${signalType.toLowerCase().replace('_', '-')}">${signalType}</span>
+                    <div class="signal-card ${trendClass} ${actionClass}" onclick="this.toggleDetails(this)">
+                        <div class="signal-header">
+                            <div class="pair-info">
+                                <div class="pair-symbol">${signal.pair}</div>
+                                <div class="trend-badge ${trendClass}">${signal.trend}</div>
                             </div>
-                            <div class="pair-meta">
-                                <div class="meta-item">
-                                    <span class="meta-label">Timeframe</span>
-                                    <span class="meta-value">${technical.primary_timeframe || 'N/A'}</span>
-                                </div>
-                                <div class="meta-item">
-                                    <span class="meta-label">Confidence</span>
-                                    <span class="meta-value confidence-${confidence.toLowerCase()}">${confidence}</span>
-                                </div>
-                                <div class="meta-item">
-                                    <span class="meta-label">Win Rate</span>
-                                    <span class="meta-value">${classification.expected_win_rate || 'N/A'}</span>
-                                </div>
-                                <div class="meta-item">
-                                    <span class="meta-label">Confluence</span>
-                                    <span class="meta-value">${classification.confluence_score || 'N/A'}</span>
-                                </div>
+                            <div class="action-badge ${actionClass}">${signal.action}</div>
+                        </div>
+                        
+                        <div class="signal-meta">
+                            <div class="meta-item">
+                                <div class="meta-label">Entry Range</div>
+                                <div class="meta-value">${signal.entryRange || 'N/A'}</div>
+                            </div>
+                            <div class="meta-item">
+                                <div class="meta-label">Target</div>
+                                <div class="meta-value">${signal.target || 'N/A'}</div>
+                            </div>
+                            <div class="meta-item">
+                                <div class="meta-label">Stop Loss</div>
+                                <div class="meta-value">${signal.stopLoss || 'N/A'}</div>
+                            </div>
+                            <div class="meta-item">
+                                <div class="meta-label">Win %</div>
+                                <div class="meta-value">${signal.winPercentage ? signal.winPercentage + '%' : 'N/A'}</div>
                             </div>
                         </div>
                         
-                        <div class="pair-body">
-                            <div class="timeframe-tabs">
-                                <button class="timeframe-tab active" data-timeframe="1h">1H</button>
-                                <button class="timeframe-tab" data-timeframe="4h">4H</button>
-                                <button class="timeframe-tab" data-timeframe="8h">8H</button>
+                        <div class="ohlc-grid">
+                            <div class="ohlc-item">
+                                <div class="ohlc-label">Open</div>
+                                <div class="ohlc-value open">${signal.ohlc.open || 'N/A'}</div>
                             </div>
-                            
-                            <div class="data-grid">
-                                <div class="data-item">
-                                    <div class="data-label">Trend</div>
-                                    <div class="data-value trend-${trend.toLowerCase()}">${trend}</div>
-                                </div>
-                                <div class="data-item">
-                                    <div class="data-label">Volume</div>
-                                    <div class="data-value">${technical.volume_confirmation || 'N/A'}</div>
-                                </div>
-                                <div class="data-item">
-                                    <div class="data-label">Pattern</div>
-                                    <div class="data-value">${technical.pattern_strength || 'N/A'}</div>
-                                </div>
-                                <div class="data-item">
-                                    <div class="data-label">Levels</div>
-                                    <div class="data-value">${technical.key_level_proximity || 'N/A'}</div>
-                                </div>
-                                <div class="data-item">
-                                    <div class="data-label">Confidence</div>
-                                    <div class="data-value confidence-${position.confidence_tier?.toLowerCase() || 'low'}">${position.confidence_tier || 'N/A'}</div>
-                                </div>
-                                <div class="data-item">
-                                    <div class="data-label">Position</div>
-                                    <div class="data-value">${position.base_position_percent || 'N/A'}%</div>
-                                </div>
+                            <div class="ohlc-item">
+                                <div class="ohlc-label">High</div>
+                                <div class="ohlc-value high">${signal.ohlc.high || 'N/A'}</div>
+                            </div>
+                            <div class="ohlc-item">
+                                <div class="ohlc-label">Low</div>
+                                <div class="ohlc-value low">${signal.ohlc.low || 'N/A'}</div>
+                            </div>
+                            <div class="ohlc-item">
+                                <div class="ohlc-label">Close</div>
+                                <div class="ohlc-value close">${signal.ohlc.close || 'N/A'}</div>
                             </div>
                         </div>
                         
-                        <div class="pair-footer">
-                            <div class="recommendation">
-                                <span class="action-badge ${action.toLowerCase()}">${action}</span>
-                                <span class="meta-value">${recommendation.timeframe || 'N/A'}</span>
+                        <div class="support-resistance">
+                            <div class="sr-item">
+                                <div class="sr-label">Support</div>
+                                <div class="sr-value support">${signal.support || 'N/A'}</div>
                             </div>
-                            
-                            <div class="risk-reward">
-                                <div class="rr-item">
-                                    <div class="rr-label">Risk/Reward</div>
-                                    <div class="rr-value">${recommendation.risk_reward_ratio || 'N/A'}</div>
-                                </div>
-                                <div class="rr-item">
-                                    <div class="rr-label">Max Drawdown</div>
-                                    <div class="rr-value">${recommendation.max_drawdown || 'N/A'}</div>
-                                </div>
-                                <div class="rr-item">
-                                    <div class="rr-label">Entry Range</div>
-                                    <div class="rr-value">${this.formatEntryRange(recommendation.entry_range)}</div>
-                                </div>
+                            <div class="sr-item">
+                                <div class="sr-label">Resistance</div>
+                                <div class="sr-value resistance">${signal.resistance || 'N/A'}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="action-section">
+                            <div class="action-badge ${actionClass}">${signal.action.toUpperCase()}</div>
+                            <div class="entry-targets">
+                                <div class="target-label">Entry: ${signal.entryRange || 'N/A'}</div>
+                                <div class="target-value">Target: ${signal.target || 'N/A'}</div>
                             </div>
                         </div>
                     </div>
                 `;
             }
 
-            formatEntryRange(range) {
-                if (!range || !Array.isArray(range) || range.length < 2) return 'N/A';
-                const [min, max] = range;
-                if (min === null || max === null) return 'N/A';
-                return `${min} - ${max}`;
-            }
-
-            selectPair(item) {
-                this.selectedPair = item;
-                this.renderCharts(item);
-                this.updateActivePair(item.pair);
-            }
-
-            updateActivePair(pairName) {
-                // Update pair filter to show selected pair
-                document.getElementById('pairFilter').value = pairName;
-                this.currentFilters.pair = pairName;
-            }
-
-            async renderCharts(item) {
-                const container = document.getElementById('chartsContainer');
-                const pair = item.pair;
-                
-                container.innerHTML = `
-                    <div class="chart-container">
-                        <h3 class="chart-title">📊 ${pair} - 1 Hour</h3>
-                        <img src="./assets/pairs/${pair}/graph-${pair}-1h.png" 
-                             alt="${pair} 1H Chart" 
-                             class="chart-image"
-                             onclick="this.showModal(this.src)">
-                    </div>
-                    <div class="chart-container">
-                        <h3 class="chart-title">📊 ${pair} - 4 Hours</h3>
-                        <img src="./assets/pairs/${pair}/graph-${pair}-4h.png" 
-                             alt="${pair} 4H Chart" 
-                             class="chart-image"
-                             onclick="this.showModal(this.src)">
-                    </div>
-                    <div class="chart-container">
-                        <h3 class="chart-title">📊 ${pair} - 8 Hours</h3>
-                        <img src="./assets/pairs/${pair}/graph-${pair}-8h.png" 
-                             alt="${pair} 8H Chart" 
-                             class="chart-image"
-                             onclick="this.showModal(this.src)">
-                    </div>
-                `;
-
-                // Add click events to charts
-                const charts = container.querySelectorAll('.chart-image');
-                charts.forEach(chart => {
-                    chart.addEventListener('click', () => this.showModal(chart.src));
-                });
-            }
-
-            showModal(imageSrc) {
-                const modal = document.getElementById('chartModal');
-                const modalImage = document.getElementById('modalImage');
-                modalImage.src = imageSrc;
-                modal.style.display = 'block';
+            toggleDetails(card) {
+                // Add expandable details functionality if needed
+                console.log('Card clicked:', card);
             }
 
             async refreshData() {
@@ -951,10 +856,7 @@
                 try {
                     await this.loadData();
                     this.updateStats();
-                    this.renderPairs();
-                    if (this.selectedPair) {
-                        this.renderCharts(this.selectedPair);
-                    }
+                    this.renderSignals();
                 } catch (error) {
                     console.error('Refresh failed:', error);
                     this.showError('Failed to refresh data.');
@@ -965,7 +867,7 @@
             }
 
             showError(message) {
-                const grid = document.getElementById('pairsGrid');
+                const grid = document.getElementById('signalsGrid');
                 grid.innerHTML = `
                     <div class="empty-state">
                         <h3>Error</h3>
