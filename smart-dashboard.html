@@ -949,6 +949,25 @@
             border-color: var(--primary);
         }
 
+        .tab-btn.main-tab {
+            background: linear-gradient(135deg, var(--warning), var(--info));
+            color: white;
+            border-color: var(--warning);
+            font-weight: 600;
+        }
+
+        .tab-btn.main-tab:hover {
+            background: linear-gradient(135deg, var(--warning), var(--info));
+            opacity: 0.9;
+        }
+
+        .tab-btn.main-tab.active {
+            background: linear-gradient(135deg, var(--warning), var(--info));
+            color: white;
+            border-color: var(--warning);
+            box-shadow: 0 0 0 2px rgba(255, 193, 7, 0.3);
+        }
+
         /* Tab Content */
         .tab-content {
             margin-top: 16px;
@@ -1032,6 +1051,60 @@
                 text-align: center;
                 min-width: 60px;
             }
+        }
+
+        .pair-card .timestamp {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .timestamp-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .main-data-indicator {
+            background: linear-gradient(135deg, var(--warning), var(--info));
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 4px;
+        }
+
+        /* Data Status Modal Styling */
+        .pair-status {
+            margin-bottom: 16px;
+            padding: 12px;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .main-available {
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        .main-missing {
+            color: var(--danger);
+            font-weight: 600;
+        }
+
+        .timeframes {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .missing {
+            color: var(--warning);
+            font-size: 0.9rem;
         }
     </style>
 </head>
@@ -1214,7 +1287,7 @@
                 try {
                     this.setLoadingState(true);
                     console.log('🔄 Loading trading signals...');
-                    console.log('🚀 Dashboard version: 2.0 - Dual Data Type Support');
+                    console.log('🚀 Dashboard version: 2.0 - Dual Data Type Support with Main Data Files');
                     
                     // Load pairs configuration with cache busting
                     const pairsResponse = await fetch('./config/pairs.json?v=' + Date.now());
@@ -1225,7 +1298,6 @@
                     this.pairs = await pairsResponse.json();
                     console.log('📋 Pairs configuration loaded:', this.pairs);
                     console.log('🔍 First pair config:', this.pairs[0]);
-                    console.log('🔍 All pairs dataFile values:', this.pairs.map(p => ({ symbol: p.symbol, dataFile: p.dataFile })));
                     
                     // Validate configuration
                     if (!Array.isArray(this.pairs) || this.pairs.length === 0) {
@@ -1250,10 +1322,38 @@
                             pairStatus[pair.symbol] = {
                                 available: [],
                                 missing: [],
-                                errors: []
+                                errors: [],
+                                mainData: null
                             };
                             
-                            // Load data for each timeframe
+                            // FIRST: Load the main consolidated data file (most important)
+                            try {
+                                const mainDataFileName = `data-${pair.symbol}.json`;
+                                console.log(`📁 Loading MAIN data: ${mainDataFileName}`);
+                                
+                                const mainDataResponse = await fetch(`./assets/pairs/${pair.symbol}/${mainDataFileName}?v=${Date.now()}`);
+                                if (mainDataResponse.ok) {
+                                    const mainPairData = await mainDataResponse.json();
+                                    console.log(`✅ MAIN data loaded for ${pair.symbol}:`, mainPairData);
+                                    
+                                    // Store main data for this pair
+                                    pairStatus[pair.symbol].mainData = mainPairData;
+                                    
+                                    // Transform main data as a special "main" timeframe
+                                    const mainTransformedData = this.transformMainData(mainPairData, pair);
+                                    if (mainTransformedData) {
+                                        allData.push(mainTransformedData);
+                                        pairStatus[pair.symbol].available.push('main');
+                                        console.log(`✅ MAIN data transformed for ${pair.symbol}`);
+                                    }
+                                } else {
+                                    console.warn(`⚠️ Failed to load MAIN data for ${pair.symbol}: ${mainDataResponse.status}`);
+                                }
+                            } catch (error) {
+                                console.warn(`⚠️ Error loading MAIN data for ${pair.symbol}:`, error);
+                            }
+                            
+                            // SECOND: Load data for each specific timeframe
                             for (const timeframe of pair.style) {
                                 try {
                                     const dataFileName = `data-${pair.symbol}-${timeframe}.json`;
@@ -1457,6 +1557,90 @@
                 return transformed;
             }
 
+            transformMainData(mainData, pairConfig) {
+                console.log(`🔄 Transforming main data for ${pairConfig.symbol}:`, mainData);
+                
+                // Check if this is signal data or price data
+                if (mainData.signal) {
+                    // This is signal data
+                    const signal = mainData.signal;
+                    const classification = signal.classification || {};
+                    const recommendation = signal.recommendation || {};
+                    const technical = signal.technical || {};
+                    const position = signal.position || {};
+                    
+                    const transformed = {
+                        pair: pairConfig.symbol,
+                        timeframe: 'main', // Special identifier for main data
+                        trend: this.mapTrend(recommendation.trend_direction || technical.trend_direction || 'neutral'),
+                        action: this.mapAction(recommendation.action || 'wait'),
+                        entryRange: recommendation.entry_range ? recommendation.entry_range.join(' - ') : 'N/A',
+                        target: recommendation.take_profit ? recommendation.take_profit[0] : 'N/A',
+                        stopLoss: recommendation.stop_loss || 'N/A',
+                        winPercentage: classification.expected_win_rate ? classification.expected_win_rate.replace('%', '') : null,
+                        confidence: classification.confidence || 'N/A',
+                        confluenceScore: classification.confluence_score || 'N/A',
+                        technicalTimeframe: technical.primary_timeframe || 'N/A',
+                        volumeConfirmation: technical.volume_confirmation || 'N/A',
+                        keyLevelProximity: technical.key_level_proximity || 'N/A',
+                        patternStrength: technical.pattern_strength || 'N/A',
+                        confidenceTier: position.confidence_tier || 'N/A',
+                        suggestedPositionSize: position.base_position_percent || 'N/A',
+                        reasoning: signal.reasoning || 'No reasoning provided',
+                        timestamp: signal.timestamp || signal.analysis_time || Date.now() / 1000,
+                        dataType: 'signal',
+                        isMainData: true, // Flag to identify main data
+                        rawData: mainData
+                    };
+                    
+                    console.log(`✅ Transformed main signal data for ${pairConfig.symbol}:`, transformed);
+                    return transformed;
+                } else if (mainData.support || mainData.resistance) {
+                    // This is price data
+                    const support = mainData.support || 'N/A';
+                    const resistance = mainData.resistance || 'N/A';
+                    const highest = mainData.highest || 'N/A';
+                    const lowest = mainData.Lowest || mainData.lowest || 'N/A';
+                    const amplitude = mainData.Amplitude_HL || 'N/A';
+                    const candles = mainData.Candles || 'N/A';
+                    
+                    const transformed = {
+                        pair: pairConfig.symbol,
+                        timeframe: 'main', // Special identifier for main data
+                        trend: 'neutral',
+                        action: 'wait',
+                        entryRange: `${support} - ${resistance}`,
+                        target: highest,
+                        stopLoss: lowest,
+                        winPercentage: null,
+                        confidence: 'N/A',
+                        confluenceScore: 'N/A',
+                        volumeConfirmation: 'N/A',
+                        keyLevelProximity: 'N/A',
+                        patternStrength: 'N/A',
+                        confidenceTier: 'N/A',
+                        suggestedPositionSize: 'N/A',
+                        reasoning: `Main price analysis: Support at ${support}, Resistance at ${resistance}. Current range: ${lowest} - ${highest}.`,
+                        timestamp: mainData.timestamp || mainData.analysis_time || Date.now() / 1000,
+                        dataType: 'price',
+                        isMainData: true, // Flag to identify main data
+                        support,
+                        resistance,
+                        highest,
+                        lowest,
+                        amplitude,
+                        candles,
+                        rawData: mainData
+                    };
+                    
+                    console.log(`✅ Transformed main price data for ${pairConfig.symbol}:`, transformed);
+                    return transformed;
+                } else {
+                    console.warn(`⚠️ Unknown data format for main data of ${pairConfig.symbol}:`, mainData);
+                    return null;
+                }
+            }
+
             applyFilters() {
                 this.filteredData = this.data.filter(signal => {
                     if (this.currentFilters.trend !== 'all' && signal.trend !== this.currentFilters.trend) {
@@ -1513,14 +1697,19 @@
                 let statusHTML = '';
                 
                 for (const pair of this.pairs) {
-                    const availableTimeframes = this.data.filter(d => d.pair === pair.symbol).map(d => d.timeframe);
+                    const pairData = this.data.filter(d => d.pair === pair.symbol);
+                    const mainData = pairData.find(d => d.timeframe === 'main');
+                    const timeframeData = pairData.filter(d => d.timeframe !== 'main');
+                    const availableTimeframes = timeframeData.map(d => d.timeframe);
                     const missingTimeframes = pair.style.filter(tf => !availableTimeframes.includes(tf));
                     
                     statusHTML += `
                         <div class="pair-status">
                             <strong>${pair.symbol}:</strong>
-                            <span class="available">✅ ${availableTimeframes.join(', ') || 'None'}</span>
-                            ${missingTimeframes.length > 0 ? `<span class="missing">❌ Missing: ${missingTimeframes.join(', ')}</span>` : ''}
+                            ${mainData ? '<span class="main-available">⭐ MAIN: ✅ Available</span>' : '<span class="main-missing">⭐ MAIN: ❌ Missing</span>'}
+                            <br>
+                            <span class="timeframes">Timeframes: ${availableTimeframes.length > 0 ? availableTimeframes.join(', ') : 'None'}</span>
+                            ${missingTimeframes.length > 0 ? `<br><span class="missing">❌ Missing: ${missingTimeframes.join(', ')}</span>` : ''}
                         </div>
                     `;
                 }
@@ -1584,7 +1773,13 @@
 
             renderPairCard(pairGroup) {
                 const { pair, signals } = pairGroup;
-                const primarySignal = signals[0]; // Use first signal for primary info
+                
+                // Prioritize main data if available
+                const mainSignal = signals.find(s => s.timeframe === 'main');
+                const timeframeSignals = signals.filter(s => s.timeframe !== 'main');
+                
+                // Use main data for primary info, fallback to first available signal
+                const primarySignal = mainSignal || signals[0];
                 const dataType = primarySignal.dataType;
                 
                 // Determine overall trend and action
@@ -1593,22 +1788,20 @@
                 const overallTrend = this.getOverallTrend(trends);
                 const overallAction = this.getOverallAction(actions);
                 
-                // Format timestamp
-                const date = new Date(primarySignal.timestamp * 1000);
-                const timestamp = date.toLocaleDateString('en-US', {
-                    month: 'numeric',
-                    day: 'numeric',
-                    year: 'numeric'
-                }) + ', ' + date.toLocaleTimeString('en-US', {
-                    hour: 'numeric',
-                    minute: '2-digit',
-                    hour12: true
-                });
+                // Format timestamp - prioritize main data timestamp
+                const timestamp = this.formatTimestamp(primarySignal.timestamp);
                 
                 // Determine data type badge
                 const dataTypeBadge = dataType === 'signal' ? 
                     '<span class="data-type-badge signal">📊 Signal Data</span>' : 
                     '<span class="data-type-badge price">💰 Price Data</span>';
+                
+                // Create tabs array with main data first
+                const allTabs = [];
+                if (mainSignal) {
+                    allTabs.push({ signal: mainSignal, label: 'MAIN', isMain: true });
+                }
+                allTabs.push(...timeframeSignals.map(s => ({ signal: s, label: s.timeframe, isMain: false })));
                 
                 return `
                     <div class="pair-card ${overallTrend} ${overallAction}">
@@ -1623,34 +1816,64 @@
                         </div>
                         
                         <div class="timeframe-tabs">
-                            ${signals.map((signal, index) => `
-                                <button class="tab-btn ${index === 0 ? 'active' : ''}" 
+                            ${allTabs.map((tab, index) => `
+                                <button class="tab-btn ${index === 0 ? 'active' : ''} ${tab.isMain ? 'main-tab' : ''}" 
                                         onclick="this.parentElement.parentElement.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active')); 
                                                  this.classList.add('active'); 
                                                  this.parentElement.parentElement.querySelectorAll('.tab-content').forEach(content => content.style.display = 'none'); 
                                                  this.parentElement.parentElement.querySelector('.tab-content-${index}').style.display = 'block';">
-                                    ${signal.timeframe}
+                                    ${tab.isMain ? '⭐ MAIN' : tab.label}
                                 </button>
                             `).join('')}
                         </div>
                         
-                        ${signals.map((signal, index) => `
+                        ${allTabs.map((tab, index) => `
                             <div class="tab-content tab-content-${index}" style="display: ${index === 0 ? 'block' : 'none'};">
-                                ${dataType === 'signal' ? 
-                                    this.renderSignalTabContent(signal) : 
-                                    this.renderPriceTabContent(signal)
+                                ${tab.signal.dataType === 'signal' ? 
+                                    this.renderSignalTabContent(tab.signal) : 
+                                    this.renderPriceTabContent(tab.signal)
                                 }
                             </div>
                         `).join('')}
                         
                         <div class="card-footer">
-                            <div class="timestamp">${timestamp}</div>
+                            <div class="timestamp">
+                                <span class="timestamp-label">Data from:</span>
+                                ${timestamp}
+                                ${mainSignal ? '<span class="main-data-indicator">⭐ Main Data</span>' : ''}
+                            </div>
                             <button class="action-btn-compact" onclick="this.viewCharts('${pair}')">
                                 📊 Charts
                             </button>
                         </div>
                     </div>
                 `;
+            }
+
+            formatTimestamp(timestamp) {
+                if (!timestamp) return 'N/A';
+                
+                // Handle both Unix timestamp and ISO string
+                let date;
+                if (typeof timestamp === 'number') {
+                    date = new Date(timestamp * 1000);
+                } else if (typeof timestamp === 'string') {
+                    date = new Date(timestamp);
+                } else {
+                    return 'Invalid timestamp';
+                }
+                
+                if (isNaN(date.getTime())) return 'Invalid timestamp';
+                
+                return date.toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric'
+                }) + ' ' + date.toLocaleTimeString('en-US', {
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true
+                });
             }
 
             getOverallTrend(trends) {
