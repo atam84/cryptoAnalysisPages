@@ -108,6 +108,11 @@ class ConsoleTradingDashboard {
         document.getElementById('refreshBtn').addEventListener('click', () => {
             this.refreshData();
         });
+        
+        // Setup donation button
+        document.getElementById('donateBtn').addEventListener('click', () => {
+            this.showDonationModal();
+        });
 
         // Setup data status modal
         document.getElementById('dataStatusBtn').addEventListener('click', () => {
@@ -150,6 +155,7 @@ class ConsoleTradingDashboard {
                 this.hideDataStatusModal();
                 this.hideDetailsModal();
                 this.hideVersionInfoModal();
+                this.hideDonationModal();
             }
         });
     }
@@ -1348,6 +1354,192 @@ class ConsoleTradingDashboard {
         } catch (error) {
             console.error('❌ Error switching tabs:', error);
         }
+    }
+
+    // ===== DONATION SYSTEM METHODS =====
+
+    showDonationModal() {
+        this.populateDonationModal();
+        document.getElementById('donationModal').style.display = 'block';
+    }
+
+    hideDonationModal() {
+        document.getElementById('donationModal').style.display = 'none';
+    }
+
+    populateDonationModal() {
+        this.populateFiatMethods();
+        this.populateCryptoOptions();
+        this.setupDonationTabs();
+    }
+
+    populateFiatMethods() {
+        const fiatMethods = document.getElementById('fiatMethods');
+        if (!fiatMethods) return;
+
+        const currency = document.getElementById('fiatCurrency').value;
+        const methods = DONATION_CONFIG.fiat[currency];
+        
+        fiatMethods.innerHTML = Object.entries(methods).map(([key, method]) => `
+            <a href="${method.url}" target="_blank" class="donation-method">
+                <div class="donation-method-icon">${method.icon}</div>
+                <div class="donation-method-info">
+                    <h4>${method.name}</h4>
+                    <p>${method.description}</p>
+                </div>
+            </a>
+        `).join('');
+    }
+
+    populateCryptoOptions() {
+        const cryptoGrid = document.getElementById('cryptoGrid');
+        if (!cryptoGrid) return;
+
+        cryptoGrid.innerHTML = Object.entries(DONATION_CONFIG.crypto).map(([key, crypto]) => `
+            <div class="crypto-option">
+                <div class="crypto-icon">${crypto.icon}</div>
+                <div class="crypto-name">${crypto.name}</div>
+                <div class="crypto-description">${crypto.description}</div>
+                <div class="crypto-address">
+                    ${crypto.address}
+                    <div class="copy-success" id="copy-success-${key}">Copied!</div>
+                </div>
+                <div class="crypto-actions">
+                    <button class="crypto-btn copy-btn" onclick="dashboard.copyCryptoAddress('${key}')">
+                        📋 Copy Address
+                    </button>
+                    <button class="crypto-btn qr-btn" onclick="dashboard.showQRCode('${key}')">
+                        📱 QR Code
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    setupDonationTabs() {
+        const tabButtons = document.querySelectorAll('.donation-tab-btn');
+        const tabContents = document.querySelectorAll('#donationModal .tab-content');
+        
+        tabButtons.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const tabName = e.target.dataset.tab;
+                this.switchDonationTab(tabName);
+            });
+        });
+
+        // Setup currency selector change
+        const currencySelector = document.getElementById('fiatCurrency');
+        if (currencySelector) {
+            currencySelector.addEventListener('change', () => {
+                this.populateFiatMethods();
+            });
+        }
+    }
+
+    switchDonationTab(tabName) {
+        try {
+            // Hide all tab contents
+            const tabContents = document.querySelectorAll('#donationModal .tab-content');
+            tabContents.forEach(content => {
+                content.style.display = 'none';
+            });
+            
+            // Remove active class from all tab buttons
+            const tabButtons = document.querySelectorAll('.donation-tab-btn');
+            tabButtons.forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            const selectedTab = document.getElementById(tabName + 'Tab');
+            if (selectedTab) {
+                selectedTab.style.display = 'block';
+            }
+            
+            // Add active class to selected tab button
+            const selectedButton = document.querySelector(`[data-tab="${tabName}"]`);
+            if (selectedButton) {
+                selectedButton.classList.add('active');
+            }
+            
+        } catch (error) {
+            console.error('❌ Error switching donation tabs:', error);
+        }
+    }
+
+    async copyCryptoAddress(cryptoKey) {
+        try {
+            const crypto = DONATION_CONFIG.crypto[cryptoKey];
+            if (!crypto) return;
+
+            await navigator.clipboard.writeText(crypto.address);
+            
+            // Show success message
+            const successElement = document.getElementById(`copy-success-${cryptoKey}`);
+            if (successElement) {
+                successElement.classList.add('show');
+                setTimeout(() => {
+                    successElement.classList.remove('show');
+                }, 2000);
+            }
+
+            console.log(`✅ Copied ${crypto.name} address to clipboard`);
+        } catch (error) {
+            console.error('❌ Error copying address:', error);
+            // Fallback for older browsers
+            this.fallbackCopyTextToClipboard(DONATION_CONFIG.crypto[cryptoKey].address);
+        }
+    }
+
+    fallbackCopyTextToClipboard(text) {
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        
+        try {
+            document.execCommand('copy');
+            console.log('✅ Address copied using fallback method');
+        } catch (err) {
+            console.error('❌ Fallback copy failed:', err);
+        }
+        
+        document.body.removeChild(textArea);
+    }
+
+    showQRCode(cryptoKey) {
+        const crypto = DONATION_CONFIG.crypto[cryptoKey];
+        if (!crypto) return;
+
+        // Create QR code modal
+        const qrModal = document.createElement('div');
+        qrModal.className = 'modal qr-modal';
+        qrModal.innerHTML = `
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>${crypto.name} QR Code</h3>
+                    <button class="modal-close" onclick="this.closest('.modal').remove()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="qr-code">
+                        <img src="${crypto.qrCode}" alt="${crypto.name} QR Code" />
+                    </div>
+                    <p><strong>Address:</strong> ${crypto.address}</p>
+                    <p><strong>Network:</strong> ${crypto.network}</p>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(qrModal);
+        qrModal.style.display = 'block';
+
+        // Close modal when clicking outside
+        qrModal.addEventListener('click', (e) => {
+            if (e.target === qrModal) {
+                qrModal.remove();
+            }
+        });
     }
 }
 

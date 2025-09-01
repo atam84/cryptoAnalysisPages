@@ -1183,3 +1183,357 @@ body {
         padding: 24px; /* More padding on mobile for better readability */
     }
 }
+
+/* ===== DONATION SYSTEM STYLES ===== */
+
+/* Header Actions */
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-top: 16px;
+}
+
+.donate-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(238, 90, 36, 0.3);
+}
+
+.donate-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(238, 90, 36, 0.4);
+    background: linear-gradient(135deg, #ff5252, #d84315);
+}
+
+.donate-btn:active {
+    transform: translateY(0);
+}
+
+.donate-icon {
+    font-size: 1.2rem;
+}
+
+/* Donation Modal */
+.donation-modal {
+    max-width: 800px;
+    width: 90%;
+}
+
+.donation-message {
+    text-align: center;
+    margin-bottom: 24px;
+    padding: 20px;
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+}
+
+.donation-message p {
+    margin-bottom: 12px;
+    color: var(--text-secondary);
+}
+
+.donation-message ul {
+    text-align: left;
+    margin: 16px 0;
+    padding-left: 20px;
+}
+
+.donation-message li {
+    margin-bottom: 8px;
+    color: var(--text-muted);
+}
+
+/* Donation Tabs */
+.donation-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    justify-content: center;
+}
+
+.donation-tab-btn {
+    padding: 12px 24px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.donation-tab-btn:hover {
+    background: var(--bg-card);
+    border-color: var(--info);
+}
+
+.donation-tab-btn.active {
+    background: var(--info);
+    color: white;
+    border-color: var(--info);
+}
+
+/* Currency Selector */
+.currency-selector {
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+.currency-selector label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.currency-select {
+    padding: 10px 16px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    border-radius: 8px;
+    font-size: 1rem;
+    min-width: 200px;
+}
+
+.currency-select:focus {
+    outline: none;
+    border-color: var(--info);
+    box-shadow: 0 0 0 2px rgba(23, 162, 184, 0.2);
+}
+
+/* Fiat Donation Methods */
+.donation-methods {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.donation-method {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    color: inherit;
+}
+
+.donation-method:hover {
+    background: var(--bg-card);
+    border-color: var(--info);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.donation-method-icon {
+    font-size: 2rem;
+    width: 50px;
+    text-align: center;
+}
+
+.donation-method-info h4 {
+    margin: 0 0 4px 0;
+    color: var(--text-primary);
+    font-size: 1rem;
+}
+
+.donation-method-info p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+/* Crypto Donation Grid */
+.crypto-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.crypto-option {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+.crypto-option:hover {
+    background: var(--bg-card);
+    border-color: var(--info);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.crypto-icon {
+    font-size: 3rem;
+    margin-bottom: 12px;
+    display: block;
+}
+
+.crypto-name {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.crypto-description {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 16px;
+}
+
+.crypto-address {
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    word-break: break-all;
+    margin-bottom: 16px;
+    position: relative;
+}
+
+.crypto-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.crypto-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.copy-btn {
+    background: var(--info);
+    color: white;
+}
+
+.copy-btn:hover {
+    background: #138496;
+}
+
+.qr-btn {
+    background: var(--success);
+    color: white;
+}
+
+.qr-btn:hover {
+    background: #218838;
+}
+
+/* QR Code Modal */
+.qr-modal .modal-content {
+    max-width: 400px;
+    text-align: center;
+}
+
+.qr-code {
+    margin: 20px 0;
+}
+
+.qr-code img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+}
+
+/* Donation Footer */
+.donation-footer {
+    text-align: center;
+    padding: 20px;
+    border-top: 1px solid var(--border);
+    margin-top: 24px;
+}
+
+.donation-note {
+    color: var(--text-muted);
+    font-style: italic;
+    margin: 0;
+}
+
+/* Success Message */
+.copy-success {
+    position: absolute;
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--success);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.copy-success.show {
+    opacity: 1;
+}
+
+/* Responsive Design for Donations */
+@media (max-width: 768px) {
+    .header-actions {
+        flex-direction: column;
+        gap: 16px;
+    }
+    
+    .donate-btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .donation-modal {
+        width: 95%;
+        margin: 2% auto;
+    }
+    
+    .donation-tabs {
+        flex-direction: column;
+    }
+    
+    .donation-methods {
+        grid-template-columns: 1fr;
+    }
+    
+    .crypto-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .crypto-actions {
+        flex-direction: column;
+    }
+    
+    .crypto-btn {
+        width: 100%;
+    }
+}

@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Console Trading Dashboard v1.6</title>
+    <meta name="description" content="Console-Style Cryptocurrency Trading Analysis Dashboard">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
+    <!-- Version Management -->
+    <script>
+        // Dashboard Version Management
+        const DASHBOARD_VERSION = '2.1';
+        const VERSION_HISTORY = [
+            { version: '1.0', date: '2025-01-01', changes: 'Initial release with comprehensive signal cards and modal system' },
+            { version: '1.1', date: '2025-01-01', changes: 'Console-style redesign with external CSS/JS and improved data organization' },
+            { version: '1.2', date: '2025-01-01', changes: 'Fixed modal functionality, improved card display, and enhanced user experience' },
+            { version: '1.3', date: '2025-01-01', changes: 'Fixed data transformation for actual JSON structure and ensured single card per pair' },
+            { version: '1.4', date: '2025-01-01', changes: 'Fixed createConsoleSignalCard function to work with transformed data structure' },
+            { version: '1.5', date: '2025-01-01', changes: 'Enhanced timeframe data display in modals and improved modern spacing layout' },
+            { version: '1.6', date: '2025-01-01', changes: 'Enhanced timeframe data display with comprehensive metrics and improved debugging' },
+            { version: '1.7', date: '2025-01-01', changes: 'Fixed timeframe data display to properly handle both signal and price data structures' },
+            { version: '1.8', date: '2025-01-01', changes: 'Added collapsible timeframe sections in modals for better organization and user experience' },
+            { version: '1.9', date: '2025-01-01', changes: 'Fixed collapsible functionality for GitHub Pages deployment using proper event delegation' },
+            { version: '2.0', date: '2025-01-01', changes: 'Fixed mobile touch functionality for collapsible timeframe sections with enhanced mobile UX' },
+            { version: '2.1', date: '2025-01-01', changes: 'Added comprehensive donation system with fiat and cryptocurrency support, PayPal, Google Pay, Apple Pay, Buy Me a Coffee, and 8 crypto networks' }
+        ];
+        
+        // Function to increment version before push
+        function incrementVersion() {
+            const currentVersion = DASHBOARD_VERSION.split('.');
+            const major = parseInt(currentVersion[0]);
+            const minor = parseInt(currentVersion[1]);
+            const newMinor = minor + 1;
+            const newVersion = `${major}.${newMinor}`;
+            
+            console.log(`🚀 Version increment required before push:`);
+            console.log(`Current: ${DASHBOARD_VERSION} → New: ${newVersion}`);
+            console.log(`Update DASHBOARD_VERSION constant and add to VERSION_HISTORY`);
+            
+            return newVersion;
+        }
+        
+        // Display version info
+        console.log(`📊 Console Trading Dashboard v${DASHBOARD_VERSION}`);
+        console.log(`📝 Remember to increment version before pushing changes`);
+        console.log(`🔧 Version 2.1: Added comprehensive donation system with fiat and cryptocurrency support`);
+    </script>
+    
+    <!-- External CSS -->
+    <link rel="stylesheet" href="./assets/css/dashboard.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>
+                <span class="icon">💻</span>
+                Console Trading Dashboard
+            </h1>
+            <p>Terminal-Style Cryptocurrency Trading Analysis</p>
+            <div class="header-actions">
+                <div class="version-info">
+                    <span class="version-badge">v<span id="dashboardVersion">2.1</span></span>
+                    <span class="version-date">Updated: <span id="lastUpdateDate">2025-01-01</span></span>
+                    <button class="version-info-btn" id="versionInfoBtn" title="Version Information">ℹ️</button>
+                </div>
+                <button class="donate-btn" id="donateBtn" title="Support the Project">
+                    <span class="donate-icon">❤️</span>
+                    Support Project
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-value" id="totalSignals">0</div>
+                <div class="stat-label">Total Pairs</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="bullishSignals">0</div>
+                <div class="stat-label">Bullish</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="bearishSignals">0</div>
+                <div class="stat-label">Bearish</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="waitSignals">0</div>
+                <div class="stat-label">Wait</div>
+            </div>
+        </div>
+
+        <!-- Data Status Button -->
+        <div class="data-status-button">
+            <button class="status-btn" id="dataStatusBtn">
+                📊 Data Availability Status
+            </button>
+        </div>
+
+        <!-- Enhanced Filters -->
+        <div class="filters">
+            <div class="filter-group">
+                <label for="pairFilter">Pair:</label>
+                <select class="filter-select" id="pairFilter">
+                    <option value="all">All Pairs</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="timeframeFilter">Timeframe:</label>
+                <select class="filter-select" id="timeframeFilter">
+                    <option value="all">All Timeframes</option>
+                    <option value="1h">1 Hour</option>
+                    <option value="8h">8 Hours</option>
+                    <option value="1d">1 Day</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="trendFilter">Trend:</label>
+                <select class="filter-select" id="trendFilter">
+                    <option value="all">All Trends</option>
+                    <option value="bullish">Bullish</option>
+                    <option value="bearish">Bearish</option>
+                    <option value="neutral">Neutral</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="actionFilter">Action:</label>
+                <select class="filter-select" id="actionFilter">
+                    <option value="all">All Actions</option>
+                    <option value="buy">Buy</option>
+                    <option value="sell">Sell</option>
+                    <option value="wait">Wait</option>
+                </select>
+            </div>
+            
+            <button class="refresh-btn" id="refreshBtn">
+                <span class="refresh-icon">🔄</span>
+                Refresh
+            </button>
+        </div>
+
+        <!-- Signals Grid -->
+        <div class="signals-grid" id="signalsGrid">
+            <div class="loading">Loading trading pairs...</div>
+        </div>
+    </div>
+
+    <!-- Data Status Modal -->
+    <div class="modal" id="dataStatusModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📊 Data Availability Status</h3>
+                <button class="modal-close" id="closeDataStatusModal">&times;</button>
+            </div>
+            <div class="modal-body" id="dataStatusModalBody">
+                <div class="loading">Loading data availability...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Version Info Modal -->
+    <div class="modal" id="versionInfoModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📋 Version Information</h3>
+                <button class="modal-close" id="closeVersionInfoModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="version-current">
+                    <h4>Current Version</h4>
+                    <div class="version-display">
+                        <span class="version-number">v<span id="modalVersion">1.1</span></span>
+                        <span class="version-date">Released: <span id="modalDate">2025-01-01</span></span>
+                    </div>
+                </div>
+                <div class="version-history">
+                    <h4>Version History</h4>
+                    <div id="versionHistoryList">
+                        <!-- Version history will be populated here -->
+                    </div>
+                </div>
+                <div class="version-actions">
+                    <button class="version-increment-btn" id="versionIncrementBtn">
+                        🚀 Increment Version (Before Push)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Details Modal -->
+    <div class="modal" id="detailsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="detailsModalTitle">Trading Details</h3>
+                <button class="modal-close" id="closeDetailsModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-tabs">
+                    <button class="detail-tab-btn active" data-tab="timeframes">⏰ Timeframes</button>
+                    <button class="detail-tab-btn" data-tab="graphs">📊 Graphs</button>
+                    <button class="detail-tab-btn" data-tab="analysis">🔍 Analysis</button>
+                </div>
+                
+                <div class="tab-content" id="timeframesTab">
+                    <div class="loading">Loading timeframe data...</div>
+                </div>
+                
+                <div class="tab-content" id="graphsTab" style="display: none;">
+                    <div class="loading">Loading chart data...</div>
+                </div>
+                
+                <div class="tab-content" id="analysisTab" style="display: none;">
+                    <div class="loading">Loading analysis data...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Donation Modal -->
+    <div class="modal" id="donationModal">
+        <div class="modal-content donation-modal">
+            <div class="modal-header">
+                <h3>❤️ Support the Project</h3>
+                <button class="modal-close" id="closeDonationModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="donation-message">
+                    <p>🚀 Help us keep this project alive and improve it further!</p>
+                    <p>Your support enables us to:</p>
+                    <ul>
+                        <li>🔍 Add more cryptocurrency pairs</li>
+                        <li>📊 Improve analysis algorithms</li>
+                        <li>🎨 Enhance the user interface</li>
+                        <li>📱 Develop mobile applications</li>
+                        <li>🌐 Expand to more exchanges</li>
+                    </ul>
+                </div>
+                
+                <div class="donation-tabs">
+                    <button class="donation-tab-btn active" data-tab="fiat">💳 Fiat</button>
+                    <button class="donation-tab-btn" data-tab="crypto">₿ Crypto</button>
+                </div>
+                
+                <div class="tab-content" id="fiatTab">
+                    <div class="currency-selector">
+                        <label for="fiatCurrency">Select Currency:</label>
+                        <select id="fiatCurrency" class="currency-select">
+                            <option value="usd">🇺🇸 US Dollar (USD)</option>
+                            <option value="eur">🇪🇺 Euro (EUR)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="donation-methods" id="fiatMethods">
+                        <!-- Fiat donation methods will be populated here -->
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="cryptoTab" style="display: none;">
+                    <div class="crypto-grid" id="cryptoGrid">
+                        <!-- Crypto donation options will be populated here -->
+                    </div>
+                </div>
+                
+                <div class="donation-footer">
+                    <p class="donation-note">💡 All donations are voluntary and greatly appreciated!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Donation Configuration -->
+    <script src="./config/donate.js"></script>
+    
+    <!-- External JavaScript -->
+    <script src="./assets/js/app.js"></script>
+</body>
+</html>
+
