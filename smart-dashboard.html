@@ -149,6 +149,202 @@
             font-weight: 500;
         }
 
+        /* Data Status Button */
+        .data-status-button {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .status-btn {
+            background: var(--info);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+
+        .status-btn:hover {
+            background: #138496;
+            transform: translateY(-1px);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            background-color: var(--bg-secondary);
+            margin: 5% auto;
+            padding: 0;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            color: var(--text-primary);
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 2rem;
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        /* Compact Card Layout */
+        .timeframe-badge {
+            background: var(--info);
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 8px;
+            margin-left: 8px;
+            font-weight: 500;
+        }
+
+        .compact-data {
+            background: var(--bg-card);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 16px;
+        }
+
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+        }
+
+        .data-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .data-label {
+            color: var(--text-muted);
+            font-weight: 500;
+            min-width: 60px;
+        }
+
+        .data-value {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .data-value.high {
+            color: var(--success);
+        }
+
+        .data-value.medium {
+            color: var(--warning);
+        }
+
+        .data-value.low {
+            color: var(--danger);
+        }
+
+        .trade-summary {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .trade-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: var(--bg-card);
+            border-radius: 6px;
+            font-size: 0.85rem;
+        }
+
+        .trade-label {
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .trade-value {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .analysis-compact {
+            margin-bottom: 16px;
+        }
+
+        .analysis-compact .analysis-text {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .action-btn-compact {
+            background: var(--info);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn-compact:hover {
+            background: #138496;
+            transform: translateY(-1px);
+        }
+
         /* Enhanced Filters */
         .filters {
             display: flex;
@@ -670,9 +866,11 @@
             </div>
         </div>
 
-        <!-- Data Availability Status -->
-        <div class="data-status" id="dataStatus">
-            <div class="loading">Loading data availability...</div>
+        <!-- Data Status Button -->
+        <div class="data-status-button">
+            <button class="status-btn" id="dataStatusBtn">
+                📊 Data Availability Status
+            </button>
         </div>
 
         <!-- Enhanced Filters -->
@@ -723,6 +921,19 @@
         <!-- Signals Grid -->
         <div class="signals-grid" id="signalsGrid">
             <div class="loading">Loading trading signals...</div>
+        </div>
+    </div>
+
+    <!-- Data Status Modal -->
+    <div class="modal" id="dataStatusModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📊 Data Availability Status</h3>
+                <button class="modal-close" id="closeDataStatusModal">&times;</button>
+            </div>
+            <div class="modal-body" id="dataStatusModalBody">
+                <div class="loading">Loading data availability...</div>
+            </div>
         </div>
     </div>
 
@@ -779,6 +990,23 @@
                 // Setup refresh button
                 document.getElementById('refreshBtn').addEventListener('click', () => {
                     this.refreshData();
+                });
+
+                // Setup data status modal
+                document.getElementById('dataStatusBtn').addEventListener('click', () => {
+                    this.showDataStatusModal();
+                });
+
+                document.getElementById('closeDataStatusModal').addEventListener('click', () => {
+                    this.hideDataStatusModal();
+                });
+
+                // Close modal when clicking outside
+                window.addEventListener('click', (event) => {
+                    const modal = document.getElementById('dataStatusModal');
+                    if (event.target === modal) {
+                        this.hideDataStatusModal();
+                    }
                 });
             }
 
@@ -1063,10 +1291,10 @@
             updateDataAvailabilityStatus() {
                 if (!this.pairs) return;
                 
-                const statusContainer = document.getElementById('dataStatus');
+                const statusContainer = document.getElementById('dataStatusModalBody');
                 if (!statusContainer) return;
                 
-                let statusHTML = '<h4>📊 Data Availability Status</h4>';
+                let statusHTML = '';
                 
                 for (const pair of this.pairs) {
                     const availableTimeframes = this.data.filter(d => d.pair === pair.symbol).map(d => d.timeframe);
@@ -1082,6 +1310,21 @@
                 }
                 
                 statusContainer.innerHTML = statusHTML;
+            }
+
+            showDataStatusModal() {
+                const modal = document.getElementById('dataStatusModal');
+                if (modal) {
+                    modal.style.display = 'block';
+                    this.updateDataAvailabilityStatus();
+                }
+            }
+
+            hideDataStatusModal() {
+                const modal = document.getElementById('dataStatusModal');
+                if (modal) {
+                    modal.style.display = 'none';
+                }
             }
 
             renderSignals() {
@@ -1135,7 +1378,7 @@
                     <div class="signal-card ${signal.trend} ${signal.action}">
                         <div class="card-header">
                             <div class="pair-info">
-                                <h3>${signal.pair}</h3>
+                                <h3>${signal.pair} <span class="timeframe-badge">${signal.timeframe}</span></h3>
                                 <div class="trend-badge ${signal.trend}">
                                     ${signal.trend === 'bullish' ? '🐂 Bullish' : signal.trend === 'bearish' ? '🐻 Bearish' : '⏸️ Neutral'}
                                 </div>
@@ -1143,46 +1386,49 @@
                             ${dataTypeBadge}
                         </div>
                         
-                        <div class="market-data">
-                            <div class="data-item">
-                                <div class="data-label">Timeframe</div>
-                                <div class="data-value">${signal.timeframe}</div>
+                        <div class="compact-data">
+                            <div class="data-row">
+                                <span class="data-label">Confidence:</span>
+                                <span class="data-value ${signal.confidence === 'HIGH' ? 'high' : signal.confidence === 'MEDIUM' ? 'medium' : 'low'}">${signal.confidence}</span>
+                                <span class="data-label">Confluence:</span>
+                                <span class="data-value">${signal.confluenceScore}</span>
                             </div>
-                            <div class="data-item">
-                                <div class="data-label">Confidence</div>
-                                <div class="data-value">${signal.confidence}</div>
-                            </div>
-                            <div class="data-item">
-                                <div class="data-label">Confluence</div>
-                                <div class="data-value">${signal.confluenceScore}</div>
-                            </div>
-                            <div class="data-item">
-                                <div class="data-label">Volume</div>
-                                <div class="data-value">${signal.volumeConfirmation}</div>
+                            <div class="data-row">
+                                <span class="data-label">Volume:</span>
+                                <span class="data-value">${signal.volumeConfirmation}</span>
+                                <span class="data-label">Pattern:</span>
+                                <span class="data-value">${signal.patternStrength}</span>
                             </div>
                         </div>
                         
-                        <div class="trade-plan">
-                            <h4>Trade Plan</h4>
-                            <ul>
-                                <li><strong>Entry Zone:</strong> ${signal.entryRange || 'N/A'}</li>
-                                <li><strong>Targets:</strong> ${signal.target || 'N/A'}</li>
-                                <li><strong>Stop Loss:</strong> ${signal.stopLoss || 'N/A'}</li>
-                                <li><strong>Min. Win:</strong> ${signal.winPercentage ? signal.winPercentage + '%' : 'N/A'}</li>
-                            </ul>
+                        <div class="trade-summary">
+                            <div class="trade-item">
+                                <span class="trade-label">Entry:</span>
+                                <span class="trade-value">${signal.entryRange || 'N/A'}</span>
+                            </div>
+                            <div class="trade-item">
+                                <span class="trade-label">Target:</span>
+                                <span class="trade-value">${signal.target || 'N/A'}</span>
+                            </div>
+                            <div class="trade-item">
+                                <span class="trade-label">Stop:</span>
+                                <span class="trade-value">${signal.stopLoss || 'N/A'}</span>
+                            </div>
+                            <div class="trade-item">
+                                <span class="trade-label">Win%:</span>
+                                <span class="trade-value">${signal.winPercentage ? signal.winPercentage + '%' : 'N/A'}</span>
+                            </div>
                         </div>
                         
-                        <div class="analysis">
-                            <h4>Analysis</h4>
-                            <div class="analysis-text">${signal.reasoning}</div>
+                        <div class="analysis-compact">
+                            <div class="analysis-text">${signal.reasoning.length > 120 ? signal.reasoning.substring(0, 120) + '...' : signal.reasoning}</div>
                         </div>
-                        
-                        <button class="action-btn" onclick="this.viewCharts('${signal.pair}')">
-                            📊 View Charts
-                        </button>
                         
                         <div class="card-footer">
                             <div class="timestamp">${timestamp}</div>
+                            <button class="action-btn-compact" onclick="this.viewCharts('${signal.pair}')">
+                                📊 Charts
+                            </button>
                         </div>
                     </div>
                 `;
@@ -1193,7 +1439,7 @@
                     <div class="signal-card ${signal.trend} ${signal.action}">
                         <div class="card-header">
                             <div class="pair-info">
-                                <h3>${signal.pair}</h3>
+                                <h3>${signal.pair} <span class="timeframe-badge">${signal.timeframe}</span></h3>
                                 <div class="trend-badge ${signal.trend}">
                                     ⏸️ Neutral
                                 </div>
@@ -1201,46 +1447,45 @@
                             ${dataTypeBadge}
                         </div>
                         
-                        <div class="market-data">
-                            <div class="data-item">
-                                <div class="data-label">Timeframe</div>
-                                <div class="data-value">${signal.timeframe}</div>
+                        <div class="compact-data">
+                            <div class="data-row">
+                                <span class="data-label">Support:</span>
+                                <span class="data-value">${signal.support}</span>
+                                <span class="data-label">Resistance:</span>
+                                <span class="data-value">${signal.resistance}</span>
                             </div>
-                            <div class="data-item">
-                                <div class="data-label">Support</div>
-                                <div class="data-value">${signal.support}</div>
-                            </div>
-                            <div class="data-item">
-                                <div class="data-label">Resistance</div>
-                                <div class="data-value">${signal.resistance}</div>
-                            </div>
-                            <div class="data-item">
-                                <div class="data-label">Candles</div>
-                                <div class="data-value">${signal.candles}</div>
+                            <div class="data-row">
+                                <span class="data-label">High:</span>
+                                <span class="data-value">${signal.highest}</span>
+                                <span class="data-label">Low:</span>
+                                <span class="data-value">${signal.lowest}</span>
                             </div>
                         </div>
                         
-                        <div class="trade-plan">
-                            <h4>Price Levels</h4>
-                            <ul>
-                                <li><strong>Current Range:</strong> ${signal.entryRange}</li>
-                                <li><strong>High:</strong> ${signal.highest}</li>
-                                <li><strong>Low:</strong> ${signal.lowest}</li>
-                                <li><strong>Amplitude:</strong> ${signal.amplitude}</li>
-                            </ul>
+                        <div class="trade-summary">
+                            <div class="trade-item">
+                                <span class="trade-label">Range:</span>
+                                <span class="trade-value">${signal.entryRange}</span>
+                            </div>
+                            <div class="trade-item">
+                                <span class="trade-label">Amplitude:</span>
+                                <span class="trade-value">${signal.amplitude}</span>
+                            </div>
+                            <div class="trade-item">
+                                <span class="trade-label">Candles:</span>
+                                <span class="trade-value">${signal.candles}</span>
+                            </div>
                         </div>
                         
-                        <div class="analysis">
-                            <h4>Price Analysis</h4>
-                            <div class="analysis-text">${signal.reasoning}</div>
+                        <div class="analysis-compact">
+                            <div class="analysis-text">${signal.reasoning.length > 120 ? signal.reasoning.substring(0, 120) + '...' : signal.reasoning}</div>
                         </div>
-                        
-                        <button class="action-btn" onclick="this.viewCharts('${signal.pair}')">
-                            📊 View Charts
-                        </button>
                         
                         <div class="card-footer">
                             <div class="timestamp">${timestamp}</div>
+                            <button class="action-btn-compact" onclick="this.viewCharts('${signal.pair}')">
+                                📊 Charts
+                            </button>
                         </div>
                     </div>
                 `;
