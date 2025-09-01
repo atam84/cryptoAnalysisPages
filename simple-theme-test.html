@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Theme Test</title>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --text-color: #ffffff;
+            --accent-color: #58a6ff;
+        }
+        
+        html[data-theme="light"] {
+            --bg-color: #f8f9fa;
+            --text-color: #212529;
+            --accent-color: #0d6efd;
+        }
+        
+        html[data-theme="dark"] {
+            --bg-color: #0d1117;
+            --text-color: #ffffff;
+            --accent-color: #58a6ff;
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .theme-switcher {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .test-content {
+            margin: 20px 0;
+            padding: 20px;
+            border: 2px solid var(--accent-color);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Simple Theme Test</h1>
+    
+    <button class="theme-switcher" id="themeSwitcher">
+        🌙 Switch to Light Mode
+    </button>
+    
+    <div class="test-content">
+        <h2>Test Content</h2>
+        <p>This page should change colors when you click the theme switcher.</p>
+        <p>Current theme: <span id="currentTheme">dark</span></p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🔧 DOM loaded, setting up simple theme switcher...');
+            
+            const themeSwitcher = document.getElementById('themeSwitcher');
+            const currentThemeSpan = document.getElementById('currentTheme');
+            
+            // Initialize theme
+            let currentTheme = localStorage.getItem('theme') || 'dark';
+            applyTheme(currentTheme);
+            
+            // Add click listener
+            themeSwitcher.addEventListener('click', () => {
+                console.log('🖱️ Theme switcher clicked!');
+                currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                applyTheme(currentTheme);
+            });
+            
+            function applyTheme(theme) {
+                document.documentElement.setAttribute('data-theme', theme);
+                localStorage.setItem('theme', theme);
+                currentThemeSpan.textContent = theme;
+                
+                if (theme === 'light') {
+                    themeSwitcher.textContent = '☀️ Switch to Dark Mode';
+                } else {
+                    themeSwitcher.textContent = '🌙 Switch to Light Mode';
+                }
+                
+                console.log('🎨 Theme applied:', theme);
+            }
+            
+            console.log('✅ Simple theme switcher setup complete');
+        });
+    </script>
+</body>
+</html>
