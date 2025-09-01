@@ -556,6 +556,68 @@ body {
     border-radius: 6px;
 }
 
+/* Data Status */
+.data-status {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 24px;
+}
+
+.data-status h4 {
+    margin: 0 0 16px 0;
+    color: var(--text-primary);
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.pair-status {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.pair-status:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.pair-status .pair-name {
+    font-weight: 600;
+    color: var(--text-accent);
+    min-width: 80px;
+}
+
+.pair-status .status {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.pair-status .status.success {
+    background: rgba(35, 134, 54, 0.2);
+    color: var(--success);
+    border: 1px solid var(--success);
+}
+
+.pair-status .status.warning {
+    background: rgba(210, 153, 34, 0.2);
+    color: var(--warning);
+    border: 1px solid var(--warning);
+}
+
+.pair-status .timeframes {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    margin-left: auto;
+}
+
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
     .container {

@@ -167,7 +167,11 @@ class ConsoleTradingDashboard {
             }
             
             const pairsConfig = await pairsResponse.json();
-            this.pairs = pairsConfig.pairs;
+            this.pairs = pairsConfig.pairs || [];
+            
+            if (!this.pairs || this.pairs.length === 0) {
+                throw new Error('No trading pairs found in configuration');
+            }
             
             console.log(`📊 Loaded ${this.pairs.length} trading pairs`);
             
@@ -176,6 +180,11 @@ class ConsoleTradingDashboard {
             
             for (const pair of this.pairs) {
                 try {
+                    if (!pair || !pair.symbol) {
+                        console.warn('⚠️ Invalid pair configuration:', pair);
+                        continue;
+                    }
+                    
                     // Try to load main data file first
                     const mainDataUrl = `./assets/pairs/${pair.symbol}/data-${pair.symbol}.json`;
                     const mainResponse = await fetch(mainDataUrl + '?v=' + Date.now());
@@ -194,12 +203,12 @@ class ConsoleTradingDashboard {
                         
                         // Load timeframe-specific data
                         const timeframeSignals = await this.loadTimeframeData(pair);
-                        if (timeframeSignals.length > 0) {
+                        if (timeframeSignals && timeframeSignals.length > 0) {
                             allSignals.push(...timeframeSignals);
                         }
                     }
                 } catch (error) {
-                    console.error(`❌ Error loading data for ${pair.symbol}:`, error);
+                    console.error(`❌ Error loading data for ${pair?.symbol || 'unknown'}:`, error);
                 }
             }
             
@@ -210,7 +219,7 @@ class ConsoleTradingDashboard {
             
         } catch (error) {
             console.error('❌ Error loading data:', error);
-            this.showError('Failed to load trading signals. Please try again.');
+            this.showError(`Failed to load trading signals: ${error.message}`);
         } finally {
             this.setLoadingState(false);
         }
@@ -529,12 +538,17 @@ class ConsoleTradingDashboard {
         if (!filter) return;
         
         filter.innerHTML = '<option value="all">All Pairs</option>';
-        this.pairs.forEach(pair => {
-            const option = document.createElement('option');
-            option.value = pair.symbol;
-            option.textContent = pair.symbol;
-            filter.appendChild(option);
-        });
+        
+        if (this.pairs && this.pairs.length > 0) {
+            this.pairs.forEach(pair => {
+                if (pair && pair.symbol) {
+                    const option = document.createElement('option');
+                    option.value = pair.symbol;
+                    option.textContent = pair.symbol;
+                    filter.appendChild(option);
+                }
+            });
+        }
     }
 
     applyFilters() {
@@ -583,22 +597,33 @@ class ConsoleTradingDashboard {
         let statusHTML = '<div class="data-status">';
         statusHTML += '<h4>📊 Data Availability Status</h4>';
         
-        this.pairs.forEach(pair => {
-            const hasMainData = this.data.some(s => s.pair === pair.symbol && s.dataType === 'main');
-            const timeframeData = this.data.filter(s => s.pair === pair.symbol && s.dataType === 'timeframe');
-            
-            statusHTML += `
-                <div class="pair-status">
-                    <span class="pair-name">${pair.symbol}</span>
-                    <span class="status ${hasMainData ? 'success' : 'warning'}">
-                        ${hasMainData ? '✅ Main Data' : '⚠️ Timeframe Data Only'}
-                    </span>
-                    <span class="timeframes">
-                        ${timeframeData.map(s => s.timeframe).join(', ') || 'No timeframe data'}
-                    </span>
-                </div>
-            `;
-        });
+        if (!this.pairs || this.pairs.length === 0) {
+            statusHTML += '<div class="pair-status">';
+            statusHTML += '<span class="status warning">⚠️ No trading pairs configured</span>';
+            statusHTML += '</div>';
+        } else {
+            this.pairs.forEach(pair => {
+                if (!pair || !pair.symbol) {
+                    console.warn('⚠️ Invalid pair in status modal:', pair);
+                    return;
+                }
+                
+                const hasMainData = this.data.some(s => s.pair === pair.symbol && s.dataType === 'main');
+                const timeframeData = this.data.filter(s => s.pair === pair.symbol && s.dataType === 'timeframe');
+                
+                statusHTML += `
+                    <div class="pair-status">
+                        <span class="pair-name">${pair.symbol}</span>
+                        <span class="status ${hasMainData ? 'success' : 'warning'}">
+                            ${hasMainData ? '✅ Main Data' : '⚠️ Timeframe Data Only'}
+                        </span>
+                        <span class="timeframes">
+                            ${timeframeData.map(s => s.timeframe).join(', ') || 'No timeframe data'}
+                        </span>
+                    </div>
+                `;
+            });
+        }
         
         statusHTML += '</div>';
         modalBody.innerHTML = statusHTML;
