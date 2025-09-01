@@ -222,7 +222,6 @@ class ConsoleTradingDashboard {
         // Add click event listener
         themeSwitcher.addEventListener('click', () => {
             console.log('🖱️ Theme switcher clicked!');
-            alert(`Theme switcher clicked! Current theme: ${this.currentTheme}`);
             const newTheme = this.currentTheme === 'dark' ? 'light' : 'dark';
             console.log('🔄 Switching theme from', this.currentTheme, 'to', newTheme);
             this.setTheme(newTheme);
