@@ -626,7 +626,7 @@ class ConsoleTradingDashboard {
                 const lowest = signalData.lowest || signalData.Lowest || 'N/A';
                 const amplitude = signalData.amplitude || signalData.Amplitude || signalData.Amplitude_HL || 'N/A';
                 const candles = signalData.candles || signalData.Candles || 'N/A';
-                const variations = signalData.variations || signalData.Variations || 'N/A';
+                const variations = signalData.variations || signalData.Variations || null;
                 const support = signalData.support || 'N/A';
                 const resistance = signalData.resistance || 'N/A';
                 const highest = signalData.highest || 'N/A';
@@ -643,7 +643,7 @@ class ConsoleTradingDashboard {
                         lowest: lowest,
                         amplitude: amplitude,
                         candles: candles,
-                        variations: typeof variations === 'object' ? JSON.stringify(variations) : variations
+                        variations: variations
                     },
                     dataType: 'price'
                 };
@@ -1112,7 +1112,7 @@ class ConsoleTradingDashboard {
 
     renderPriceMetrics(data) {
         if (!data) return '<div class="no-data">No price data available</div>';
-        
+        const variationsPretty = data.variations ? `<pre style="white-space:pre-wrap;word-break:break-word;">${typeof data.variations === 'string' ? data.variations : JSON.stringify(data.variations, null, 2)}</pre>` : 'N/A';
         return `
             <div class="metrics-grid">
                 <div class="metric-item">
@@ -1141,7 +1141,7 @@ class ConsoleTradingDashboard {
                 </div>
                 <div class="metric-item">
                     <span class="metric-label">Variations:</span>
-                    <span class="metric-value">${data.variations || 'N/A'}</span>
+                    <span class="metric-value">${variationsPretty}</span>
                 </div>
             </div>
         `;
@@ -1154,8 +1154,8 @@ class ConsoleTradingDashboard {
             return `
                 <div class="chart-item">
                     <h5>${pair} - ${tf.toUpperCase()} Chart</h5>
-                    <div class="chart-container">
-                        <img class="chart-image" src="${src}" alt="${pair} ${tf} chart" onerror="this.parentElement.innerHTML='<div class=\'chart-placeholder\'>No ${tf} chart available</div>'">
+                    <div class="chart-container" data-src="${src}">
+                        <div class="chart-placeholder">Loading ${tf} chart...</div>
                     </div>
                 </div>
             `;
@@ -1167,6 +1167,16 @@ class ConsoleTradingDashboard {
                 ${imagesHtml}
             </div>
         `;
+        // Lazy load images and handle 404 gracefully without console noise
+        tabElement.querySelectorAll('.chart-container').forEach(container => {
+            const img = new Image();
+            const src = container.getAttribute('data-src');
+            img.className = 'chart-image';
+            img.alt = `${pair} chart`;
+            img.onload = () => { container.innerHTML = ''; container.appendChild(img); };
+            img.onerror = () => { container.innerHTML = '<div class="chart-placeholder">No chart available</div>'; };
+            img.src = src;
+        });
     }
 
     populateAnalysisTab(tabElement, signals) {
