@@ -1,0 +1,18 @@
+{
+ "symbol": "ETH-USDT",
+ "timeframe": "1h",
+ "support": "4348",
+ "resistance": "4407",
+ "highest": "4497.67",
+ "Lowest": "4211.5",
+ "Amplitude_HL": "63.27",
+ "Candles": "70",
+ "Variations": {
+	"Open_Close": "-18.11",
+	"Open_Close_pct": "-0.41",
+	"From_High": "-37.37",
+	"Open_Close_pct": "-0.85",
+	"From_Low": "25.9", 
+	"Open_Close_pct": "0.6"
+  }
+}
