@@ -1,0 +1,58 @@
+{
+  "signal": {
+    "symbol": "OP-USDT",
+    "timestamp": 1756800711.699,
+    "analysis_time": "2025-09-02T09:11:51.699+01:00",
+    
+    "classification": {
+      "type": "NO_SIGNAL",
+      "confidence": "LOW",
+      "confluence_score": "5/10",
+      "expected_win_rate": "30%",
+      "frequency_tier": "LOW"
+    },
+    
+    "recommendation": {
+      "action": "WAIT",
+      "timeframe": "SWING",
+      "entry_range": [0.686, 0.692],
+      "stop_loss": 0.67,
+      "take_profit": [0.74, 0.75, 0.76],
+      "risk_reward_ratio": "1.25:1",
+      "max_drawdown": "-4%"
+    },
+    
+    "position_sizing": {
+      "confidence_tier": "LOW",
+      "base_position_percent": 0.5,
+      "max_portfolio_risk": 1,
+      "volatility_adjustment": "NORMAL",
+      "suggested_position_size": "0.3435 (calculated) based on portfolio one side"
+    },
+    
+    "technical_analysis": {
+      "primary_timeframe": "1d",
+      "timeframes_aligned": 2,
+      "trend_direction": "BEARISH",
+      "volume_confirmation": "WEAK",
+      "key_level_proximity": "FAR",
+      "pattern_strength": "WEAK"
+    },
+    
+    "risk_management": {
+      "stop_loss_type": "TECHNICAL",
+      "reward_targets": [
+        {"price": 0.74, "probability": "50%"},
+        {"price": 0.75, "probability": "30%"},
+        {"price": 0.76, "probability": "20%"}
+      ],
+      "exit_strategy": "Scale out at the first target and trail stop for the remaining.",
+      "risk_factors": [
+        "Market volatility",
+        "Current bearish trend"
+      ]
+    },
+    
+    "reasoning": "Having analyzed the recent history where the asset has shown a win rate of only 30%, it is crucial to adjust selectivity sharply. Given the current streak of 2 losses, we've identified a need for caution, resulting in a recommendation to wait. The analysis ranks the confluence at 5/10, leading to a NO_SIGNAL classification as it fails to meet the higher confidence thresholds—highlighting bearish trends and weak volume confirmation. Therefore, the advised entry range is established at 0.686 to 0.692 with corresponding targets reflecting realistic resistance levels."
+  }
+}
