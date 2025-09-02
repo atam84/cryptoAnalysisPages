@@ -1,0 +1,18 @@
+{
+ "symbol": "SUI-USDT",
+ "timeframe": "1h",
+ "support": "3.28",
+ "resistance": "3.32",
+ "highest": "3.35",
+ "Lowest": "3.11",
+ "Amplitude_HL": "0.01",
+ "Candles": "70",
+ "Variations": {
+	"Open_Close": "0",
+	"Open_Close_pct": "-0.04",
+	"From_High": "0",
+	"Open_Close_pct": "-0.04",
+	"From_Low": "0.01", 
+	"Open_Close_pct": "0.3"
+  }
+}
