@@ -1,0 +1,58 @@
+{
+  "signal": {
+    "symbol": "BNB-USDT",
+    "timestamp": 1756824407.24,
+    "analysis_time": "2025-09-02T15:46:47.240+01:00",
+    
+    "classification": {
+      "type": "NO_SIGNAL",
+      "confidence": "LOW",
+      "confluence_score": "7/10",
+      "expected_win_rate": "Poor",
+      "frequency_tier": "LOW"
+    },
+    
+    "recommendation": {
+      "action": "WAIT",
+      "timeframe": "N/A",
+      "entry_range": [
+        0,
+        0
+      ],
+      "stop_loss": 0,
+      "take_profit": [],
+      "risk_reward_ratio": "N/A",
+      "max_drawdown": "0%"
+    },
+    
+    "position_sizing": {
+      "confidence_tier": "LOW",
+      "base_position_percent": 0.5,
+      "max_portfolio_risk": 1,
+      "volatility_adjustment": "NORMAL",
+      "suggested_position_size": "0%"
+    },
+    
+    "technical_analysis": {
+      "primary_timeframe": "1d",
+      "timeframes_aligned": 2,
+      "trend_direction": "BAISSIÈRE",
+      "volume_confirmation": "MODERATE",
+      "key_level_proximity": "NEAR",
+      "pattern_strength": "WEAK"
+    },
+    
+    "risk_management": {
+      "stop_loss_type": "TECHNICAL",
+      "reward_targets": [],
+      "exit_strategy": "No clear entry points; strategy should focus on potential future signals.",
+      "risk_factors": [
+        "Current losing streak is significant",
+        "Recent performance is underwhelming",
+        "Confluence below required levels"
+      ]
+    },
+    
+    "reasoning": "Given the current losing streak of 4 and a confluence score of 7/10, it is prudent to classify this as NO_SIGNAL. The recent performance does not support a strong trading opportunity, and it is better to wait for favorable conditions."
+  }
+}
