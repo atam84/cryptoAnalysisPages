@@ -12,7 +12,7 @@
     <!-- Version Management -->
     <script>
         // Dashboard Version Management
-        const DASHBOARD_VERSION = '2.3';
+        const DASHBOARD_VERSION = '2.4';
         const VERSION_HISTORY = [
             { version: '1.0', date: '2025-01-01', changes: 'Initial release with comprehensive signal cards and modal system' },
             { version: '1.1', date: '2025-01-01', changes: 'Console-style redesign with external CSS/JS and improved data organization' },
@@ -27,7 +27,8 @@
             { version: '2.0', date: '2025-01-01', changes: 'Fixed mobile touch functionality for collapsible timeframe sections with enhanced mobile UX' },
             { version: '2.1', date: '2025-01-01', changes: 'Added comprehensive donation system with fiat and cryptocurrency support, PayPal, Google Pay, Apple Pay, Buy Me a Coffee, and 8 crypto networks' },
             { version: '2.2', date: '2025-01-01', changes: 'Added theme switching functionality with light/dark modes, improved header alignment, and enhanced mobile responsiveness' },
-            { version: '2.3', date: '2025-09-02', changes: 'Refined data loading and fallback logic; removed duplicate legacy methods; synced new pairs and main data files' }
+            { version: '2.3', date: '2025-09-02', changes: 'Refined data loading and fallback logic; removed duplicate legacy methods; synced new pairs and main data files' },
+            { version: '2.4', date: '2025-09-02', changes: 'Fix donation modal handlers; normalize timeframe keys; pretty-print Variations; robust graphs lazy-loading; richer Analysis tab' }
         ];
         
         // Function to increment version before push
@@ -48,7 +49,7 @@
         // Display version info
         console.log(`📊 Console Trading Dashboard v${DASHBOARD_VERSION}`);
         console.log(`📝 Remember to increment version before pushing changes`);
-        console.log(`🔧 Version 2.3: Refined data loading/fallback logic and synced pairs`);
+        console.log(`🔧 Version 2.4: Donation modal fix, timeframe normalization, graphs lazy-load, richer Analysis`);
     </script>
     
     <!-- External CSS -->
