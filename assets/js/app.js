@@ -1020,9 +1020,9 @@ class ConsoleTradingDashboard {
                 this.populateGraphsTab(graphsTab, pair);
             }
             
-            // Populate analysis tab
+            // Populate analysis tab (use the freshly loaded timeframe signals)
             if (analysisTab) {
-                this.populateAnalysisTab(analysisTab, signals);
+                this.populateAnalysisTab(analysisTab, combinedSignals);
             }
             
         } catch (error) {
@@ -1208,19 +1208,28 @@ class ConsoleTradingDashboard {
 
     renderAnalysisData(data, signal) {
         if (signal.dataType === 'signal') {
+            const classification = typeof data.classification === 'string' ? data.classification : JSON.stringify(data.classification || {}, null, 2);
+            const recommendation = typeof data.recommendation === 'string' ? data.recommendation : JSON.stringify(data.recommendation || {}, null, 2);
+            const reasoning = data.analysisAndReasoning || data.reasoning || 'N/A';
             return `
                 <div class="analysis-metrics">
                     <p><strong>Trend:</strong> ${signal.trend || 'N/A'}</p>
                     <p><strong>Action:</strong> ${signal.action || 'N/A'}</p>
-                    <p><strong>Confidence:</strong> ${data.confidence || 'N/A'}</p>
-                    <p><strong>Risk Level:</strong> ${data.riskLevel || 'N/A'}</p>
+                    <p><strong>Classification:</strong></p>
+                    <pre style="white-space:pre-wrap;word-break:break-word;">${classification}</pre>
+                    <p><strong>Recommendation:</strong></p>
+                    <pre style="white-space:pre-wrap;word-break:break-word;">${recommendation}</pre>
+                    <p><strong>Reasoning:</strong></p>
+                    <pre style="white-space:pre-wrap;word-break:break-word;">${reasoning}</pre>
                 </div>
             `;
         } else {
+            const trend = this.getPriceTrend(data);
+            const vol = this.getVolatilityLevel(data);
             return `
                 <div class="analysis-metrics">
-                    <p><strong>Price Trend:</strong> ${this.getPriceTrend(data)}</p>
-                    <p><strong>Volatility:</strong> ${this.getVolatilityLevel(data)}</p>
+                    <p><strong>Price Trend:</strong> ${trend}</p>
+                    <p><strong>Volatility:</strong> ${vol}</p>
                     <p><strong>Support Level:</strong> ${data.support || 'N/A'}</p>
                     <p><strong>Resistance Level:</strong> ${data.resistance || 'N/A'}</p>
                 </div>
