@@ -1,0 +1,74 @@
+{
+  "signal": {
+    "symbol": "OP-USDT",
+    "timestamp": 1756844222.303,
+    "analysis_time": "2025-09-02T21:17:02.303+01:00",
+    
+    "classification": {
+      "type": "NO_SIGNAL",
+      "confidence": "LOW",
+      "confluence_score": "5/10",
+      "expected_win_rate": "30%",
+      "frequency_tier": "LOW"
+    },
+    
+    "recommendation": {
+      "action": "WAIT",
+      "timeframe": "SWING",
+      "entry_range": [
+        0.688,
+        0.693
+      ],
+      "stop_loss": 0.67,
+      "take_profit": [
+        0.74,
+        0.75,
+        0.76
+      ],
+      "risk_reward_ratio": "1.25:1",
+      "max_drawdown": "-4%"
+    },
+    
+    "position_sizing": {
+      "confidence_tier": "LOW",
+      "base_position_percent": 0.5,
+      "max_portfolio_risk": 1,
+      "volatility_adjustment": "NORMAL",
+      "suggested_position_size": "calculated percentage based on portfolio"
+    },
+    
+    "technical_analysis": {
+      "primary_timeframe": "1d",
+      "timeframes_aligned": 2,
+      "trend_direction": "BEARISH",
+      "volume_confirmation": "WEAK",
+      "key_level_proximity": "FAR",
+      "pattern_strength": "WEAK"
+    },
+    
+    "risk_management": {
+      "stop_loss_type": "TECHNICAL",
+      "reward_targets": [
+        {
+          "price": 0.74,
+          "probability": "50%"
+        },
+        {
+          "price": 0.75,
+          "probability": "30%"
+        },
+        {
+          "price": 0.76,
+          "probability": "20%"
+        }
+      ],
+      "exit_strategy": "Scale out at the first target and trail stop for the remaining.",
+      "risk_factors": [
+        "Market volatility",
+        "Current bearish trend"
+      ]
+    },
+    
+    "reasoning": "Based on recent win rate of 30%, the selectivity is adjusted. With a current streak of 2 losses, not sufficient confluence score below the required 8/10, results in a classification of NO_SIGNAL. The asset showed bearish trends, and therefore, the recommendation is to wait for a clearer setup."
+  }
+}
