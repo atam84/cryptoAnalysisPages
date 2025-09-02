@@ -599,19 +599,64 @@ class ConsoleTradingDashboard {
             
             if (!signalData) return null;
 
+            // Detect structure type and normalize for modal renderers
+            const isSignalStructure = !!(signalData.classification || signalData.recommendation || signalData.position_sizing);
+            const isPriceStructure = !!(signalData.support || signalData.resistance || signalData.highest || signalData.lowest);
+
+            if (isSignalStructure) {
+                return {
+                    pair: pairSymbol,
+                    timeframe: timeframe,
+                    timestamp: data.timestamp || new Date().toISOString(),
+                    classification: signalData.classification || {},
+                    recommendation: signalData.recommendation || {},
+                    position_sizing: signalData.position_sizing || {},
+                    technical_analysis: signalData.technical_analysis || {},
+                    risk_management: signalData.risk_management || {},
+                    reasoning: signalData.reasoning || 'No reasoning provided',
+                    trend: this.determineTrend(signalData),
+                    action: this.determineAction(signalData),
+                    data: {
+                        classification: signalData.classification?.type || signalData.classification || 'N/A',
+                        recommendation: signalData.recommendation?.action || signalData.recommendation || 'N/A',
+                        positionSizing: signalData.position_sizing?.position_size || signalData.position_sizing || 'N/A',
+                        technicalAnalysis: signalData.technical_analysis?.trend || signalData.technical_analysis || 'N/A',
+                        riskManagement: signalData.risk_management?.stop_loss_type || signalData.risk_management || 'N/A',
+                        analysisAndReasoning: signalData.reasoning || 'N/A'
+                    },
+                    dataType: 'signal'
+                };
+            }
+
+            if (isPriceStructure) {
+                return {
+                    pair: pairSymbol,
+                    timeframe: timeframe,
+                    timestamp: data.timestamp || new Date().toISOString(),
+                    trend: this.getPriceTrend(signalData).toLowerCase(),
+                    action: 'wait',
+                    data: {
+                        support: signalData.support,
+                        resistance: signalData.resistance,
+                        highest: signalData.highest,
+                        lowest: signalData.lowest,
+                        amplitude: signalData.amplitude,
+                        candles: signalData.candles,
+                        variations: signalData.variations
+                    },
+                    dataType: 'price'
+                };
+            }
+
+            // Unknown structure
             return {
                 pair: pairSymbol,
                 timeframe: timeframe,
                 timestamp: data.timestamp || new Date().toISOString(),
-                classification: signalData.classification || {},
-                recommendation: signalData.recommendation || {},
-                position_sizing: signalData.position_sizing || {},
-                technical_analysis: signalData.technical_analysis || {},
-                risk_management: signalData.risk_management || {},
-                reasoning: signalData.reasoning || 'No reasoning provided',
-                trend: this.determineTrend(signalData),
-                action: this.determineAction(signalData),
-                dataType: 'timeframe'
+                trend: 'neutral',
+                action: 'wait',
+                data: {},
+                dataType: 'unknown'
             };
         } catch (error) {
             console.error(`❌ Error transforming timeframe data for ${pairSymbol} ${timeframe}:`, error);
@@ -941,7 +986,7 @@ class ConsoleTradingDashboard {
         }
     }
 
-    openDetailsModal(pair, signals) {
+    async openDetailsModal(pair, signals) {
         try {
             const modal = document.getElementById('detailsModal');
             const modalTitle = document.getElementById('detailsModalTitle');
@@ -960,12 +1005,16 @@ class ConsoleTradingDashboard {
             // Show modal
             modal.style.display = 'block';
             
+            // Load up-to-date timeframe data for the selected pair
+            const tfSignals = await this.loadTimeframeData({ symbol: pair });
+            const combinedSignals = Array.isArray(signals) && signals.length > 0 ? [...tfSignals] : tfSignals;
+
             // Populate timeframe data
             if (timeframesTab) {
-                this.populateTimeframesTab(timeframesTab, signals);
+                this.populateTimeframesTab(timeframesTab, combinedSignals);
             }
-            
-            // Populate graphs tab
+
+            // Populate graphs tab with available images
             if (graphsTab) {
                 this.populateGraphsTab(graphsTab, pair);
             }
@@ -1098,14 +1147,23 @@ class ConsoleTradingDashboard {
     }
 
     populateGraphsTab(tabElement, pair) {
+        const timeframes = ['1h', '8h', '1d'];
+        const imagesHtml = timeframes.map(tf => {
+            const src = `./assets/pairs/${pair}/graph-${pair}-${tf}.png`;
+            return `
+                <div class="chart-item">
+                    <h5>${pair} - ${tf.toUpperCase()} Chart</h5>
+                    <div class="chart-container">
+                        <img class="chart-image" src="${src}" alt="${pair} ${tf} chart" onerror="this.parentElement.innerHTML='<div class=\'chart-placeholder\'>No ${tf} chart available</div>'">
+                    </div>
+                </div>
+            `;
+        }).join('');
+
         tabElement.innerHTML = `
             <div class="graphs-content">
                 <h4>📊 Charts for ${pair}</h4>
-                <p>Chart functionality coming soon...</p>
-                <div class="chart-placeholder">
-                    <div class="chart-icon">📈</div>
-                    <p>Interactive charts will be displayed here</p>
-                </div>
+                ${imagesHtml}
             </div>
         `;
     }
@@ -1226,6 +1284,100 @@ class ConsoleTradingDashboard {
         if (modal) {
             modal.style.display = 'none';
         }
+    }
+
+    // ===== Donation Modal Logic =====
+    showDonationModal() {
+        const modal = document.getElementById('donationModal');
+        if (!modal) return;
+        this.populateDonationModal();
+        modal.style.display = 'block';
+    }
+
+    hideDonationModal() {
+        const modal = document.getElementById('donationModal');
+        if (modal) modal.style.display = 'none';
+    }
+
+    populateDonationModal() {
+        try {
+            // Tabs
+            const fiatTabBtn = document.querySelector('.donation-tab-btn[data-tab="fiat"]');
+            const cryptoTabBtn = document.querySelector('.donation-tab-btn[data-tab="crypto"]');
+            const fiatTab = document.getElementById('fiatTab');
+            const cryptoTab = document.getElementById('cryptoTab');
+            const currencySelect = document.getElementById('fiatCurrency');
+
+            // Initialize fiat methods
+            if (currencySelect) {
+                const current = currencySelect.value || (DONATION_CONFIG?.settings?.defaultCurrency || 'usd');
+                this.populateFiatMethods(current);
+                currencySelect.onchange = (e) => this.populateFiatMethods(e.target.value);
+            }
+
+            // Initialize crypto options
+            this.populateCryptoOptions();
+
+            // Setup tab switching
+            if (fiatTabBtn && cryptoTabBtn && fiatTab && cryptoTab) {
+                fiatTabBtn.onclick = () => {
+                    fiatTabBtn.classList.add('active');
+                    cryptoTabBtn.classList.remove('active');
+                    fiatTab.style.display = 'block';
+                    cryptoTab.style.display = 'none';
+                };
+                cryptoTabBtn.onclick = () => {
+                    cryptoTabBtn.classList.add('active');
+                    fiatTabBtn.classList.remove('active');
+                    fiatTab.style.display = 'none';
+                    cryptoTab.style.display = 'block';
+                };
+            }
+        } catch (e) {
+            console.error('❌ Error populating donation modal:', e);
+        }
+    }
+
+    populateFiatMethods(currencyKey) {
+        const container = document.getElementById('fiatMethods');
+        if (!container) return;
+
+        const methods = DONATION_CONFIG?.fiat?.[currencyKey] || {};
+        const html = Object.values(methods).map(m => `
+            <a class="donation-method" href="${m.url}" target="_blank" rel="noopener noreferrer">
+                <div class="donation-method-icon">${m.icon || '💳'}</div>
+                <div class="donation-method-info">
+                    <h4>${m.name}</h4>
+                    <p>${m.description || ''}</p>
+                </div>
+            </a>
+        `).join('');
+
+        container.innerHTML = html || '<div class="donation-message">No fiat methods configured.</div>';
+    }
+
+    populateCryptoOptions() {
+        const grid = document.getElementById('cryptoGrid');
+        if (!grid) return;
+
+        const cryptos = DONATION_CONFIG?.crypto || {};
+        const html = Object.values(cryptos).map(c => `
+            <div class="crypto-option">
+                <span class="crypto-icon">${c.icon || '₿'}</span>
+                <div class="crypto-name">${c.name}</div>
+                <div class="crypto-description">${c.description || ''}</div>
+                <div class="crypto-address">
+                    <div class="copy-success" id="copy-${c.name.replace(/\s+/g,'-').toLowerCase()}">Copied!</div>
+                    ${c.address}
+                </div>
+                <div class="crypto-actions">
+                    <button class="crypto-btn copy-btn" onclick="navigator.clipboard && navigator.clipboard.writeText('${c.address}').then(() => { const el = document.getElementById('copy-${c.name.replace(/\s+/g,'-').toLowerCase()}'); if (el) { el.classList.add('show'); setTimeout(()=>el.classList.remove('show'), 1200); } }).catch(()=>{})">Copy Address</button>
+                    <a class="crypto-btn qr-btn" href="${c.qrCode}" target="_blank" rel="noopener noreferrer">View QR</a>
+                </div>
+            </div>
+        `).join('');
+
+        grid.innerHTML = html || '<div class="donation-message">No crypto options configured.</div>';
     }
 
 
