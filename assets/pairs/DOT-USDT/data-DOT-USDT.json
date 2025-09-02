@@ -1,0 +1,55 @@
+{
+  "signal": {
+    "symbol": "DOT-USDT",
+    "timestamp": 1756851615.505,
+    "analysis_time": "2025-09-02T23:20:15.505+01:00",
+    
+    "classification": {
+      "type": "NO_SIGNAL",
+      "confidence": "HIGH",
+      "confluence_score": "7.5/10",
+      "expected_win_rate": "70%",
+      "frequency_tier": "LOW"
+    },
+    
+    "recommendation": {
+      "action": "WAIT",
+      "timeframe": "SWING",
+      "entry_range": [3.7437, 3.7997],
+      "stop_loss": 3.7047,
+      "take_profit": [4.0, 4.1, 4.3],
+      "risk_reward_ratio": "2:1",
+      "max_drawdown": "-2.5%"
+    },
+    
+    "position_sizing": {
+      "confidence_tier": "HIGH",
+      "base_position_percent": 1.5,
+      "max_portfolio_risk": 2,
+      "volatility_adjustment": "REDUCE",
+      "suggested_position_size": "1.5%"
+    },
+    
+    "technical_analysis": {
+      "primary_timeframe": "1d",
+      "timeframes_aligned": 2,
+      "trend_direction": "BEARISH",
+      "volume_confirmation": "STRONG",
+      "key_level_proximity": "NEAR",
+      "pattern_strength": "MODERATE"
+    },
+    
+    "risk_management": {
+      "stop_loss_type": "TECHNICAL",
+      "reward_targets": [
+        {"price": 4.0, "probability": "50%"},
+        {"price": 4.1, "probability": "40%"},
+        {"price": 4.3, "probability": "20%"}
+      ],
+      "exit_strategy": "Monitor key levels for adjustments.",
+      "risk_factors": ["Market volatility", "Recent losses"]
+    },
+    
+    "reasoning": "Given the recent losing streak of 3 and a confluence score of 7.5/10, I recommend a 'WAIT' signal. This aligns with the high-risk factors evident from past performance, indicating a need for confirmation before entering any positions."
+  }
+}
