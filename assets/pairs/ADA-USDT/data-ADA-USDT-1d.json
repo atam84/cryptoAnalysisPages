@@ -1,0 +1,18 @@
+{
+ "symbol": "ADA-USDT",
+ "timeframe": "1d",
+ "support": "0.59",
+ "resistance": "0.84",
+ "highest": "1.02",
+ "Lowest": "0.54",
+ "Amplitude_HL": "0.03",
+ "Candles": "70",
+ "Variations": {
+	"Open_Close": "0.02",
+	"Open_Close_pct": "2.82",
+	"From_High": "0",
+	"Open_Close_pct": "-0.51",
+	"From_Low": "0.03", 
+	"Open_Close_pct": "3.25"
+  }
+}
