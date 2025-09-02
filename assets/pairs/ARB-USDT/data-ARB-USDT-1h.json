@@ -1,0 +1,18 @@
+{
+ "symbol": "ARB-USDT",
+ "timeframe": "1h",
+ "support": "0.48",
+ "resistance": "0.52",
+ "highest": "0.52",
+ "Lowest": "0.47",
+ "Amplitude_HL": "0",
+ "Candles": "70",
+ "Variations": {
+	"Open_Close": "0",
+	"Open_Close_pct": "-0.04",
+	"From_High": "0",
+	"Open_Close_pct": "-0.04",
+	"From_Low": "0", 
+	"Open_Close_pct": "0.52"
+  }
+}
