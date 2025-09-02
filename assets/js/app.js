@@ -132,10 +132,7 @@ class ConsoleTradingDashboard {
         const donateBtn = document.getElementById('donateBtn');
         if (donateBtn) {
             console.log('✅ Donate button found, adding event listener');
-            donateBtn.addEventListener('click', () => {
-                console.log('🔄 Donate button clicked!');
-                this.showDonationModal();
-            });
+            donateBtn.addEventListener('click', this.showDonationModal.bind(this));
         } else {
             console.error('❌ Donate button not found!');
         }
@@ -143,10 +140,7 @@ class ConsoleTradingDashboard {
         // Setup donation modal close button
         const closeDonationModal = document.getElementById('closeDonationModal');
         if (closeDonationModal) {
-            closeDonationModal.addEventListener('click', () => {
-                console.log('🔄 Closing donation modal');
-                this.hideDonationModal();
-            });
+            closeDonationModal.addEventListener('click', this.hideDonationModal.bind(this));
         }
 
         // Setup data status modal
@@ -629,20 +623,27 @@ class ConsoleTradingDashboard {
             }
 
             if (isPriceStructure) {
+                const lowest = signalData.lowest || signalData.Lowest || 'N/A';
+                const amplitude = signalData.amplitude || signalData.Amplitude || signalData.Amplitude_HL || 'N/A';
+                const candles = signalData.candles || signalData.Candles || 'N/A';
+                const variations = signalData.variations || signalData.Variations || 'N/A';
+                const support = signalData.support || 'N/A';
+                const resistance = signalData.resistance || 'N/A';
+                const highest = signalData.highest || 'N/A';
                 return {
                     pair: pairSymbol,
                     timeframe: timeframe,
                     timestamp: data.timestamp || new Date().toISOString(),
-                    trend: this.getPriceTrend(signalData).toLowerCase(),
+                    trend: this.getPriceTrend({ highest, lowest }).toLowerCase(),
                     action: 'wait',
                     data: {
-                        support: signalData.support,
-                        resistance: signalData.resistance,
-                        highest: signalData.highest,
-                        lowest: signalData.lowest,
-                        amplitude: signalData.amplitude,
-                        candles: signalData.candles,
-                        variations: signalData.variations
+                        support: support,
+                        resistance: resistance,
+                        highest: highest,
+                        lowest: lowest,
+                        amplitude: amplitude,
+                        candles: candles,
+                        variations: typeof variations === 'object' ? JSON.stringify(variations) : variations
                     },
                     dataType: 'price'
                 };
