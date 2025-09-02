@@ -1,0 +1,18 @@
+{
+ "symbol": "SAND-USDT",
+ "timeframe": "1d",
+ "support": "0.26",
+ "resistance": "0.3",
+ "highest": "0.36",
+ "Lowest": "0.24",
+ "Amplitude_HL": "0.01",
+ "Candles": "60",
+ "Variations": {
+	"Open_Close": "0",
+	"Open_Close_pct": "1.68",
+	"From_High": "0",
+	"Open_Close_pct": "-0.73",
+	"From_Low": "0.01", 
+	"Open_Close_pct": "2.3"
+  }
+}
