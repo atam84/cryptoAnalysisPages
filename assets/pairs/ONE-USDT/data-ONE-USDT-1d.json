@@ -1,0 +1,18 @@
+{
+ "symbol": "ONE-USDT",
+ "timeframe": "1d",
+ "support": "0.01",
+ "resistance": "0.02",
+ "highest": "0.01",
+ "Lowest": "0.01",
+ "Amplitude_HL": "0",
+ "Candles": "70",
+ "Variations": {
+	"Open_Close": "0",
+	"Open_Close_pct": "2.78",
+	"From_High": "0",
+	"Open_Close_pct": "-0.66",
+	"From_Low": "0", 
+	"Open_Close_pct": "3.65"
+  }
+}
