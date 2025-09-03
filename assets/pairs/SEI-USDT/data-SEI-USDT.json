@@ -1,0 +1,57 @@
+{
+  "signal": {
+    "symbol": "SEI-USDT",
+    "timestamp": 1756898892.142,
+    "analysis_time": "2025-09-03T12:28:12.142+01:00",
+    
+    "classification": {
+      "type": "NO_SIGNAL",
+      "confidence": "LOW",
+      "confluence_score": "6/10",
+      "expected_win_rate": "46.5%",
+      "frequency_tier": "MEDIUM"
+    },
+    
+    "recommendation": {
+      "action": "WAIT",
+      "timeframe": "SWING",
+      "entry_range": [0.2875, 0.2887],
+      "stop_loss": 0.2805,
+      "take_profit": [0.3054, 0.3193],
+      "risk_reward_ratio": "2:1",
+      "max_drawdown": "-3.5%"
+    },
+    
+    "position_sizing": {
+      "confidence_tier": "LOW",
+      "base_position_percent": 0.5,
+      "max_portfolio_risk": 1,
+      "volatility_adjustment": "NORMAL",
+      "suggested_position_size": "calculated percentage based on portfolio"
+    },
+    
+    "technical_analysis": {
+      "primary_timeframe": "1d",
+      "timeframes_aligned": 2,
+      "trend_direction": "NEUTRAL",
+      "volume_confirmation": "HIGH",
+      "key_level_proximity": "NEAR",
+      "pattern_strength": "WEAK"
+    },
+    
+    "risk_management": {
+      "stop_loss_type": "TECHNICAL",
+      "reward_targets": [
+        {"price": 0.3054, "probability": "70%"},
+        {"price": 0.3193, "probability": "60%"}
+      ],
+      "exit_strategy": "Consider exiting at first target or trailing stop after first target hit.",
+      "risk_factors": [
+        "Market volatility",
+        "Recent downward pressure"
+      ]
+    },
+    
+    "reasoning": "Given the current win rate of 46.5%, selectivity requires a stricter confluence score of 8/10 for high-quality signals. The confluence score is 6/10, which does not meet the minimum required for a strong signal classification, thus I recommend waiting."
+  }
+}
