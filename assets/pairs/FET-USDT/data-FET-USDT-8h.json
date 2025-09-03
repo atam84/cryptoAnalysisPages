@@ -1,0 +1,18 @@
+{
+ "symbol": "FET-USDT",
+ "timeframe": "8h",
+ "support": "0.67",
+ "resistance": "0.73",
+ "highest": "0.77",
+ "Lowest": "0.58",
+ "Amplitude_HL": "0.01",
+ "Candles": "70",
+ "Variations": {
+	"Open_Close": "0.01",
+	"Open_Close_pct": "0.97",
+	"From_High": "0",
+	"Open_Close_pct": "-0.32",
+	"From_Low": "0.01", 
+	"Open_Close_pct": "1.16"
+  }
+}
