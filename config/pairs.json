@@ -100,5 +100,11 @@
     "style": ["1h", "8h", "1d"],
     "candles_soft_limit": 140,
     "candles_hard_limit": 150
+  },
+  {
+    "symbol": "PLUME-USDT",
+    "style": ["1h", "8h", "1d"],
+    "candles_soft_limit": 140,
+    "candles_hard_limit": 150
   }
 ]
