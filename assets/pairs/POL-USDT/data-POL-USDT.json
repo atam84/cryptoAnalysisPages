@@ -1,0 +1,71 @@
+{
+  "signal": {
+    "symbol": "POL-USDT",
+    "timestamp": 1756919546.252,
+    "analysis_time": "2025-09-03T18:12:26.252+01:00",
+    
+    "classification": {
+      "type": "MODERATE",
+      "confidence": "MEDIUM",
+      "confluence_score": "6/10",
+      "expected_win_rate": "70%",
+      "frequency_tier": "MEDIUM"
+    },
+    
+    "recommendation": {
+      "action": "BUY",
+      "timeframe": "SWING",
+      "entry_range": [0.284, 0.288],
+      "stop_loss": 0.28329,
+      "take_profit": [
+        0.2948,
+        0.2985,
+        0.3035
+      ],
+      "risk_reward_ratio": "2:1",
+      "max_drawdown": "-3.5%"
+    },
+    
+    "position_sizing": {
+      "confidence_tier": "MEDIUM",
+      "base_position_percent": 1,
+      "max_portfolio_risk": 1.5,
+      "volatility_adjustment": "NORMAL",
+      "suggested_position_size": "calculated percentage based on volatility"
+    },
+    
+    "technical_analysis": {
+      "primary_timeframe": "1d",
+      "timeframes_aligned": 2,
+      "trend_direction": "BULLISH",
+      "volume_confirmation": "STRONG",
+      "key_level_proximity": "NEAR",
+      "pattern_strength": "MODERATE"
+    },
+    
+    "risk_management": {
+      "stop_loss_type": "TECHNICAL",
+      "reward_targets": [
+        {
+          "price": 0.2948,
+          "probability": "60%"
+        },
+        {
+          "price": 0.2985,
+          "probability": "50%"
+        },
+        {
+          "price": 0.3035,
+          "probability": "40%"
+        }
+      ],
+      "exit_strategy": "Exit on next significant resistance level or trailing stop.",
+      "risk_factors": [
+        "Market volatility",
+        "Economic news"
+      ]
+    },
+    
+    "reasoning": "Based on recent win rate of 70%, I am adjusting selectivity to a moderate signal as the confluence score holds steady at 6/10. Given the current streak of 1 loss, position sizing remains standard. The entry range is set to 0.284 - 0.288, with the stop-loss at 0.28329 suitably placed below recent support. The proposed targets reflect achievable resistance levels in the current market context."
+  }
+}
