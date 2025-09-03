@@ -1,0 +1,58 @@
+{
+  "signal": {
+    "symbol": "BTC-USDT",
+    "timestamp": 1756918318.879,
+    "analysis_time": "2025-09-03T17:51:58.879+01:00",
+    
+    "classification": {
+      "type": "NO_SIGNAL",
+      "confidence": "LOW",
+      "confluence_score": "8/10",
+      "expected_win_rate": "65%",
+      "frequency_tier": "MEDIUM"
+    },
+    
+    "recommendation": {
+      "action": "WAIT",
+      "timeframe": "SWING",
+      "entry_range": [110055.626, 113407.574],
+      "stop_loss": 106800,
+      "take_profit": [111000, 112000, 115000],
+      "risk_reward_ratio": 1.7,
+      "max_drawdown": "-3.5%"
+    },
+    
+    "position_sizing": {
+      "confidence_tier": "LOW",
+      "base_position_percent": 0.5,
+      "max_portfolio_risk": 1,
+      "volatility_adjustment": "NORMAL",
+      "suggested_position_size": "0.5%"
+    },
+    
+    "technical_analysis": {
+      "primary_timeframe": "1d",
+      "timeframes_aligned": 3,
+      "trend_direction": "HAUSSIÈRE",
+      "volume_confirmation": "HIGH",
+      "key_level_proximity": "NEAR",
+      "pattern_strength": "MODERATE"
+    },
+    
+    "risk_management": {
+      "stop_loss_type": "TECHNICAL",
+      "reward_targets": [
+        {"price": 111000, "probability": "60%"},
+        {"price": 112000, "probability": "30%"},
+        {"price": 115000, "probability": "10%"}
+      ],
+      "exit_strategy": "Wait for clearer trend confirmation before entering trades.",
+      "risk_factors": [
+        "Market volatility",
+        "Recent performance trends"
+      ]
+    },
+    
+    "reasoning": "The signal is classified as 'NO_SIGNAL' due to the recent losing streak of 4 and a confluence score of 8/10. Although there is some bullish momentum in the market, the need for caution is warranted as the asset has exhibited a history of losses. A wait-and-see approach is advised to avoid compounding losses during this uncertain period."
+  }
+}
