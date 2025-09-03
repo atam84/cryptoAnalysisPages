@@ -1,0 +1,18 @@
+{
+ "symbol": "ATOM-USDT",
+ "timeframe": "1d",
+ "support": "4",
+ "resistance": "4.6",
+ "highest": "5.32",
+ "Lowest": "3.85",
+ "Amplitude_HL": "0.09",
+ "Candles": "70",
+ "Variations": {
+	"Open_Close": "0.04",
+	"Open_Close_pct": "0.8",
+	"From_High": "-0.02",
+	"Open_Close_pct": "-0.47",
+	"From_Low": "0.07", 
+	"Open_Close_pct": "1.49"
+  }
+}
