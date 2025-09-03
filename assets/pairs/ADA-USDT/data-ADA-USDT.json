@@ -1,9 +1,8 @@
-
 {
   "signal": {
     "symbol": "ADA-USDT",
-    "timestamp": 1756851267.086,
-    "analysis_time": "2025-09-02T23:14:27.086+01:00",
+    "timestamp": 1756918789.525,
+    "analysis_time": "2025-09-03T17:59:49.525+01:00",
     
     "classification": {
       "type": "NO_SIGNAL",
@@ -17,14 +16,14 @@
       "action": "WAIT",
       "timeframe": "SWING",
       "entry_range": [
-        0.8156,
-        0.8304
+        0.8112, 
+        0.833
       ],
-      "stop_loss": 0.8078,
+      "stop_loss": 0.8063,
       "take_profit": [
-        0.8381,
-        0.844,
-        0.846
+        0.842,
+        0.846,
+        0.851
       ],
       "risk_reward_ratio": "1.5:1",
       "max_drawdown": "-4%"
@@ -51,15 +50,15 @@
       "stop_loss_type": "TECHNICAL",
       "reward_targets": [
         {
-          "price": 0.8381,
+          "price": 0.842,
           "probability": "60%"
         },
         {
-          "price": 0.844,
+          "price": 0.846,
           "probability": "40%"
         },
         {
-          "price": 0.846,
+          "price": 0.851,
           "probability": "30%"
         }
       ],
@@ -70,6 +69,6 @@
       ]
     },
     
-    "reasoning": "Given the recent history of consecutive losses (4) for ADA-USDT and a confluence score of 6/10, the signal has been classified as NO_SIGNAL. The recent performance indicates a lack of sufficient momentum for a new position, leading to a cautious approach. Therefore, it's advisable to wait for a clearer confirmation or improvement in market conditions."
+    "reasoning": "Given the recent history of consecutive losses (4) for ADA-USDT and a confluence score of 6/10, the signal has been classified as NO_SIGNAL. The recent performance indicates insufficient momentum for a new position, leading to a cautious approach. Therefore, it's advisable to wait for stronger confirmation before entering a trade."
   }
 }

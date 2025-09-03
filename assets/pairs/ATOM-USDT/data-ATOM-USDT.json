@@ -1,9 +1,8 @@
-
 {
   "signal": {
     "symbol": "ATOM-USDT",
-    "timestamp": 1756851766.948,
-    "analysis_time": "2025-09-02T23:22:46.948+01:00",
+    "timestamp": 1756919652.446,
+    "analysis_time": "2025-09-03T18:14:12.446+01:00",
     
     "classification": {
       "type": "NO_SIGNAL",
@@ -16,18 +15,11 @@
     "recommendation": {
       "action": "WAIT",
       "timeframe": "SWING",
-      "entry_range": [
-        4.387,
-        4.447
-      ],
-      "stop_loss": 4.51,
-      "take_profit": [
-        4.6,
-        4.68,
-        4.8
-      ],
-      "risk_reward_ratio": "1.5:1",
-      "max_drawdown": "-3.5%"
+      "entry_range": [4.4684, 4.6005],
+      "stop_loss": 4.4192,
+      "take_profit": [4.6, 4.68, 4.8],
+      "risk_reward_ratio": "2:1",
+      "max_drawdown": "-2.5%"
     },
     
     "position_sizing": {
@@ -39,7 +31,7 @@
     },
     
     "technical_analysis": {
-      "primary_timeframe": "1d",
+      "primary_timeframe": "1h",
       "timeframes_aligned": 2,
       "trend_direction": "BEARISH",
       "volume_confirmation": "STRONG",
@@ -50,16 +42,17 @@
     "risk_management": {
       "stop_loss_type": "TECHNICAL",
       "reward_targets": [
-        { "price": 4.6, "probability": "60%" },
-        { "price": 4.68, "probability": "40%" }
+        {"price": 4.6, "probability": "60%"},
+        {"price": 4.68, "probability": "40%"},
+        {"price": 4.8, "probability": "20%"}
       ],
-      "exit_strategy": "Exiting when price crosses key support or resistance levels",
+      "exit_strategy": "Exiting if the price crosses key support or resistance levels signifying a reversal.",
       "risk_factors": [
         "Market volatility",
-        "Recent negative sentiment affecting ATOM"
+        "Negative news affecting ATOM"
       ]
     },
     
-    "reasoning": "Given the recent losing streak of >= 4 and a confluence score of 6/10, this signal does not meet the criteria for a higher classification and is thus categorized as 'NO_SIGNAL'. It is advisable to wait for stronger confirmation before executing a trade."
+    "reasoning": "Given the recent losing streak of >= 4 and a confluence score of 6/10, this signal does not meet the criteria for higher classifications and is thus categorized as 'NO_SIGNAL'. It is advisable to wait for stronger confirmation before executing a trade."
   }
 }

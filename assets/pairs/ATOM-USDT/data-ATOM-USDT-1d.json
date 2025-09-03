@@ -1,18 +1,18 @@
 {
  "symbol": "ATOM-USDT",
  "timeframe": "1d",
- "support": "4.1",
+ "support": "4",
  "resistance": "4.6",
  "highest": "5.32",
  "Lowest": "3.85",
- "Amplitude_HL": "0.12",
+ "Amplitude_HL": "0.16",
  "Candles": "70",
  "Variations": {
-	"Open_Close": "0.04",
-	"Open_Close_pct": "0.9",
+	"Open_Close": "0.1",
+	"Open_Close_pct": "2.24",
 	"From_High": "-0.03",
-	"Open_Close_pct": "-0.72",
-	"From_Low": "0.09", 
-	"Open_Close_pct": "1.98"
+	"Open_Close_pct": "-0.73",
+	"From_Low": "0.13", 
+	"Open_Close_pct": "2.94"
   }
 }

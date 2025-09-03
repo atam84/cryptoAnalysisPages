@@ -1,8 +1,8 @@
 {
   "signal": {
     "symbol": "ICP-USDT",
-    "timestamp": 1756851117.967,
-    "analysis_time": "2025-09-02T23:11:57.967+01:00",
+    "timestamp": 1756918524.081,
+    "analysis_time": "2025-09-03T17:55:24.081+01:00",
     
     "classification": {
       "type": "NO_SIGNAL",
@@ -15,9 +15,16 @@
     "recommendation": {
       "action": "WAIT",
       "timeframe": "SWING",
-      "entry_range": [4.8404, 4.857],
-      "stop_loss": 4.713,
-      "take_profit": [5.15, 5.29, 5.58],
+      "entry_range": [
+        4.8405,
+        4.9135
+      ],
+      "stop_loss": 4.84,
+      "take_profit": [
+        5.15,
+        5.29,
+        5.58
+      ],
       "risk_reward_ratio": 2.5,
       "max_drawdown": "-2.5%"
     },
@@ -27,7 +34,7 @@
       "base_position_percent": 0.5,
       "max_portfolio_risk": 1,
       "volatility_adjustment": "NORMAL",
-      "suggested_position_size": "2.5%"
+      "suggested_position_size": "calculated percentage"
     },
     
     "technical_analysis": {
@@ -47,12 +54,9 @@
         {"price": 5.58, "probability": "10%"}
       ],
       "exit_strategy": "Monitor market conditions and adjust targets as price moves.",
-      "risk_factors": [
-        "Market volatility",
-        "Low volume periods"
-      ]
+      "risk_factors": ["Market volatility", "Low volume periods"]
     },
     
-    "reasoning": "Based on recent win rate of 70%, I am adjusting selectivity due to a low confluence score of 6/10 amidst a recent streak of three losses. Thus, I am recommending to wait before entering a new position. The defined entry range offers space from the stop-loss at 4.713 and aligns closely with anticipated resistance points, providing a cautious yet prudent approach."
+    "reasoning": "Based on recent performance metrics and history adjustments, I am adjusting selectivity due to the confluence score being at 6/10 amidst a losing streak of 3. Consequently, I am recommending to wait before entering any new positions. The defined entry range of 4.8405 to 4.9135 provides a reasonable end from targets while keeping close to the stop-loss minimizing risk."
   }
 }

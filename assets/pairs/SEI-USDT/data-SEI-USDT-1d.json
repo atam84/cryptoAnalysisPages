@@ -8,11 +8,11 @@
  "Amplitude_HL": "0.01",
  "Candles": "70",
  "Variations": {
-	"Open_Close": "0.01",
-	"Open_Close_pct": "4.21",
+	"Open_Close": "0",
+	"Open_Close_pct": "1.71",
 	"From_High": "0",
-	"Open_Close_pct": "-0.28",
+	"Open_Close_pct": "-0.95",
 	"From_Low": "0.01", 
-	"Open_Close_pct": "4.86"
+	"Open_Close_pct": "3.69"
   }
 }

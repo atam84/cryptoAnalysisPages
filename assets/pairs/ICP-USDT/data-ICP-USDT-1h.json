@@ -1,18 +1,18 @@
 {
  "symbol": "ICP-USDT",
  "timeframe": "1h",
- "support": "4.8",
+ "support": "4.82",
  "resistance": "4.87",
- "highest": "4.94",
+ "highest": "4.93",
  "Lowest": "4.59",
- "Amplitude_HL": "0.02",
+ "Amplitude_HL": "0.04",
  "Candles": "70",
  "Variations": {
-	"Open_Close": "-0.02",
-	"Open_Close_pct": "-0.35",
+	"Open_Close": "0",
+	"Open_Close_pct": "0.02",
 	"From_High": "-0.02",
-	"Open_Close_pct": "-0.35",
-	"From_Low": "0", 
-	"Open_Close_pct": "0.1"
+	"Open_Close_pct": "-0.39",
+	"From_Low": "0.02", 
+	"Open_Close_pct": "0.35"
   }
 }

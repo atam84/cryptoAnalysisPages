@@ -1,9 +1,8 @@
-
 {
   "signal": {
     "symbol": "ZIL-USDT",
-    "timestamp": 1756851413.843,
-    "analysis_time": "2025-09-02T23:16:53.843+01:00",
+    "timestamp": 1756919002.201,
+    "analysis_time": "2025-09-03T18:03:22.201+01:00",
     
     "classification": {
       "type": "NO_SIGNAL",
@@ -16,11 +15,11 @@
     "recommendation": {
       "action": "WAIT",
       "timeframe": "SWING",
-      "entry_range": [0.01117, 0.01144],
-      "stop_loss": 0.0118,
-      "take_profit": [0.01248, 0.01275, 0.013],
-      "risk_reward_ratio": "1.2:1",
-      "max_drawdown": "4%"
+      "entry_range": [0.01145, 0.01147],
+      "stop_loss": 0.01118,
+      "take_profit": [0.0116, 0.0118],
+      "risk_reward_ratio": "2.0:1",
+      "max_drawdown": "-4%"
     },
     
     "position_sizing": {
@@ -43,14 +42,16 @@
     "risk_management": {
       "stop_loss_type": "TECHNICAL",
       "reward_targets": [
-        {"price": 0.01248, "probability": "50%"},
-        {"price": 0.01275, "probability": "30%"},
-        {"price": 0.013, "probability": "20%"}
+        {"price": 0.0116, "probability": "60%"},
+        {"price": 0.0118, "probability": "40%"}
       ],
-      "exit_strategy": "Monitor market reaction for pull-backs or trend confirmations at target levels.",
-      "risk_factors": ["Market volatility", "recent losing streak"]
+      "exit_strategy": "Monitor market conditions for reversals at target levels.",
+      "risk_factors": [
+        "Market volatility",
+        "Recent losing streak"
+      ]
     },
     
-    "reasoning": "Based on recent win rate of 30%, I am adjusting selectivity to 'NO_SIGNAL.' Given the current streak of losses, position sizing remains conservative. This asset recently showed a confluence score of 6/10 and is in neutral territory; therefore, I recommend waiting for clearer signals."
+    "reasoning": "Based on recent win rate of 30%, I am classifying this as NO_SIGNAL given the current losing streak and the confluence score of 6/10. Position sizing remains conservative due to these conditions. While there might be a narrow entry zone, the market does not indicate a strong entry opportunity with high confidence."
   }
 }

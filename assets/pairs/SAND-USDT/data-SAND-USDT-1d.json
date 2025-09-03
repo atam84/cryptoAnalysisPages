@@ -9,10 +9,10 @@
  "Candles": "70",
  "Variations": {
 	"Open_Close": "0.01",
-	"Open_Close_pct": "3.18",
+	"Open_Close_pct": "1.89",
 	"From_High": "0",
-	"Open_Close_pct": "0",
+	"Open_Close_pct": "-0.63",
 	"From_Low": "0.01", 
-	"Open_Close_pct": "3.81"
+	"Open_Close_pct": "2.86"
   }
 }

@@ -1,49 +1,42 @@
 {
   "signal": {
     "symbol": "OP-USDT",
-    "timestamp": 1756851221.477,
-    "analysis_time": "2025-09-02T23:13:41.477+01:00",
+    "timestamp": 1756918709.039,
+    "analysis_time": "2025-09-03T17:58:29.039+01:00",
     
     "classification": {
-      "type": "NO_SIGNAL",
-      "confidence": "LOW",
-      "confluence_score": "5/10",
-      "expected_win_rate": "30%",
-      "frequency_tier": "LOW"
+      "type": "HIGH_QUALITY",
+      "confidence": "HIGH",
+      "confluence_score": "8/10",
+      "expected_win_rate": "70%",
+      "frequency_tier": "MEDIUM"
     },
     
     "recommendation": {
-      "action": "WAIT",
+      "action": "BUY",
       "timeframe": "SWING",
-      "entry_range": [
-        0.6913,
-        0.7267
-      ],
-      "stop_loss": 0.6806,
-      "take_profit": [
-        0.74,
-        0.75,
-        0.76
-      ],
-      "risk_reward_ratio": "1.25:1",
-      "max_drawdown": "-4%"
+      "entry_range": [0.702975, 0.721],
+      "stop_loss": 0.68,
+      "take_profit": [0.74, 0.75, 0.76],
+      "risk_reward_ratio": "2.5:1",
+      "max_drawdown": "-2.5%"
     },
     
     "position_sizing": {
-      "confidence_tier": "LOW",
-      "base_position_percent": 0.5,
-      "max_portfolio_risk": 1,
+      "confidence_tier": "HIGH",
+      "base_position_percent": 1,
+      "max_portfolio_risk": 2,
       "volatility_adjustment": "NORMAL",
       "suggested_position_size": "calculated percentage based on portfolio"
     },
     
     "technical_analysis": {
       "primary_timeframe": "1d",
-      "timeframes_aligned": 2,
-      "trend_direction": "BEARISH",
-      "volume_confirmation": "WEAK",
-      "key_level_proximity": "FAR",
-      "pattern_strength": "WEAK"
+      "timeframes_aligned": 3,
+      "trend_direction": "BULLISH",
+      "volume_confirmation": "STRONG",
+      "key_level_proximity": "NEAR",
+      "pattern_strength": "STRONG"
     },
     
     "risk_management": {
@@ -60,6 +53,6 @@
       ]
     },
     
-    "reasoning": "Based on the recent win rate of 30%, I am adjusting selectivity to maintain risk management. Given the current streak of 2 losses, position sizing remains lower at 0.5%. The asset recently showed a bearish trend with weak volume confirmation, thus the recommendation is to wait for a clearer setup."
+    "reasoning": "Based on the recent win rate of 70%, I am maintaining selectivity while providing a high-quality signal. The performance metrics align with a promising bullish trend following strong volume confirmation and solid proximity to key levels. The entry range is defined just above the expected stop-loss level to mitigate risk while allowing for potential profit taking."
   }
 }

@@ -3,16 +3,16 @@
  "timeframe": "1h",
  "support": "3.28",
  "resistance": "3.32",
- "highest": "3.35",
+ "highest": "3.4",
  "Lowest": "3.11",
- "Amplitude_HL": "0.01",
+ "Amplitude_HL": "0",
  "Candles": "70",
  "Variations": {
 	"Open_Close": "0",
-	"Open_Close_pct": "-0.04",
+	"Open_Close_pct": "0.01",
 	"From_High": "0",
-	"Open_Close_pct": "-0.04",
-	"From_Low": "0.01", 
-	"Open_Close_pct": "0.3"
+	"Open_Close_pct": "-0.01",
+	"From_Low": "0", 
+	"Open_Close_pct": "0.01"
   }
 }

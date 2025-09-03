@@ -1,31 +1,38 @@
 {
   "signal": {
     "symbol": "SOL-USDT",
-    "timestamp": 1756851176.223,
-    "analysis_time": "2025-09-02T23:12:56.223+01:00",
+    "timestamp": 1756918629.783,
+    "analysis_time": "2025-09-03T17:57:09.783+01:00",
     
     "classification": {
-      "type": "MODERATE",
-      "confidence": "MEDIUM",
+      "type": "NO_SIGNAL",
+      "confidence": "LOW",
       "confluence_score": "7/10",
-      "expected_win_rate": "65%",
+      "expected_win_rate": "40%",
       "frequency_tier": "MEDIUM"
     },
     
     "recommendation": {
-      "action": "BUY",
+      "action": "WAIT",
       "timeframe": "SWING",
-      "entry_range": [203.54, 204.54],
-      "stop_loss": 202.3,
-      "take_profit": [206.25, 208.14, 210.63],
+      "entry_range": [
+        201.49,
+        204.54
+      ],
+      "stop_loss": 199.11,
+      "take_profit": [
+        206.25,
+        208.14,
+        210.63
+      ],
       "risk_reward_ratio": "2:1",
       "max_drawdown": "-3.5%"
     },
     
     "position_sizing": {
-      "confidence_tier": "MEDIUM",
-      "base_position_percent": 1,
-      "max_portfolio_risk": 1.5,
+      "confidence_tier": "LOW",
+      "base_position_percent": 0.5,
+      "max_portfolio_risk": 1,
       "volatility_adjustment": "NORMAL",
       "suggested_position_size": "1.0%"
     },
@@ -42,9 +49,18 @@
     "risk_management": {
       "stop_loss_type": "TECHNICAL",
       "reward_targets": [
-        {"price": 206.25, "probability": "65%"},
-        {"price": 208.14, "probability": "60%"},
-        {"price": 210.63, "probability": "55%"}
+        {
+          "price": 206.25,
+          "probability": "65%"
+        },
+        {
+          "price": 208.14,
+          "probability": "60%"
+        },
+        {
+          "price": 210.63,
+          "probability": "55%"
+        }
       ],
       "exit_strategy": "Trail stops to secure profits as price reaches targets.",
       "risk_factors": [
@@ -53,6 +69,6 @@
       ]
     },
     
-    "reasoning": "Based on recent win rate of 65%, I maintain moderate selectivity. The confluence score is 7/10, which signifies reasonable market conditions for entry. The asset currently showed a bullish trend with a strong volume confirmation, while the price is near key resistance levels. Position sizing is determined to be 1.0% of the portfolio to account for the medium confidence tier."
+    "reasoning": "Based on the current win rate of 40%, I am adjusting selectivity downward. The current losing streak affects the position sizing significantly. Given the confluence score of 7/10, I do not recommend entering a new position at this stage. The technical levels indicate a potential bullish trend, but the recent performance urges caution and suggests waiting for better confirmation."
   }
 }

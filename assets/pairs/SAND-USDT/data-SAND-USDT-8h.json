@@ -5,14 +5,14 @@
  "resistance": "0.31",
  "highest": "0.32",
  "Lowest": "0.26",
- "Amplitude_HL": "0.01",
+ "Amplitude_HL": "0",
  "Candles": "70",
  "Variations": {
-	"Open_Close": "0.01",
-	"Open_Close_pct": "2.19",
+	"Open_Close": "0",
+	"Open_Close_pct": "-0.43",
 	"From_High": "0",
-	"Open_Close_pct": "0",
-	"From_Low": "0.01", 
-	"Open_Close_pct": "2.22"
+	"Open_Close_pct": "-0.63",
+	"From_Low": "0", 
+	"Open_Close_pct": "0.3"
   }
 }

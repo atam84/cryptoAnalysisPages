@@ -4,15 +4,15 @@
  "support": "745",
  "resistance": "864",
  "highest": "900.55",
- "Lowest": "792.43",
- "Amplitude_HL": "8.04",
+ "Lowest": "795.5",
+ "Amplitude_HL": "3.54",
  "Candles": "70",
  "Variations": {
-	"Open_Close": "5.01",
-	"Open_Close_pct": "0.59",
-	"From_High": "-1.84",
-	"Open_Close_pct": "-0.22",
-	"From_Low": "6.2", 
-	"Open_Close_pct": "0.73"
+	"Open_Close": "-1.73",
+	"Open_Close_pct": "-0.2",
+	"From_High": "-2.81",
+	"Open_Close_pct": "-0.33",
+	"From_Low": "0.73", 
+	"Open_Close_pct": "0.09"
   }
 }
