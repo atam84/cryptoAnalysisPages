@@ -1,0 +1,18 @@
+{
+ "symbol": "BTC-USDT",
+ "timeframe": "8h",
+ "support": "107260",
+ "resistance": "117822",
+ "highest": "124447.7",
+ "Lowest": "107260",
+ "Amplitude_HL": "819.4",
+ "Candles": "70",
+ "Variations": {
+	"Open_Close": "401.3",
+	"Open_Close_pct": "0.36",
+	"From_High": "-208.3",
+	"Open_Close_pct": "-0.19",
+	"From_Low": "611.1", 
+	"Open_Close_pct": "0.55"
+  }
+}
