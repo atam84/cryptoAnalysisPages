@@ -1,0 +1,58 @@
+{
+  "signal": {
+    "symbol": "SAND-USDT",
+    "timestamp": 1756900339.954,
+    "analysis_time": "2025-09-03T12:52:19.954+01:00",
+    
+    "classification": {
+      "type": "NO_SIGNAL",
+      "confidence": "LOW",
+      "confluence_score": "4/10",
+      "expected_win_rate": "25%",
+      "frequency_tier": "HIGH"
+    },
+    
+    "recommendation": {
+      "action": "WAIT",
+      "timeframe": "SWING",
+      "entry_range": [0.27469, 0.28305],
+      "stop_loss": 0.26736,
+      "take_profit": [0.28, 0.29, 0.31],
+      "risk_reward_ratio": 1.5,
+      "max_drawdown": "-4%"
+    },
+    
+    "position_sizing": {
+      "confidence_tier": "LOW",
+      "base_position_percent": 0.5,
+      "max_portfolio_risk": 1,
+      "volatility_adjustment": "NORMAL",
+      "suggested_position_size": "0.5%"
+    },
+    
+    "technical_analysis": {
+      "primary_timeframe": "1d",
+      "timeframes_aligned": 2,
+      "trend_direction": "NEUTRAL",
+      "volume_confirmation": "HIGH",
+      "key_level_proximity": "NEAR",
+      "pattern_strength": "WEAK"
+    },
+    
+    "risk_management": {
+      "stop_loss_type": "TECHNICAL",
+      "reward_targets": [
+        {"price": 0.28, "probability": "70%"},
+        {"price": 0.29, "probability": "50%"},
+        {"price": 0.31, "probability": "30%"}
+      ],
+      "exit_strategy": "Monitor price action for signs of reversal.",
+      "risk_factors": [
+        "Recent losses in similar patterns",
+        "Low confidence due to confluence score"
+      ]
+    },
+    
+    "reasoning": "Given the recent losing streak of 4 trades and a confluence score of only 4/10, I classify this as NO_SIGNAL. Current market dynamics suggest further confirmation is needed before taking positions. It's critical to exercise caution during this period to prevent additional losses."
+  }
+}
