@@ -1,0 +1,18 @@
+{
+ "symbol": "ICP-USDT",
+ "timeframe": "1h",
+ "support": "4.8",
+ "resistance": "4.85",
+ "highest": "4.94",
+ "Lowest": "4.59",
+ "Amplitude_HL": "0.02",
+ "Candles": "70",
+ "Variations": {
+	"Open_Close": "0",
+	"Open_Close_pct": "0.04",
+	"From_High": "-0.01",
+	"Open_Close_pct": "-0.15",
+	"From_Low": "0.01", 
+	"Open_Close_pct": "0.25"
+  }
+}
