@@ -1,0 +1,18 @@
+{
+ "symbol": "PLUME-USDT",
+ "timeframe": "8h",
+ "support": "0.08",
+ "resistance": "0.12",
+ "highest": "0.12",
+ "Lowest": "0.08",
+ "Amplitude_HL": "0",
+ "Candles": "70",
+ "Variations": {
+	"Open_Close": "0",
+	"Open_Close_pct": "1.21",
+	"From_High": "0",
+	"Open_Close_pct": "-0.07",
+	"From_Low": "0", 
+	"Open_Close_pct": "1.25"
+  }
+}
