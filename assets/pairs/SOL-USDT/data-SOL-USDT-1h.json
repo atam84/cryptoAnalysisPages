@@ -1,0 +1,18 @@
+{
+ "symbol": "SOL-USDT",
+ "timeframe": "1h",
+ "support": "202",
+ "resistance": "208",
+ "highest": "213",
+ "Lowest": "197.84",
+ "Amplitude_HL": "0.88",
+ "Candles": "70",
+ "Variations": {
+	"Open_Close": "0.55",
+	"Open_Close_pct": "0.27",
+	"From_High": "-0.18",
+	"Open_Close_pct": "-0.09",
+	"From_Low": "0.7", 
+	"Open_Close_pct": "0.34"
+  }
+}
