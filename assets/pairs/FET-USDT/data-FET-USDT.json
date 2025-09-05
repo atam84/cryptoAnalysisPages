@@ -1,0 +1,67 @@
+
+{
+  "signal": {
+    "symbol": "FET-USDT",
+    "timestamp": 1757068989.577,
+    "analysis_time": "2025-09-05T11:43:09.577+01:00",
+    
+    "classification": {
+      "type": "NO_SIGNAL",
+      "confidence": "LOW",
+      "confluence_score": "7/10",
+      "expected_win_rate": "30%",
+      "frequency_tier": "LOW"
+    },
+    
+    "recommendation": {
+      "action": "WAIT",
+      "timeframe": "SWING",
+      "entry_range": [
+        0.5934,
+        0.6086
+      ],
+      "stop_loss": 0.5843,
+      "take_profit": [
+        0.6346,
+        0.640,
+        0.645
+      ],
+      "risk_reward_ratio": "1.5:1",
+      "max_drawdown": "-4%"
+    },
+    
+    "position_sizing": {
+      "confidence_tier": "LOW",
+      "base_position_percent": 0.5,
+      "max_portfolio_risk": 1,
+      "volatility_adjustment": "NORMAL",
+      "suggested_position_size": "0.5%"
+    },
+    
+    "technical_analysis": {
+      "primary_timeframe": "1d",
+      "timeframes_aligned": 2,
+      "trend_direction": "BEARISH",
+      "volume_confirmation": "STRONG",
+      "key_level_proximity": "NEAR",
+      "pattern_strength": "WEAK"
+    },
+    
+    "risk_management": {
+      "stop_loss_type": "TECHNICAL",
+      "reward_targets": [
+        {"price": 0.6346, "probability": "60%"},
+        {"price": 0.640, "probability": "50%"},
+        {"price": 0.645, "probability": "40%"}
+      ],
+      "exit_strategy": "Monitor for reversal signals.",
+      "risk_factors": [
+        "Recent losing streak of 5",
+        "Win rate below 30%",
+        "Confluence score just meeting the minimum threshold"
+      ]
+    },
+    
+    "reasoning": "Given the current losing streak of 5 and a confluence score of 7/10, this signal does not represent a reliable entry point. The risk of further losses is significant, thus classified as NO_SIGNAL."
+  }
+}
