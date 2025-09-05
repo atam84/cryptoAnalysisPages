@@ -1,0 +1,18 @@
+{
+ "symbol": "DOT-USDT",
+ "timeframe": "1d",
+ "support": "3.7",
+ "resistance": "4.1",
+ "highest": "4.67",
+ "Lowest": "3.24",
+ "Amplitude_HL": "0.09",
+ "Candles": "70",
+ "Variations": {
+	"Open_Close": "0.07",
+	"Open_Close_pct": "1.76",
+	"From_High": "-0.01",
+	"Open_Close_pct": "-0.33",
+	"From_Low": "0.07", 
+	"Open_Close_pct": "1.93"
+  }
+}
