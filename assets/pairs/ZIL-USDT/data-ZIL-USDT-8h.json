@@ -1,0 +1,18 @@
+{
+ "symbol": "ZIL-USDT",
+ "timeframe": "8h",
+ "support": "0.01",
+ "resistance": "0.01",
+ "highest": "0.01",
+ "Lowest": "0.01",
+ "Amplitude_HL": "0",
+ "Candles": "70",
+ "Variations": {
+	"Open_Close": "0",
+	"Open_Close_pct": "0",
+	"From_High": "0",
+	"Open_Close_pct": "-0.18",
+	"From_Low": "0", 
+	"Open_Close_pct": "0.8"
+  }
+}
