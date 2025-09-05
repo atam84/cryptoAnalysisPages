@@ -1,0 +1,64 @@
+
+{
+  "signal": {
+    "symbol": "ETH-USDT",
+    "timestamp": 1757068302.175,
+    "analysis_time": "2025-09-05T11:31:42.175+01:00",
+    
+    "classification": {
+      "type": "NO_SIGNAL",
+      "confidence": "LOW",
+      "confluence_score": "7/10",
+      "expected_win_rate": "30%",
+      "frequency_tier": "HIGH"
+    },
+    
+    "recommendation": {
+      "action": "WAIT",
+      "timeframe": "N/A",
+      "entry_range": [
+        4345.03,
+        4411.2
+      ],
+      "stop_loss": 4256.81,
+      "take_profit": [
+        4433.26,
+        4475
+      ],
+      "risk_reward_ratio": "0.88:1",
+      "max_drawdown": "-4%"
+    },
+    
+    "position_sizing": {
+      "confidence_tier": "LOW",
+      "base_position_percent": 0.5,
+      "max_portfolio_risk": 1,
+      "volatility_adjustment": "NORMAL",
+      "suggested_position_size": "0.5%"
+    },
+    
+    "technical_analysis": {
+      "primary_timeframe": "1h",
+      "timeframes_aligned": 2,
+      "trend_direction": "BEARISH",
+      "volume_confirmation": "STRONG",
+      "key_level_proximity": "NEAR",
+      "pattern_strength": "MODERATE"
+    },
+    
+    "risk_management": {
+      "stop_loss_type": "TECHNICAL",
+      "reward_targets": [
+        {"price": 4433.26, "probability": "60%"},
+        {"price": 4475, "probability": "50%"}
+      ],
+      "exit_strategy": "Monitor for stronger confirmation.",
+      "risk_factors": [
+        "Recent losing streak",
+        "Market volatility"
+      ]
+    },
+    
+    "reasoning": "Given the recent losing streak of 4 consecutive losses and the confluence score of 7/10, the signal is classified as 'NO_SIGNAL'. Despite showing potential for price movement, the recent performance history suggests caution is required, with waiting for clearer confirmations advised."
+  }
+}
