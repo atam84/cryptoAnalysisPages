@@ -1,0 +1,18 @@
+{
+ "symbol": "SEI-USDT",
+ "timeframe": "1h",
+ "support": "0.27",
+ "resistance": "0.3",
+ "highest": "0.3",
+ "Lowest": "0.28",
+ "Amplitude_HL": "0",
+ "Candles": "70",
+ "Variations": {
+	"Open_Close": "0",
+	"Open_Close_pct": "0.48",
+	"From_High": "0",
+	"Open_Close_pct": "-0.17",
+	"From_Low": "0", 
+	"Open_Close_pct": "0.48"
+  }
+}
